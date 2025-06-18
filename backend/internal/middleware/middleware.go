@@ -1,10 +1,10 @@
 package middleware
 
 import (
-    "net/http"
+	"net/http"
 )
 
 // AuthMiddleware checks for user authentication
 func AuthMiddleware(next http.Handler) http.Handler {
-
+	return nil //à remplir
 }
