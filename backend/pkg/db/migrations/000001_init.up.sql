@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS "users" (
     "avatar" VARCHAR(128) NOT NULL,
     "nick_name" VARCHAR(64) NOT NULL,
     "about" VARCHAR(512) NOT NULL,
+    "date_creation" VARCHAR(25) NOT NULL,
     "private_mode" BOOLEAN NOT NULL,
     PRIMARY KEY("id")
 );
