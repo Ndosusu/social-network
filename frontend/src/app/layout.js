@@ -5,7 +5,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <div className="w-screen h-screen absolute z-0">
+        <div className="w-screen h-screen absolute z-0 bg-black">
           <Beams
             beamWidth={1}
             beamHeight={25}
