@@ -8,11 +8,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type BDD struct {
+type DB struct {
 	Conn *sql.DB
 }
 
-func (db *BDD) OpenConn() {
+func (db *DB) OpenConn() {
 	conn, err := sql.Open("sqlite3", config.DBPath)
 	if err != nil {
 		fmt.Println(err)
@@ -21,7 +21,7 @@ func (db *BDD) OpenConn() {
 	db.Conn = conn
 }
 
-func (db *BDD) CloseConn() {
+func (db *DB) CloseConn() {
 	err := db.Conn.Close()
 	if err != nil {
 		fmt.Println(err)
