@@ -3,11 +3,11 @@ package models
 import "fmt"
 
 type Group struct {
-	Id            int
-	Admin_id      int
-	Title         string
-	About         string
-	Date_creation string
+	Id           int
+	AdminId      int
+	Title        string
+	About        string
+	DateCreation string
 }
 
 func (db *DB) InsertGroup(obj map[string]any) Response {
@@ -45,7 +45,7 @@ func (db *DB) SelectGroupById(obj map[string]any) Response {
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
 	group := Group{}
-	err := result.Scan(&group.Id, &group.Admin_id, &group.Title, &group.About, &group.Date_creation)
+	err := result.Scan(&group.Id, &group.AdminId, &group.Title, &group.About, &group.DateCreation)
 	if err != nil {
 		fmt.Println(err)
 		return Response{Group{}}

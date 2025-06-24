@@ -49,7 +49,7 @@ func (db *DB) InsertUser(obj map[string]any) Response {
 		return Response{0}
 	}
 
-	stmt := "INSERT INTO users(uuid, email, password, first_name, last_name, date_birth, avatar, nick_name, about, date_creation, private_mode) VALUES (?,?,?,?,?,?,?,?,?,?,?);"
+	stmt := "INSERT INTO users (uuid, email, password, first_name, last_name, date_birth, avatar, nick_name, about, date_creation, private_mode) VALUES (?,?,?,?,?,?,?,?,?,?,?);"
 	result, err := db.Conn.Exec(stmt, newUUID, obj["email"], passwordHash, obj["first_name"], obj["last_name"], obj["date_birth"], obj["avatar"], obj["nickname"], obj["about"], utils.GetCurrentTime(), false)
 	if err != nil {
 		fmt.Println(err)
@@ -72,7 +72,7 @@ func (db *DB) SelectUserById(obj map[string]any) Response {
 		}
 	*/
 
-	stmt := "SELECT id, uuid, email, first_name, last_name, date_birth, avatar, nick_name, about, date_creation, private_mode;"
+	stmt := "SELECT id, uuid, email, first_name, last_name, date_birth, avatar, nick_name, about, date_creation, private_mode FROM users WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
 	user := User{}

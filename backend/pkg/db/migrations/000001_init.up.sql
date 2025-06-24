@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS "events" (
     "group_id" INTEGER,
     "title" VARCHAR(64) NOT NULL,
     "about" VARCHAR(512) NOT NULL,
-    "date" VARCHAR(25) NOT NULL,
+    "date_schedule" VARCHAR(25) NOT NULL,
     PRIMARY KEY("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION
