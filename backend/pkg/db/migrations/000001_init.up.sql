@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS "users" (
     "id" INTEGER NOT NULL UNIQUE,
     "uuid" VARCHAR(36) NOT NULL UNIQUE,
     "email" VARCHAR(255) NOT NULL UNIQUE,
-    "password" VARCHAR(128) NOT NULL UNIQUE,
+    "password" VARCHAR(60) NOT NULL UNIQUE,
     "first_name" VARCHAR(64) NOT NULL,
     "last_name" VARCHAR(64) NOT NULL,
     "date_birth" VARCHAR(10) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS "groups" (
 
 CREATE TABLE IF NOT EXISTS "events" (
     "id" INTEGER NOT NULL UNIQUE,
-    "group_id" INTEGER,
+    "group_id" INTEGER NOT NULL,
     "title" VARCHAR(64) NOT NULL,
     "about" VARCHAR(512) NOT NULL,
     "date" VARCHAR(25) NOT NULL,
