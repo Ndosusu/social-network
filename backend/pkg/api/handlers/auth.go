@@ -72,13 +72,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	db.OpenConn()
 	defer db.CloseConn()
 
-	// Check if the email already exists
-	existingUser, _ := models.GetUserByEmail(db.Conn, user.Email)
-	if existingUser != nil {
-		http.Error(w, "Email already exists", http.StatusConflict)
-		return
-	}
-
 	// Set the user's UUID
 	if err := user.Save(db.Conn); err != nil {
 		http.Error(w, "Failed to create user: "+err.Error(), http.StatusInternalServerError)
