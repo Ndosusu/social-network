@@ -34,7 +34,6 @@ func (db *DB) InsertUser(obj map[string]any) Response {
 			nickname : string,
 			avatar : string
 			about : string,
-			method : InsertUser
 		}
 	*/
 
@@ -70,7 +69,6 @@ func (db *DB) SelectUserById(obj map[string]any) Response {
 		expected input (as json object) :
 		{
 			id : int,
-			method : SelectUserById
 		}
 	*/
 
@@ -93,7 +91,6 @@ func (db *DB) Authenticate(obj map[string]any) Response {
 		{
 			mail : string,
 			password : string,
-			method : Authenticate
 		}
 	*/
 	var id int
