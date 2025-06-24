@@ -4,11 +4,28 @@ import { useState } from "react";
 export default function Home() {
   const [loginForm, setLogin] = useState(true)
 
+    const loginResolve = async (event) => {
+        event.preventDefault()
+
+        const formData = new FormData(event.currentTarget)
+        let body = {}
+
+        formData.forEach((val, key) =>{
+            body[key] = val
+        })
+
+        let result = await fetch("localhost:8080/auth/login", {
+            method: 'POST',
+            data: JSON.stringify(body)
+        })
+        console.log(result)
+    }
+
   if (loginForm) {
     return (
       <div className="h-full w-full flex flex-col justify-center items-center text-white gap-10">
         <section className="w-1/3 h-2/4">
-          <form id="login" className="w-full h-full flex flex-col bg-primaryT p-10 justify-between items-center neon-xl rounded-3xl" method="post">
+          <form id="login" onSubmit={loginResolve} className="w-full h-full flex flex-col bg-primaryT p-10 justify-between items-center neon-xl rounded-3xl" method="post">
             <div className="flex flex-col h-fit gap-5 w-full justify-between">
               <input name="Mail" type="text" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Mail"/>
               <input name="Password" type="password" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Password"/>
