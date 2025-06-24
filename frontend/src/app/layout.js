@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
             beamWidth={1}
             beamHeight={25}
             beamNumber={50}
-            lightColor="#BF51FB"
+            lightColor="rgb(191, 81, 251)"
             speed={1}
             noiseIntensity={1.5}
             scale={0.2}

@@ -3,6 +3,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [loginForm, setLogin] = useState(true)
+
   if (loginForm) {
     return (
       <div className="h-full w-full flex flex-col justify-center items-center text-white gap-10">
@@ -13,8 +14,8 @@ export default function Home() {
               <input name="Password" type="password" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Password"/>
             </div>
             <div className="flex flex-col w-full items-center">
-              <input type="submit" className="bg-secondary h-13 w-1/2 rounded-xl neon-xl hover:cursor-pointer text-xl" value="Log in"/>
-              <a className="hover:cursor-pointer" onClick={() => {
+              <input type="submit" className="bg-secondary h-13 w-1/2 rounded-xl neon-xl hover:cursor-pointer text-xl duration-100 ease-in-out hover:scale-110" value="Log in"/>
+              <a className="hover:cursor-pointer underline active:text-secondary" onClick={() => {
                 document.querySelector("#login").reset()
                 setLogin(false)
                 }}>Or register here</a>
@@ -22,9 +23,9 @@ export default function Home() {
           </form>
         </section>
         <div className="bg-primaryT neon-xl rounded-3xl w-1/3 h-1/6 flex flex-row gap-5 p-3 justify-around items-center">
-          <img id="logGoogle" src="/googleLogo.svg" className="w-fit h-3/4 bg-white neon-sm p-2 rounded-xl"></img>
-          <img id="logDiscord" src="/discord.svg" className="w-fit h-3/4 bg-discord neon-sm p-2 rounded-xl"></img>
-          <img id="logGithub" src="/github.svg" className="w-fit h-3/4 bg-black neon-sm p-2 rounded-xl"></img>
+          <img id="logGoogle" src="/googleLogo.svg" className="w-fit h-3/4 bg-white neon-sm p-2 rounded-xl duration-100 ease-in-out hover:scale-110"></img>
+          <img id="logDiscord" src="/discord.svg" className="w-fit h-3/4 bg-discord neon-sm p-2 rounded-xl duration-100 ease-in-out hover:scale-110"></img>
+          <img id="logGithub" src="/github.svg" className="w-fit h-3/4 bg-black neon-sm p-2 rounded-xl duration-100 ease-in-out hover:scale-110"></img>
         </div>
       </div>
     )
@@ -51,8 +52,8 @@ export default function Home() {
               </div>
             </div>
             <div className="flex flex-col w-full items-center">
-              <input type="submit" className="bg-secondary h-13 w-1/2 rounded-xl neon-xl hover:cursor-pointer text-xl" value="Register"/>
-              <a className="hover:cursor-pointer" onClick={() => {
+              <input type="submit" className="bg-secondary h-13 w-1/2 rounded-xl neon-xl hover:cursor-pointer text-xl duration-100 ease-in-out hover:scale-110" value="Register"/>
+              <a className="hover:cursor-pointer underline active:text-secondary" onClick={() => {
                 document.querySelector("#register").reset()
                 setLogin(true)
                 }}>Or log in here</a>
