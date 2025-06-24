@@ -9,16 +9,15 @@ export default function Home() {
 
         const formData = new FormData(event.currentTarget)
         let body = {}
-
+ 
         formData.forEach((val, key) =>{
             body[key] = val
         })
 
-        let result = await fetch("localhost:8080/auth/login", {
+        let result = await fetch("http://localhost:8080/auth/login", {
             method: 'POST',
-            data: JSON.stringify(body)
         })
-        console.log(result)
+        console.log(await result.json())
     }
 
   if (loginForm) {
