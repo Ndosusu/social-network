@@ -56,3 +56,19 @@ func (db *DB) SelectLogById(obj map[string]any) Response {
 
 	return Response{log}
 }
+func (db *DB) DeleteLog(obj map[string]any) Response {
+	/*
+		expected input (as json object) :
+		{
+			id : int,
+		}
+	*/
+	stmt := "DELETE FROM chat_log WHERE id = ?;"
+	_, err := db.Conn.Exec(stmt, obj["id"])
+	if err != nil {
+		fmt.Println(err)
+		return Response{0}
+	}
+
+	return Response{1}
+}

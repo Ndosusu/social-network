@@ -25,7 +25,7 @@ func (db *DB) InsertNotif(obj map[string]any) Response {
 			event_id : int,
 		}
 	*/
-	stmt := "INSERT INTO notifs (type, user_to, user_from, group_id, event_id) VALUES (?, ?, ?, ?, ?);"
+	stmt := "INSERT INTO notifications (type, user_to, user_from, group_id, event_id) VALUES (?, ?, ?, ?, ?);"
 	result, err := db.Conn.Exec(stmt, obj["group_id"], obj["title"], obj["about"], obj["date_schedule"], utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
@@ -47,7 +47,7 @@ func (db *DB) SelectNotifById(obj map[string]any) Response {
 			id : int,
 		}
 	*/
-	stmt := "SELECT id, type, user_to, user_from, group_id, event_id FROM notifs WHERE id = ?;"
+	stmt := "SELECT id, type, user_to, user_from, group_id, event_id FROM notifications WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
 	notif := Notif{}
@@ -58,4 +58,20 @@ func (db *DB) SelectNotifById(obj map[string]any) Response {
 	}
 
 	return Response{notif}
+}
+func (db *DB) DeleteNotif(obj map[string]any) Response {
+	/*
+		expected input (as json object) :
+		{
+			id : int,
+		}
+	*/
+	stmt := "DELETE FROM notifications WHERE id = ?;"
+	_, err := db.Conn.Exec(stmt, obj["id"])
+	if err != nil {
+		fmt.Println(err)
+		return Response{0}
+	}
+
+	return Response{1}
 }

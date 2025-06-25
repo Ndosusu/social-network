@@ -60,3 +60,19 @@ func (db *DB) SelectPostById(obj map[string]any) Response {
 
 	return Response{post}
 }
+func (db *DB) DeletePost(obj map[string]any) Response {
+	/*
+		expected input (as json object) :
+		{
+			id : int,
+		}
+	*/
+	stmt := "DELETE FROM posts WHERE id = ?;"
+	_, err := db.Conn.Exec(stmt, obj["id"])
+	if err != nil {
+		fmt.Println(err)
+		return Response{0}
+	}
+
+	return Response{1}
+}
