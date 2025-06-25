@@ -6,12 +6,13 @@ import (
 )
 
 type Notif struct {
-	Id         int
-	NotifType  int
-	ReceiverId int
-	SenderId   int
-	GroupId    int
-	EventId    int
+	Id           int
+	NotifType    int
+	ReceiverId   int
+	SenderId     int
+	GroupId      int
+	EventId      int
+	DateCreation string
 }
 
 func (db *DB) InsertNotif(obj map[string]any) Response {
@@ -25,8 +26,8 @@ func (db *DB) InsertNotif(obj map[string]any) Response {
 			event_id : int,
 		}
 	*/
-	stmt := "INSERT INTO notifications (type, user_to, user_from, group_id, event_id) VALUES (?, ?, ?, ?, ?);"
-	result, err := db.Conn.Exec(stmt, obj["group_id"], obj["title"], obj["about"], obj["date_schedule"], utils.GetCurrentTime())
+	stmt := "INSERT INTO notifications (type, user_to, user_from, group_id, event_id, date_creation) VALUES (?, ?, ?, ?, ?);"
+	result, err := db.Conn.Exec(stmt, obj["type"], obj["user_to"], obj["user_from"], obj["group_id"], obj["event_id"], utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
 		return Response{0}
@@ -47,11 +48,11 @@ func (db *DB) SelectNotifById(obj map[string]any) Response {
 			id : int,
 		}
 	*/
-	stmt := "SELECT id, type, user_to, user_from, group_id, event_id FROM notifications WHERE id = ?;"
+	stmt := "SELECT id, type, user_to, user_from, group_id, event_id, date_creation FROM notifications WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
 	notif := Notif{}
-	err := result.Scan(&notif.Id, &notif.NotifType, &notif.ReceiverId, &notif.SenderId, &notif.GroupId, &notif.EventId)
+	err := result.Scan(&notif.Id, &notif.NotifType, &notif.ReceiverId, &notif.SenderId, &notif.GroupId, &notif.EventId, &notif.DateCreation)
 	if err != nil {
 		fmt.Println(err)
 		return Response{Notif{}}
