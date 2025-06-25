@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS "likes" (
     "id" INTEGER NOT NULL UNIQUE,
     "user_id" INTEGER NOT NULL,
     "post_id" INTEGER,
-    "comments_id" INTEGER,
+    "comment_id" INTEGER,
     PRIMARY KEY("id"),
     FOREIGN KEY ("user_id") REFERENCES "users"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION,
