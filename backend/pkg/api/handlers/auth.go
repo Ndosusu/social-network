@@ -6,83 +6,109 @@ import (
 	"time"
 )
 
-// func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method != http.MethodPost {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	// Set CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type", "application/json")
 
-// 	registrationMap := make(map[string]any) // Initialize a map to hold registration data
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
-// 	names := [3]string{"nickname", "first_name", "last_name"}
-// 	for _, name := range names { // Iterate over the required fields, check if the form value is present and not empty
-// 		value := r.FormValue(name)
-// 		if value == "" {
-// 			http.Error(w, "Missing "+name, http.StatusBadRequest)
-// 			return
-// 		}
-// 		registrationMap[name] = value // Store the value in the map
-// 	}
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Method not allowed",
+		})
+		return
+	}
 
-// 	ageStr := r.FormValue("age")
-// 	if ageStr == "" {
-// 		http.Error(w, "Missing age", http.StatusBadRequest)
-// 		return
-// 	}
-// 	age, err := strconv.Atoi(ageStr)
-// 	if err != nil || age <= 0 {
-// 		http.Error(w, "Invalid age", http.StatusBadRequest)
-// 		return
-// 	}
-// 	registrationMap["age"] = age
+	// Success response with JSON
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Registration validation successful",
+		"data": map[string]interface{}{
+			"status":    "registered",
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
+		},
+	})
 
-// 	email := r.FormValue("email")
-// 	if match, err := regexp.MatchString(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, email); err != nil || !match {
-// 		http.Error(w, "Invalid email format", http.StatusBadRequest)
-// 		return
-// 	} else {
-// 		registrationMap["email"] = email
-// 	}
+	// registrationMap := make(map[string]any) // Initialize a map to hold registration data
 
-// 	password := r.FormValue("password")
-// 	if password == "" || len(password) < 6 {
-// 		http.Error(w, "Password must be at least 6 characters", http.StatusBadRequest)
-// 		return
-// 	}
-// 	registrationMap["password"] = password
+	// names := [3]string{"nickname", "first_name", "last_name"}
+	// for _, name := range names { // Iterate over the required fields, check if the form value is present and not empty
+	// 	value := r.FormValue(name)
+	// 	if value == "" {
+	// 		http.Error(w, "Missing "+name, http.StatusBadRequest)
+	// 		return
+	// 	}
+	// 	registrationMap[name] = value // Store the value in the map
+	// }
 
-// 	// Create a new user
-// 	user := &models.User{
-// 		Email:       registrationMap["email"].(string),
-// 		Password:    registrationMap["password"].(string),
-// 		FirstName:   registrationMap["first_name"].(string),
-// 		LastName:    registrationMap["last_name"].(string),
-// 		NickName:    registrationMap["nickname"].(string),
-// 		DateBirth:   registrationMap["age"].(int),
-// 		Avatar:      "default_avatar.png",
-// 		About:       "", //TODO
-// 		PrivateMode: false,
-// 	}
+	// ageStr := r.FormValue("age")
+	// if ageStr == "" {
+	// 	http.Error(w, "Missing age", http.StatusBadRequest)
+	// 	return
+	// }
+	// age, err := strconv.Atoi(ageStr)
+	// if err != nil || age <= 0 {
+	// 	http.Error(w, "Invalid age", http.StatusBadRequest)
+	// 	return
+	// }
+	// registrationMap["age"] = age
 
-// 	// Open database connection
-// 	db := &models.BDD{}
-// 	db.OpenConn()
-// 	defer db.CloseConn()
+	// email := r.FormValue("email")
+	// if match, err := regexp.MatchString(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, email); err != nil || !match {
+	// 	http.Error(w, "Invalid email format", http.StatusBadRequest)
+	// 	return
+	// } else {
+	// 	registrationMap["email"] = email
+	// }
 
-// 	// Set the user's UUID
-// 	if err := user.Save(db.Conn); err != nil {
-// 		http.Error(w, "Failed to create user: "+err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
+	// password := r.FormValue("password")
+	// if password == "" || len(password) < 6 {
+	// 	http.Error(w, "Password must be at least 6 characters", http.StatusBadRequest)
+	// 	return
+	// }
+	// registrationMap["password"] = password
 
-// 	//Success response
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.WriteHeader(http.StatusCreated)
-// 	json.NewEncoder(w).Encode(map[string]interface{}{
-// 		"message": "User created successfully",
-// 		"user_id": user.UUID,
-// 	})
-// }
+	// // Create a new user
+	// user := &models.User{
+	// 	Email:       registrationMap["email"].(string),
+	// 	Password:    registrationMap["password"].(string),
+	// 	FirstName:   registrationMap["first_name"].(string),
+	// 	LastName:    registrationMap["last_name"].(string),
+	// 	NickName:    registrationMap["nickname"].(string),
+	// 	DateBirth:   registrationMap["age"].(int),
+	// 	Avatar:      "default_avatar.png",
+	// 	About:       "", //TODO
+	// 	PrivateMode: false,
+	// }
+
+	// // Open database connection
+	// db := &models.BDD{}
+	// db.OpenConn()
+	// defer db.CloseConn()
+
+	// // Set the user's UUID
+	// if err := user.Save(db.Conn); err != nil {
+	// 	http.Error(w, "Failed to create user: "+err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// //Success response
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(http.StatusCreated)
+	// json.NewEncoder(w).Encode(map[string]interface{}{
+	// 	"message": "User created successfully",
+	// 	"user_id": user.UUID,
+	// })
+}
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers
