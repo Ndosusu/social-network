@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS "likes" (
         ON UPDATE NO ACTION ON DELETE NO ACTION,
     FOREIGN KEY ("post_id") REFERENCES "posts"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION,
-    FOREIGN KEY ("comments_id") REFERENCES "comments"("id")
+    FOREIGN KEY ("comment_id") REFERENCES "comment"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
