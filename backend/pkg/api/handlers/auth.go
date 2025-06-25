@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
+	"time"
 )
 
 // func RegisterHandler(w http.ResponseWriter, r *http.Request) {
@@ -84,17 +85,37 @@ import (
 // }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Println("ok")
+	// Set CORS headers
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Content-Type", "application/json")
 
-	w.Write([]byte(`"Je prend un string"`))
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
-	// if r.Method != http.MethodPost {
-	// 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	// 	return
-	// }
+	// Only allow POST method
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Method not allowed",
+		})
+		return
+	}
+
+	// Success response with proper JSON structure
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Login validation successful",
+		"data": map[string]interface{}{
+			"status":    "authenticated",
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
+		},
+	})
 
 	// email := r.FormValue("email")
 	// if email == "" {
