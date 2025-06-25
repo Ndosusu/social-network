@@ -8,6 +8,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Struct to contain any type that result from database operations
+type Response struct {
+	Result any
+}
+
+// Struct to manage database connection
 type DB struct {
 	Conn *sql.DB
 }
