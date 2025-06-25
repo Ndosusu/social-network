@@ -27,8 +27,8 @@ export default function Home() {
         <section className="w-1/3 h-2/4">
           <form id="login" onSubmit={loginResolve} className="w-full h-full flex flex-col bg-primaryT p-10 justify-between items-center neon-xl rounded-3xl" method="post">
             <div className="flex flex-col h-fit gap-5 w-full justify-between">
-              <input name="Mail" type="text" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Mail"/>
-              <input name="Password" type="password" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Password"/>
+              <input name="Mail" type="text" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Mail" required/>
+              <input name="Password" type="password" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Password" required/>
             </div>
             <div className="flex flex-col w-full items-center">
               <input type="submit" className="bg-secondary h-13 w-1/2 rounded-xl neon-xl hover:cursor-pointer text-xl duration-100 ease-in-out hover:scale-110" value="Log in"/>
@@ -50,22 +50,29 @@ export default function Home() {
   else if(!loginForm) {
     return (
       <div className="h-full w-full flex flex-col justify-center items-center text-white">
-        <section className="w-2/5 h-5/6">
+        <section className="w-fit h-5/6">
           <form id="register" className="w-full h-full flex flex-col bg-primaryT p-10 justify-between items-center neon-xl rounded-3xl" method="post">
-            <div className="flex flex-col h-fit gap-5 w-full justify-between">
-              <input name="FirstName" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="First Name"/>
-              <input name="LastName" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="Last Name"/>
-              <input name="Nickname" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="Nickname"/>
-              <input name="Mail" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="Mail"/>
-              <input name="Password" type="password" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="Password"/>
-              <input name="RPassword" type="password" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="Repeat Password"/>
-              <div>
-                <p>Date of Birth:</p>
-                <div className="w-full flex flex-row gap-4">
-                  <input name="Day" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Day" />
-                  <input name="Month" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Month"/>
-                  <input name="Year" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Year"/>
-                </div>          
+            <div className="flex flex-col h-fit gap-5 justify-between">
+              <div className="flex flex-row h-full gap-8">
+                <div className="grid grid-cols-2 gap-5 w-1/2">
+                  <input name="FirstName" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="First Name" required/>
+                  <input name="LastName" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="Last Name" required/>
+                  <input name="Mail" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Mail" required/>
+                  <input name="Password" type="password" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Password" required/>
+                  <input name="RPassword" type="password" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Repeat Password" required/>
+                  <div className="col-span-2">
+                  <p>Date of Birth:</p>
+                    <div className="w-full flex flex-row gap-4">
+                      <input name="Day" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Day" required/>
+                      <input name="Month" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Month" required/>
+                      <input name="Year" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Year" required/>
+                    </div> 
+                  </div>   
+                </div>
+                <div className="grid grid-cols-2 gap-5 w-1/2 auto-rows-max">
+                  <input name="Nickname" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Nickname"/>
+                  <textarea className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2 h-40 resize-none" placeholder="About you" maxLength={512}></textarea>
+                </div>
               </div>
             </div>
             <div className="flex flex-col w-full items-center">
