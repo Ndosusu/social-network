@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
             rotation={60}
           />
         </div>
-        <div id="mainContainer" className="w-screen h-screen absolute z-10 max-w-full max-h-full overflow-scroll">
+        <div id="mainContainer" className="w-screen h-screen absolute z-10 max-w-full max-h-full overflow-hidden">
           {children}
         </div>
       </body>
