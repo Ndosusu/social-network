@@ -111,7 +111,9 @@ export default function Home() {
                         <input name="Avatar" type="file" id="avatar" className="hidden" onChange={changedFile} accept=".gif,.jpg,.jpeg,.png"/>
                         <p>Avatar chosen (optional): </p><p id="fileName">None</p>
                       </div>
-                      <img id="preview" className="w-25 h-25 rounded-xl hidden"></img>
+                      <div className="w-25 h-25">
+                        <img id="preview" className="w-full h-full rounded-xl hidden"></img>
+                      </div>
                     </label>
                     
                   </div>
