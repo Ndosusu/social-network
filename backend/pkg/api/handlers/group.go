@@ -4,7 +4,7 @@ import "net/http"
 
 func GroupHandler(w http.ResponseWriter, r *http.Request) {
 
-	setCORSHeaders(w, r)
+	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodGet && r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -26,7 +26,7 @@ func GroupHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 
-	setCORSHeaders(w, r)
+	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -37,7 +37,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 func RequestJoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 
-	setCORSHeaders(w, r)
+	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -48,7 +48,7 @@ func RequestJoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 func InviteToGroupHandler(w http.ResponseWriter, r *http.Request) {
 
-	setCORSHeaders(w, r)
+	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

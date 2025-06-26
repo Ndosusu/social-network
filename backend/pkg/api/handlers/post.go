@@ -4,7 +4,7 @@ import "net/http"
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
-	setCORSHeaders(w, r)
+	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -14,7 +14,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 func PostHandler(w http.ResponseWriter, r *http.Request) {
 
-	setCORSHeaders(w, r)
+	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

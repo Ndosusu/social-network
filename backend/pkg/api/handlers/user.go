@@ -4,7 +4,7 @@ import "net/http"
 
 func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 
-	setCORSHeaders(w, r)
+	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -15,7 +15,7 @@ func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 func FollowUserHandler(w http.ResponseWriter, r *http.Request) {
 
-	setCORSHeaders(w, r)
+	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
