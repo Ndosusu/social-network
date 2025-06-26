@@ -9,7 +9,7 @@ func InitRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// Authentication routes
-	// mux.HandleFunc("POST /auth/register", handlers.RegisterHandler)
+	mux.HandleFunc("POST /auth/register", handlers.RegisterHandler)
 	mux.HandleFunc("POST /auth/login", handlers.LoginHandler)
 	// mux.HandleFunc("POST /auth/logout", handlers.LogoutHandler)
 

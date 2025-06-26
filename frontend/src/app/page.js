@@ -14,7 +14,7 @@ export default function Home() {
         body[key] = val
     })
 
-    let result = await fetch("localhost:8080/auth/login", {
+    let result = await fetch("http://localhost:8080/auth/login", {
         method: 'POST',
         data: JSON.stringify(body)
     })
@@ -31,7 +31,11 @@ export default function Home() {
         body[key] = val
     })
 
-    console.log(body["Avatar"])
+    let result = await fetch("http://localhost:8080/auth/register",{
+      method: 'POST',
+      data: body,
+    })
+    console.log(result)
   }
 
   const changedFile = async (event) => {
