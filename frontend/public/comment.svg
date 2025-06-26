@@ -3,8 +3,8 @@
     <defs>
         <mask id="middle">
             <rect x="0" y="0" width="50" height="50" fill="white"/>
-            <path d="M47 47 L25 47 L47 25 Z" fill="black"/>
-            <circle r="22" cy="25" cx="25" fill="black"/>
+            <path d="M46 46 L25 46 L46 25 Z" fill="black"/>
+            <circle r="21" cy="25" cx="25" fill="black"/>
         </mask>
     </defs>
     <g mask="url(#middle)" fill="white">

@@ -17,8 +17,8 @@ function PostList() {
                     <div className="w-full h-fit p-2">
                         text
                     </div>
-                    <img src="/comment.svg"></img>
-                    <img src="/like.svg"></img>
+                    <img src="/comment.svg" className="h-8"></img>
+                    <img src="/like.svg" className="h-8"></img>
                 </div>
             </div>
         </div>
