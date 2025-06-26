@@ -4,22 +4,55 @@ import { useState } from "react";
 export default function Home() {
   const [loginForm, setLogin] = useState(true)
 
-    const loginResolve = async (event) => {
-        event.preventDefault()
+  const loginResolve = async (event) => {
+    event.preventDefault()
 
-        const formData = new FormData(event.currentTarget)
-        let body = {}
+    const formData = new FormData(event.currentTarget)
+    let body = {}
 
-        formData.forEach((val, key) =>{
-            body[key] = val
-        })
+    formData.forEach((val, key) =>{
+        body[key] = val
+    })
 
-        let result = await fetch("localhost:8080/auth/login", {
-            method: 'POST',
-            data: JSON.stringify(body)
-        })
-        console.log(result)
-    }
+    let result = await fetch("localhost:8080/auth/login", {
+        method: 'POST',
+        data: JSON.stringify(body)
+    })
+    console.log(result)
+  }
+
+  const registerResolve = async (event) => {
+    event.preventDefault()
+
+    const formData = new FormData(event.currentTarget)
+    let body = {}
+
+    formData.forEach((val, key) =>{
+        body[key] = val
+    })
+
+    console.log(body["Avatar"])
+  }
+
+  const changedFile = async (event) => {
+      const preview = document.querySelector("#preview")
+      const fileName = document.querySelector("#fileName")
+      const file = event.target.files[0]
+      if (file) {
+        let reader = new FileReader()
+        preview.classList.remove("hidden")
+        fileName.textContent = file.name
+        reader.onload = (e) => {
+          preview.setAttribute("src", e.target.result)
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.setAttribute("src", "")
+        preview.classList.add("hidden")
+        fileName.textContent = "None"
+        console.log("no file")
+      }
+  }
 
   if (loginForm) {
     return (
@@ -51,7 +84,7 @@ export default function Home() {
     return (
       <div className="h-full w-full flex flex-col justify-center items-center text-white">
         <section className="w-fit h-5/6">
-          <form id="register" className="w-full h-full flex flex-col bg-primaryT p-10 justify-between items-center neon-xl rounded-3xl" method="post">
+          <form id="register" onSubmit={registerResolve} encType="multipart/form-data" className="w-full h-full flex flex-col bg-primaryT p-10 justify-between items-center neon-xl rounded-3xl" method="post">
             <div className="flex flex-col h-fit gap-5 justify-between">
               <div className="flex flex-row h-full gap-8">
                 <div className="grid grid-cols-2 gap-5 w-1/2">
@@ -65,13 +98,23 @@ export default function Home() {
                     <div className="w-full flex flex-row gap-4">
                       <input name="Day" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Day" required/>
                       <input name="Month" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Month" required/>
-                      <input name="Year" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Year" required/>
+                      <input name="Year" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-max" placeholder="Year" required/>
                     </div> 
                   </div>   
                 </div>
                 <div className="grid grid-cols-2 gap-5 w-1/2 auto-rows-max">
                   <input name="Nickname" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Nickname"/>
-                  <textarea className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2 h-40 resize-none" placeholder="About you" maxLength={512}></textarea>
+                  <textarea name="About" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2 h-40 resize-none" placeholder="About you" maxLength={512}></textarea>
+                  <div className="col-span-2 grid align-center h-fit">
+                    <label htmlFor="avatar" className="bg-primaryT h-fit neon-sm rounded-xl w-full p-2 flex flex-row justify-between" >
+                      <div>
+                        <input name="Avatar" type="file" id="avatar" className="hidden" onChange={changedFile} accept=".gif,.jpg,.jpeg,.png"/>
+                        <p>Avatar chosen: </p><p id="fileName">None</p>
+                      </div>
+                      <img id="preview" className="w-25 h-25 rounded-xl hidden"></img>
+                    </label>
+                    
+                  </div>
                 </div>
               </div>
             </div>
