@@ -7,16 +7,7 @@ import (
 )
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	setCORSHeaders(w, r)
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -112,15 +103,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	setCORSHeaders(w, r)
 
 	// Only allow POST method
 	if r.Method != http.MethodPost {
@@ -198,25 +181,28 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// })
 }
 
-// func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method != http.MethodPost {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
-// 	// Delete the session cookie
-// 	http.SetCookie(w, &http.Cookie{
-// 		Name:     "user_session",
-// 		Value:    "",
-// 		Path:     "/",
-// 		HttpOnly: true,
-// 		Secure:   true,
-// 		SameSite: http.SameSiteLaxMode,
-// 		Expires:  time.Now().Add(-time.Hour),
-// 	})
+	setCORSHeaders(w, r)
 
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(map[string]string{
-// 		"message": "Logout successful",
-// 	})
-// }
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// 	// Delete the session cookie
+	// 	http.SetCookie(w, &http.Cookie{
+	// 		Name:     "user_session",
+	// 		Value:    "",
+	// 		Path:     "/",
+	// 		HttpOnly: true,
+	// 		Secure:   true,
+	// 		SameSite: http.SameSiteLaxMode,
+	// 		Expires:  time.Now().Add(-time.Hour),
+	// 	})
+
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	json.NewEncoder(w).Encode(map[string]string{
+	// 		"message": "Logout successful",
+	// 	})
+}
