@@ -16,8 +16,12 @@ import (
 
 func Connect(dbPath string) error {
 	_, filename, _, _ := runtime.Caller(0)
-	baseDir, _ := strings.CutSuffix(filename, "backend/pkg/db/sqlite/sqlite.go")
+	// CORRECTION: chemin
+	baseDir, _ := strings.CutSuffix(filename, "pkg/db/sqlite/sqlite.go")
 	DBPath := baseDir + config.DBPath + "/" + config.DBName
+
+	log.Printf("Attempting to connect to database at: %s", DBPath)
+
 	db, err := sql.Open("sqlite3", DBPath)
 	if err != nil {
 		return err
@@ -40,7 +44,8 @@ func ApplyMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to create migration driver: %w", err)
 	}
 	_, filename, _, _ := runtime.Caller(0)
-	baseDir, _ := strings.CutSuffix(filename, "backend/pkg/db/sqlite/sqlite.go")
+	// CORRECTION: même correction ici
+	baseDir, _ := strings.CutSuffix(filename, "pkg/db/sqlite/sqlite.go")
 	migrationPath := "file://" + baseDir + config.MigPath
 
 	m, err := migrate.NewWithDatabaseInstance(

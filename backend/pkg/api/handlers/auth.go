@@ -1,10 +1,17 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
+	"runtime"
+	"social-network/config"
+	"social-network/pkg/db/models"
+	"strings"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,11 +108,12 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Registration data received: %+v", registrationData)
 
 	// Gérer le fichier avatar s'il existe
+	avatarPath := "default-avatar.png" // valeur par défaut
 	file, fileHeader, err := r.FormFile("Avatar")
 	if err == nil {
 		defer file.Close()
 		log.Printf("Avatar file received: %s, size: %d", fileHeader.Filename, fileHeader.Size)
-		registrationData["Avatar"] = fileHeader.Filename
+		avatarPath = fileHeader.Filename
 	}
 
 	// Validation basique
@@ -129,13 +137,87 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Connexion à la base de données
+	_, filename, _, _ := runtime.Caller(0)
+	baseDir, _ := strings.CutSuffix(filename, "pkg/api/handlers/auth.go")
+	dbPath := baseDir + config.DBPath + "/" + config.DBName
+
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		log.Printf("Database connection error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Database connection failed",
+		})
+		return
+	}
+	defer db.Close()
+
+	// Préparer les données pour l'insertion en base
+	userModel := &models.DB{Conn: db}
+
+	// Formatter la date de naissance (assurer le format YYYY-MM-DD)
+	day := registrationData["Day"].(string)
+	month := registrationData["Month"].(string)
+	year := registrationData["Year"].(string)
+
+	// Ajouter des zéros si nécessaire
+	if len(day) == 1 {
+		day = "0" + day
+	}
+	if len(month) == 1 {
+		month = "0" + month
+	}
+
+	dateBirth := year + "-" + month + "-" + day
+
+	userData := map[string]any{
+		"email":      registrationData["Mail"],
+		"first_name": registrationData["FirstName"],
+		"last_name":  registrationData["LastName"],
+		"password":   registrationData["Password"],
+		"date_birth": dateBirth,
+		"nickname":   registrationData["Nickname"],
+		"avatar":     avatarPath,
+		"about":      registrationData["About"],
+	}
+
+	// Insérer l'utilisateur en base de données
+	result := userModel.InsertUser(userData)
+
+	// Vérifier si l'insertion a réussi
+	// La fonction InsertUser retourne Response{0} en cas d'erreur
+	if result.Result == 0 {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Failed to create user account",
+		})
+		return
+	}
+
+	// Extraire les données utilisateur du résultat
+	user, ok := result.Result.(models.User)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Failed to retrieve user data",
+		})
+		return
+	}
+
 	// Success response
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
 		"message": "Registration successful",
 		"data": map[string]interface{}{
-			"user_data": registrationData,
+			"user_id":   user.Id,
+			"uuid":      user.Uuid,
+			"email":     user.Email,
+			"nickname":  user.Nickname,
 			"timestamp": time.Now().UTC().Format(time.RFC3339),
 		},
 	})
