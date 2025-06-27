@@ -1,12 +1,4 @@
 export default function Home() {
-    return (
-        <div className="text-white h-full w-full grid items-center">
-            <PostList/>
-        </div>
-    )
-}
-
-function PostList() {
     let temp = [{
         id: 1,
         user: "wiz",
@@ -21,10 +13,12 @@ function PostList() {
         nbCom: "90"
     }]
 
-    return(
-        <div className="bg-primaryT h-5/4 w-2/3 neon-xl center grid items-center">
-            <div className="w-full h-screen overflow-scroll flex flex-col items-center p-4 gap-7">
-                {temp.map((obj, index) => (<CreatePost post={obj} key={obj.id}/>))}
+    return (
+        <div className="text-white h-full w-full grid items-center">
+            <div className="bg-primaryT h-5/4 w-2/3 neon-xl center grid items-center">
+                <div className="w-full h-screen overflow-scroll flex flex-col items-center p-4 gap-7">
+                    {temp.map((obj, index) => (<CreatePost post={obj} key={obj.id}/>))}
+                </div>
             </div>
         </div>
     )
