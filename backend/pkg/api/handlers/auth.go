@@ -14,6 +14,24 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+type LoginRequest struct {
+	Mail     string `json:"mail"`
+	Password string `json:"password"`
+}
+
+type RegisterRequest struct {
+	FirstName string `form:"FirstName"`
+	LastName  string `form:"LastName"`
+	Mail      string `form:"Mail"`
+	Password  string `form:"Password"`
+	RPassword string `form:"RPassword"`
+	Day       string `form:"Day"`
+	Month     string `form:"Month"`
+	Year      string `form:"Year"`
+	Nickname  string `form:"Nickname"`
+	About     string `form:"About"`
+}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -38,10 +56,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Log des données reçues pour debug
-	log.Printf("Login data received: %+v", loginData)
-
-	// Validation basique
+	// Log the received data for debugging, excluding sensitive information
 	mail, mailOk := loginData["Mail"].(string)
 	password, passwordOk := loginData["Password"].(string)
 
@@ -54,13 +69,62 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// DB connection
+	db, err := getDBConnection()
+	if err != nil {
+		log.Printf("Database connection error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Database connection failed",
+		})
+		return
+	}
+	defer db.Close()
+
+	// Verify user credentials
+	userModel := &models.DB{Conn: db}
+	log.Printf("Attempting authentication for email: %s", mail)
+
+	result := userModel.Authenticate(map[string]any{
+		"mail":     mail,
+		"password": password,
+	})
+
+	// Check if authentication failed
+	if result.Result == nil {
+		log.Printf("Authentication failed for email: %s - invalid credentials", mail)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Invalid email or password",
+		})
+		return
+	}
+
+	user, ok := result.Result.(models.User)
+	if !ok || user.Id == 0 {
+		log.Printf("Authentication failed for email: %s - failed to retrieve user data", mail)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Invalid email or password",
+		})
+		return
+	}
+
+	log.Printf("Authentication successful for user: %s (ID: %d, UUID: %s)", user.Email, user.Id, user.Uuid)
+
 	// Success response
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
 		"message": "Login successful",
 		"data": map[string]interface{}{
-			"mail":      mail,
+			"user_id":   user.Id,
+			"uuid":      user.Uuid,
+			"email":     user.Email,
+			"nickname":  user.Nickname,
 			"status":    "authenticated",
 			"timestamp": time.Now().UTC().Format(time.RFC3339),
 		},
@@ -79,7 +143,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse multipart form data (pour gérer les fichiers)
+	// Parse multipart form data
 	err := r.ParseMultipartForm(32 << 20) // 32MB max
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -105,7 +169,15 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Log des données reçues pour debug
-	log.Printf("Registration data received: %+v", registrationData)
+	logData := make(map[string]interface{})
+	for k, v := range registrationData {
+		if k != "Password" && k != "RPassword" {
+			logData[k] = v
+		} else {
+			logData[k] = "[HIDDEN]"
+		}
+	}
+	log.Printf("Registration data received: %+v", logData)
 
 	// Gérer le fichier avatar s'il existe
 	avatarPath := "default-avatar.png" // valeur par défaut
@@ -138,11 +210,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Connexion à la base de données
-	_, filename, _, _ := runtime.Caller(0)
-	baseDir, _ := strings.CutSuffix(filename, "pkg/api/handlers/auth.go")
-	dbPath := baseDir + config.DBPath + "/" + config.DBName
-
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := getDBConnection()
 	if err != nil {
 		log.Printf("Database connection error: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -186,8 +254,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Insérer l'utilisateur en base de données
 	result := userModel.InsertUser(userData)
 
-	// Vérifier si l'insertion a réussi
-	// La fonction InsertUser retourne Response{0} en cas d'erreur
 	if result.Result == 0 {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -236,4 +302,11 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Logout logic here...
+}
+
+func getDBConnection() (*sql.DB, error) {
+	_, filename, _, _ := runtime.Caller(1)
+	baseDir, _ := strings.CutSuffix(filename, "pkg/api/handlers/auth.go")
+	dbPath := baseDir + config.DBPath + "/" + config.DBName
+	return sql.Open("sqlite3", dbPath)
 }

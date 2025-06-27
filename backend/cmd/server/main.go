@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"os/exec"
 	"runtime"
 	"social-network/config"
 	"social-network/pkg/api"
@@ -22,14 +20,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Loading error on file .env: %v", err)
 	}
-
-	cmd := exec.Command("/bin/bash", baseDir+"script/data.sh") // Execute the data script
-	fmt.Println("Executing command:", cmd.String())
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Printf("Error: %s\n", err)
-	}
-	fmt.Printf("Output:\n%s\n", string(output))
 
 	err = sqlite.Connect(config.DBPath)
 	if err != nil {
