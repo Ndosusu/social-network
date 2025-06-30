@@ -57,3 +57,9 @@ input.neon-sm:hover {
   border-top-left-radius: 0.75rem;
   border-top-right-radius: 0.75rem;
 }
+
+.postAction {
+  border-left: none;
+  border-top-right-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+}
