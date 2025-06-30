@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -15,10 +14,7 @@ func main() {
 		fmt.Println("Available script: migrate, pair")
 	}
 
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		log.Fatal("Error getting source file path")
-	}
+	_, filename, _, _ := runtime.Caller(0)
 
 	scriptName := os.Args[1]
 	scriptArgs := os.Args[2:]
