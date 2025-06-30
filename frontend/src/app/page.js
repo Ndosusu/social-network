@@ -1,8 +1,10 @@
 "use client"
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Home() {
   const [loginForm, setLogin] = useState(true)
+  const router = useRouter()
 
   const loginResolve = async (event) => {
     event.preventDefault()
@@ -27,7 +29,7 @@ export default function Home() {
       console.log("Login response:", response)
       
       if (response.success) {
-        alert("Login successful!")
+        router.push("home")
       } else {
         alert("Login failed: " + response.error)
       }
@@ -52,8 +54,7 @@ export default function Home() {
       console.log("Register response:", response)
       
       if (response.success) {
-        alert("Registration successful!")
-        setLogin(true)
+        router.push("home")
       } else {
         alert("Registration failed: " + response.error)
       }
