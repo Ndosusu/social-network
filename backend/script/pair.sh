@@ -2,8 +2,6 @@
 SCRIPT_DIR=$(dirname "$0")
 ENV_FILE="$SCRIPT_DIR/../config/config.env"
 
-echo SCRIPT_DIR: "$SCRIPT_DIR"
-
 if [[ -f "$ENV_FILE" ]]; then
   source "$ENV_FILE"
 else
@@ -11,4 +9,7 @@ else
   exit 1
 fi
 
-migrate create -ext sql -dir "$MIG_PATH" -seq "$@"
+BASE_DIR="$SCRIPT_DIR/../.."
+ABSOLUTE_MIG_PATH="$BASE_DIR/$MIG_PATH"
+
+migrate create -ext sql -dir "$ABSOLUTE_MIG_PATH" -seq "$@"

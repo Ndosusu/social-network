@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS "users" (
     "id" INTEGER NOT NULL UNIQUE,
     "uuid" VARCHAR(36) NOT NULL UNIQUE,
     "email" VARCHAR(255) NOT NULL UNIQUE,
-    "password" VARCHAR(128) NOT NULL UNIQUE,
+    "password" VARCHAR(60) NOT NULL UNIQUE,
     "first_name" VARCHAR(64) NOT NULL,
     "last_name" VARCHAR(64) NOT NULL,
     "date_birth" VARCHAR(10) NOT NULL,
@@ -26,10 +26,10 @@ CREATE TABLE IF NOT EXISTS "groups" (
 
 CREATE TABLE IF NOT EXISTS "events" (
     "id" INTEGER NOT NULL UNIQUE,
-    "group_id" INTEGER,
+    "group_id" INTEGER NOT NULL,
     "title" VARCHAR(64) NOT NULL,
     "about" VARCHAR(512) NOT NULL,
-    "date" VARCHAR(25) NOT NULL,
+    "date_schedule" VARCHAR(25) NOT NULL,
     PRIMARY KEY("id"),
     FOREIGN KEY ("group_id") REFERENCES "groups"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -69,13 +69,13 @@ CREATE TABLE IF NOT EXISTS "likes" (
     "id" INTEGER NOT NULL UNIQUE,
     "user_id" INTEGER NOT NULL,
     "post_id" INTEGER,
-    "comments_id" INTEGER,
+    "comment_id" INTEGER,
     PRIMARY KEY("id"),
     FOREIGN KEY ("user_id") REFERENCES "users"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION,
     FOREIGN KEY ("post_id") REFERENCES "posts"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION,
-    FOREIGN KEY ("comments_id") REFERENCES "comments"("id")
+    FOREIGN KEY ("comment_id") REFERENCES "comment"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 

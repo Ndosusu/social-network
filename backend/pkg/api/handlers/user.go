@@ -3,19 +3,22 @@ package handlers
 import "net/http"
 
 func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	w.Write([]byte("User information endpoint"))
 }
 
 func FollowUserHandler(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
-	w.Write([]byte("Follow user endpoint"))
 }

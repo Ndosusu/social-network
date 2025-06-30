@@ -1,102 +1,40 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
+	"runtime"
+	"social-network/config"
+	"social-network/pkg/db/models"
+	"strings"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
-// func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method != http.MethodPost {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
+type LoginRequest struct {
+	Mail     string `json:"mail"`
+	Password string `json:"password"`
+}
 
-// 	registrationMap := make(map[string]any) // Initialize a map to hold registration data
-
-// 	names := [3]string{"nickname", "first_name", "last_name"}
-// 	for _, name := range names { // Iterate over the required fields, check if the form value is present and not empty
-// 		value := r.FormValue(name)
-// 		if value == "" {
-// 			http.Error(w, "Missing "+name, http.StatusBadRequest)
-// 			return
-// 		}
-// 		registrationMap[name] = value // Store the value in the map
-// 	}
-
-// 	ageStr := r.FormValue("age")
-// 	if ageStr == "" {
-// 		http.Error(w, "Missing age", http.StatusBadRequest)
-// 		return
-// 	}
-// 	age, err := strconv.Atoi(ageStr)
-// 	if err != nil || age <= 0 {
-// 		http.Error(w, "Invalid age", http.StatusBadRequest)
-// 		return
-// 	}
-// 	registrationMap["age"] = age
-
-// 	email := r.FormValue("email")
-// 	if match, err := regexp.MatchString(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, email); err != nil || !match {
-// 		http.Error(w, "Invalid email format", http.StatusBadRequest)
-// 		return
-// 	} else {
-// 		registrationMap["email"] = email
-// 	}
-
-// 	password := r.FormValue("password")
-// 	if password == "" || len(password) < 6 {
-// 		http.Error(w, "Password must be at least 6 characters", http.StatusBadRequest)
-// 		return
-// 	}
-// 	registrationMap["password"] = password
-
-// 	// Create a new user
-// 	user := &models.User{
-// 		Email:       registrationMap["email"].(string),
-// 		Password:    registrationMap["password"].(string),
-// 		FirstName:   registrationMap["first_name"].(string),
-// 		LastName:    registrationMap["last_name"].(string),
-// 		NickName:    registrationMap["nickname"].(string),
-// 		DateBirth:   registrationMap["age"].(int),
-// 		Avatar:      "default_avatar.png",
-// 		About:       "", //TODO
-// 		PrivateMode: false,
-// 	}
-
-// 	// Open database connection
-// 	db := &models.BDD{}
-// 	db.OpenConn()
-// 	defer db.CloseConn()
-
-// 	// Set the user's UUID
-// 	if err := user.Save(db.Conn); err != nil {
-// 		http.Error(w, "Failed to create user: "+err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	//Success response
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.WriteHeader(http.StatusCreated)
-// 	json.NewEncoder(w).Encode(map[string]interface{}{
-// 		"message": "User created successfully",
-// 		"user_id": user.UUID,
-// 	})
-// }
+type RegisterRequest struct {
+	FirstName string `form:"FirstName"`
+	LastName  string `form:"LastName"`
+	Mail      string `form:"Mail"`
+	Password  string `form:"Password"`
+	RPassword string `form:"RPassword"`
+	Day       string `form:"Day"`
+	Month     string `form:"Month"`
+	Year      string `form:"Year"`
+	Nickname  string `form:"Nickname"`
+	About     string `form:"About"`
+}
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	// Set CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Content-Type", "application/json")
 
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	// Only allow POST method
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -106,91 +44,269 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Success response with proper JSON structure
+	// Parse JSON body for login data
+	var loginData map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&loginData)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Invalid JSON data",
+		})
+		return
+	}
+
+	// Log the received data for debugging, excluding sensitive information
+	mail, mailOk := loginData["Mail"].(string)
+	password, passwordOk := loginData["Password"].(string)
+
+	if !mailOk || !passwordOk || mail == "" || password == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Missing email or password",
+		})
+		return
+	}
+
+	// DB connection
+	db, err := getDBConnection()
+	if err != nil {
+		log.Printf("Database connection error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Database connection failed",
+		})
+		return
+	}
+	defer db.Close()
+
+	// Verify user credentials
+	userModel := &models.DB{Conn: db}
+	log.Printf("Attempting authentication for email: %s", mail)
+
+	result := userModel.Authenticate(map[string]any{
+		"mail":     mail,
+		"password": password,
+	})
+
+	// Check if authentication failed
+	if result.Result == nil {
+		log.Printf("Authentication failed for email: %s - invalid credentials", mail)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Invalid email or password",
+		})
+		return
+	}
+
+	user, ok := result.Result.(models.User)
+	if !ok || user.Id == 0 {
+		log.Printf("Authentication failed for email: %s - failed to retrieve user data", mail)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Invalid email or password",
+		})
+		return
+	}
+
+	log.Printf("Authentication successful for user: %s (ID: %d, UUID: %s)", user.Email, user.Id, user.Uuid)
+
+	// Success response
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"message": "Login validation successful",
+		"message": "Login successful",
 		"data": map[string]interface{}{
+			"user_id":   user.Id,
+			"uuid":      user.Uuid,
+			"email":     user.Email,
+			"nickname":  user.Nickname,
 			"status":    "authenticated",
 			"timestamp": time.Now().UTC().Format(time.RFC3339),
 		},
 	})
-
-	// email := r.FormValue("email")
-	// if email == "" {
-	// 	http.Error(w, "Missing email", http.StatusBadRequest)
-	// 	return
-	// }
-
-	// password := r.FormValue("password")
-	// if password == "" {
-	// 	http.Error(w, "Missing password", http.StatusBadRequest)
-	// 	return
-	// }
-
-	// // Open database connection
-	// db := &models.BDD{}
-	// db.OpenConn()
-	// defer db.CloseConn()
-
-	// //
-	// user, err := models.GetUserByEmail(db.Conn, email)
-	// if err != nil {
-	// 	http.Error(w, "Invalid credentials", http.StatusUnauthorized)
-	// 	return
-	// }
-
-	// // Check password
-	// if !user.CheckPassword(password) {
-	// 	http.Error(w, "Invalid credentials", http.StatusUnauthorized)
-	// 	return
-	// }
-
-	// //Create a session cookie
-	// http.SetCookie(w, &http.Cookie{
-	// 	Name:     "user_session",
-	// 	Value:    user.UUID,
-	// 	Path:     "/",
-	// 	HttpOnly: true,
-	// 	Secure:   true,
-	// 	SameSite: http.SameSiteLaxMode,
-	// 	Expires:  time.Now().Add(24 * time.Hour),
-	// })
-
-	// // Success response
-	// w.Header().Set("Content-Type", "application/json")
-	// json.NewEncoder(w).Encode(map[string]interface{}{
-	// 	"message": "Login successful",
-	// 	"user": map[string]interface{}{
-	// 		"id":         user.UUID,
-	// 		"email":      user.Email,
-	// 		"first_name": user.FirstName,
-	// 		"last_name":  user.LastName,
-	// 		"nick_name":  user.NickName,
-	// 	},
-	// })
 }
 
-// func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method != http.MethodPost {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-// 	// Delete the session cookie
-// 	http.SetCookie(w, &http.Cookie{
-// 		Name:     "user_session",
-// 		Value:    "",
-// 		Path:     "/",
-// 		HttpOnly: true,
-// 		Secure:   true,
-// 		SameSite: http.SameSiteLaxMode,
-// 		Expires:  time.Now().Add(-time.Hour),
-// 	})
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Method not allowed",
+		})
+		return
+	}
 
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(map[string]string{
-// 		"message": "Logout successful",
-// 	})
-// }
+	// Parse multipart form data
+	err := r.ParseMultipartForm(32 << 20) // 32MB max
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Failed to parse form data",
+		})
+		return
+	}
+
+	// Récupérer les données du formulaire
+	registrationData := map[string]interface{}{
+		"FirstName": r.FormValue("FirstName"),
+		"LastName":  r.FormValue("LastName"),
+		"Mail":      r.FormValue("Mail"),
+		"Password":  r.FormValue("Password"),
+		"RPassword": r.FormValue("RPassword"),
+		"Day":       r.FormValue("Day"),
+		"Month":     r.FormValue("Month"),
+		"Year":      r.FormValue("Year"),
+		"Nickname":  r.FormValue("Nickname"),
+		"About":     r.FormValue("About"),
+	}
+
+	// Log des données reçues pour debug
+	logData := make(map[string]interface{})
+	for k, v := range registrationData {
+		if k != "Password" && k != "RPassword" {
+			logData[k] = v
+		} else {
+			logData[k] = "[HIDDEN]"
+		}
+	}
+	log.Printf("Registration data received: %+v", logData)
+
+	// Gérer le fichier avatar s'il existe
+	avatarPath := "default-avatar.png" // valeur par défaut
+	file, fileHeader, err := r.FormFile("Avatar")
+	if err == nil {
+		defer file.Close()
+		log.Printf("Avatar file received: %s, size: %d", fileHeader.Filename, fileHeader.Size)
+		avatarPath = fileHeader.Filename
+	}
+
+	// Validation basique
+	if registrationData["FirstName"] == "" || registrationData["LastName"] == "" ||
+		registrationData["Mail"] == "" || registrationData["Password"] == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Missing required fields",
+		})
+		return
+	}
+
+	// Vérifier que les mots de passe correspondent
+	if registrationData["Password"] != registrationData["RPassword"] {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Passwords do not match",
+		})
+		return
+	}
+
+	// Connexion à la base de données
+	db, err := getDBConnection()
+	if err != nil {
+		log.Printf("Database connection error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Database connection failed",
+		})
+		return
+	}
+	defer db.Close()
+
+	// Préparer les données pour l'insertion en base
+	userModel := &models.DB{Conn: db}
+
+	// Formatter la date de naissance (assurer le format YYYY-MM-DD)
+	day := registrationData["Day"].(string)
+	month := registrationData["Month"].(string)
+	year := registrationData["Year"].(string)
+
+	// Ajouter des zéros si nécessaire
+	if len(day) == 1 {
+		day = "0" + day
+	}
+	if len(month) == 1 {
+		month = "0" + month
+	}
+
+	dateBirth := year + "-" + month + "-" + day
+
+	userData := map[string]any{
+		"email":      registrationData["Mail"],
+		"first_name": registrationData["FirstName"],
+		"last_name":  registrationData["LastName"],
+		"password":   registrationData["Password"],
+		"date_birth": dateBirth,
+		"nickname":   registrationData["Nickname"],
+		"avatar":     avatarPath,
+		"about":      registrationData["About"],
+	}
+
+	// Insérer l'utilisateur en base de données
+	result := userModel.InsertUser(userData)
+
+	if result.Result == 0 {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Failed to create user account",
+		})
+		return
+	}
+
+	// Extraire les données utilisateur du résultat
+	user, ok := result.Result.(models.User)
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Failed to retrieve user data",
+		})
+		return
+	}
+
+	// Success response
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Registration successful",
+		"data": map[string]interface{}{
+			"user_id":   user.Id,
+			"uuid":      user.Uuid,
+			"email":     user.Email,
+			"nickname":  user.Nickname,
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
+		},
+	})
+}
+
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if r.Method == http.MethodOptions {
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Logout logic here...
+}
+
+func getDBConnection() (*sql.DB, error) {
+	_, filename, _, _ := runtime.Caller(1)
+	baseDir, _ := strings.CutSuffix(filename, "pkg/api/handlers/auth.go")
+	dbPath := baseDir + config.DBPath + "/" + config.DBName
+	return sql.Open("sqlite3", dbPath)
+}
