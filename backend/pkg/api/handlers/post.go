@@ -1,3 +1,4 @@
+// Package handlers provides HTTP handlers for the social network API
 package handlers
 
 import (
@@ -7,59 +8,48 @@ import (
 	"strconv"
 )
 
-func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Method not allowed",
-		})
-		return
+// Helper functions for post handlers
+func parsePostID(r *http.Request) (int, error) {
+	postIDStr := r.URL.Query().Get("id")
+	if postIDStr == "" {
+		return 0, nil
 	}
+	return strconv.Atoi(postIDStr)
+}
 
-	// Parse JSON body
-	var postData map[string]interface{}
-	err := json.NewDecoder(r.Body).Decode(&postData)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Invalid JSON format",
-		})
-		return
-	}
-
-	// Validate required fields
-	requiredFields := []string{"author_id", "message", "privacy_mode"}
-	for _, field := range requiredFields {
-		if postData[field] == nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"error":   "Missing required field: " + field,
-			})
-			return
+func validateRequiredFields(data map[string]interface{}, fields []string) string {
+	for _, field := range fields {
+		if data[field] == nil {
+			return "Missing required field: " + field
 		}
 	}
+	return ""
+}
 
-	// Connect to database
+func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
+	if !validateMethod(w, r, http.MethodPost) {
+		return
+	}
+
+	var postData map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&postData); err != nil {
+		writeErrorResponse(w, http.StatusBadRequest, "Invalid JSON format")
+		return
+	}
+
+	if errMsg := validateRequiredFields(postData, []string{"author_id", "message", "privacy_mode"}); errMsg != "" {
+		writeErrorResponse(w, http.StatusBadRequest, errMsg)
+		return
+	}
+
 	db, err := getDBConnection()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Database connection failed",
-		})
+		writeErrorResponse(w, http.StatusInternalServerError, "Database connection failed")
 		return
 	}
 	defer db.Close()
 
-	// Create DB instance
-	dbInstance := &models.DB{Conn: db}
-
-	// Set default values for optional fields
+	// Set defaults
 	if postData["image"] == nil {
 		postData["image"] = ""
 	}
@@ -67,363 +57,181 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		postData["group_id"] = 0
 	}
 
-	// Insert post
+	dbInstance := &models.DB{Conn: db}
 	result := dbInstance.InsertPost(postData)
 	if result.Result == 0 {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Failed to create post",
-		})
+		writeErrorResponse(w, http.StatusInternalServerError, "Failed to create post")
 		return
 	}
 
-	// Return success response with created post
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    result.Result,
-		"message": "Post created successfully",
-	})
+	writeSuccessResponse(w, http.StatusCreated, "Post created successfully", result.Result)
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Method not allowed",
-		})
+	if !validateMethod(w, r, http.MethodGet) {
 		return
 	}
 
-	// Get post ID from URL query parameters
-	postIdStr := r.URL.Query().Get("id")
-	if postIdStr == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Post ID is required",
-		})
+	postID, err := parsePostID(r)
+	if err != nil || postID == 0 {
+		writeErrorResponse(w, http.StatusBadRequest, "Invalid or missing post ID")
 		return
 	}
 
-	postId, err := strconv.Atoi(postIdStr)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Invalid post ID format",
-		})
-		return
-	}
-
-	// Connect to database
 	db, err := getDBConnection()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Database connection failed",
-		})
+		writeErrorResponse(w, http.StatusInternalServerError, "Database connection failed")
 		return
 	}
 	defer db.Close()
 
-	// Create DB instance
 	dbInstance := &models.DB{Conn: db}
-
-	// Get post by ID
-	result := dbInstance.SelectPostById(map[string]any{"id": postId})
+	result := dbInstance.SelectPostById(map[string]any{"id": postID})
 	post, ok := result.Result.(models.Post)
 	if !ok || post.Id == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Post not found",
-		})
+		writeErrorResponse(w, http.StatusNotFound, "Post not found")
 		return
 	}
 
-	// Return post data
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    post,
-	})
+	writeSuccessResponse(w, http.StatusOK, "", post)
 }
 
 func PostsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Method not allowed",
-		})
+	if !validateMethod(w, r, http.MethodGet) {
 		return
 	}
 
-	// Get query parameters
-	userIdStr := r.URL.Query().Get("user_id")
-	groupIdStr := r.URL.Query().Get("group_id")
-	privacyModeStr := r.URL.Query().Get("privacy_mode")
-	limitStr := r.URL.Query().Get("limit")
-	offsetStr := r.URL.Query().Get("offset")
-
-	// Parse parameters
+	// Parse query parameters
 	queryParams := make(map[string]any)
 
-	if limitStr != "" {
+	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
 		if limit, err := strconv.Atoi(limitStr); err == nil {
 			queryParams["limit"] = float64(limit)
 		}
 	}
 
-	if offsetStr != "" {
+	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
 		if offset, err := strconv.Atoi(offsetStr); err == nil {
 			queryParams["offset"] = float64(offset)
 		}
 	}
 
-	// Connect to database
 	db, err := getDBConnection()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Database connection failed",
-		})
+		writeErrorResponse(w, http.StatusInternalServerError, "Database connection failed")
 		return
 	}
 	defer db.Close()
 
-	// Create DB instance
 	dbInstance := &models.DB{Conn: db}
-
 	var result models.Response
 
-	// Determine which query to use based on parameters
-	if userIdStr != "" {
-		if userId, err := strconv.Atoi(userIdStr); err == nil {
-			queryParams["user_id"] = userId
+	// Route based on query parameters
+	switch {
+	case r.URL.Query().Get("user_id") != "":
+		if userID, err := strconv.Atoi(r.URL.Query().Get("user_id")); err == nil {
+			queryParams["user_id"] = userID
 			result = dbInstance.SelectPostsByUserId(queryParams)
 		} else {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"error":   "Invalid user ID format",
-			})
+			writeErrorResponse(w, http.StatusBadRequest, "Invalid user ID format")
 			return
 		}
-	} else if groupIdStr != "" {
-		if groupId, err := strconv.Atoi(groupIdStr); err == nil {
-			queryParams["group_id"] = groupId
+	case r.URL.Query().Get("group_id") != "":
+		if groupID, err := strconv.Atoi(r.URL.Query().Get("group_id")); err == nil {
+			queryParams["group_id"] = groupID
 			result = dbInstance.SelectPostsByGroupId(queryParams)
 		} else {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"error":   "Invalid group ID format",
-			})
+			writeErrorResponse(w, http.StatusBadRequest, "Invalid group ID format")
 			return
 		}
-	} else if privacyModeStr != "" {
-		if privacyMode, err := strconv.Atoi(privacyModeStr); err == nil {
+	case r.URL.Query().Get("privacy_mode") != "":
+		if privacyMode, err := strconv.Atoi(r.URL.Query().Get("privacy_mode")); err == nil {
 			queryParams["privacy_mode"] = privacyMode
 			result = dbInstance.SelectPostsByPrivacyMode(queryParams)
 		} else {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"error":   "Invalid privacy mode format",
-			})
+			writeErrorResponse(w, http.StatusBadRequest, "Invalid privacy mode format")
 			return
 		}
-	} else {
-		// Get all posts
+	default:
 		result = dbInstance.SelectAllPosts(queryParams)
 	}
 
-	// Return posts
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    result.Result,
-	})
+	writeSuccessResponse(w, http.StatusOK, "", result.Result)
 }
 
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method != http.MethodDelete {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Method not allowed",
-		})
+	if !validateMethod(w, r, http.MethodDelete) {
 		return
 	}
 
-	// Get post ID from URL query parameters
-	postIdStr := r.URL.Query().Get("id")
-	if postIdStr == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Post ID is required",
-		})
+	postID, err := parsePostID(r)
+	if err != nil || postID == 0 {
+		writeErrorResponse(w, http.StatusBadRequest, "Invalid or missing post ID")
 		return
 	}
 
-	postId, err := strconv.Atoi(postIdStr)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Invalid post ID format",
-		})
-		return
-	}
-
-	// Connect to database
 	db, err := getDBConnection()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Database connection failed",
-		})
+		writeErrorResponse(w, http.StatusInternalServerError, "Database connection failed")
 		return
 	}
 	defer db.Close()
 
-	// Create DB instance
 	dbInstance := &models.DB{Conn: db}
 
-	// Check if post exists first
-	existingPost := dbInstance.SelectPostById(map[string]any{"id": postId})
-	if post, ok := existingPost.Result.(models.Post); !ok || post.Id == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Post not found",
-		})
+	// Check if post exists
+	if existingPost := dbInstance.SelectPostById(map[string]any{"id": postID}); existingPost.Result == nil {
+		writeErrorResponse(w, http.StatusNotFound, "Post not found")
 		return
 	}
 
-	// Delete the post
-	result := dbInstance.DeletePost(map[string]any{"id": postId})
+	result := dbInstance.DeletePost(map[string]any{"id": postID})
 	if result.Result == 0 {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Failed to delete post",
-		})
+		writeErrorResponse(w, http.StatusInternalServerError, "Failed to delete post")
 		return
 	}
 
-	// Return success response
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Post deleted successfully",
-	})
+	writeSuccessResponse(w, http.StatusOK, "Post deleted successfully", nil)
 }
 
 func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method != http.MethodPut {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Method not allowed",
-		})
+	if !validateMethod(w, r, http.MethodPut) {
 		return
 	}
 
-	// Get post ID from URL query parameters
-	postIdStr := r.URL.Query().Get("id")
-	if postIdStr == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Post ID is required",
-		})
+	postID, err := parsePostID(r)
+	if err != nil || postID == 0 {
+		writeErrorResponse(w, http.StatusBadRequest, "Invalid or missing post ID")
 		return
 	}
 
-	postId, err := strconv.Atoi(postIdStr)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Invalid post ID format",
-		})
-		return
-	}
-
-	// Parse JSON body
 	var updateData map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&updateData)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Invalid JSON format",
-		})
+	if err := json.NewDecoder(r.Body).Decode(&updateData); err != nil {
+		writeErrorResponse(w, http.StatusBadRequest, "Invalid JSON format")
 		return
 	}
 
-	// Connect to database
 	db, err := getDBConnection()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Database connection failed",
-		})
+		writeErrorResponse(w, http.StatusInternalServerError, "Database connection failed")
 		return
 	}
 	defer db.Close()
 
-	// Create DB instance
 	dbInstance := &models.DB{Conn: db}
 
-	// Check if post exists first
-	existingPost := dbInstance.SelectPostById(map[string]any{"id": postId})
-	if post, ok := existingPost.Result.(models.Post); !ok || post.Id == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Post not found",
-		})
+	// Check if post exists
+	if existingPost := dbInstance.SelectPostById(map[string]any{"id": postID}); existingPost.Result == nil {
+		writeErrorResponse(w, http.StatusNotFound, "Post not found")
 		return
 	}
 
-	// Add the post ID to the update data
-	updateData["id"] = postId
-
-	// Update the post using UpdatePost method (we'll need to add this to the model)
+	updateData["id"] = postID
 	result := dbInstance.UpdatePost(updateData)
 	if result.Result == 0 {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "Failed to update post",
-		})
+		writeErrorResponse(w, http.StatusInternalServerError, "Failed to update post")
 		return
 	}
 
-	// Return updated post
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    result.Result,
-		"message": "Post updated successfully",
-	})
+	writeSuccessResponse(w, http.StatusOK, "Post updated successfully", result.Result)
 }
