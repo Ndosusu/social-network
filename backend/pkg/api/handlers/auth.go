@@ -300,13 +300,23 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
-	// Logout logic here...
 }
 
 func getDBConnection() (*sql.DB, error) {
 	_, filename, _, _ := runtime.Caller(1)
-	baseDir, _ := strings.CutSuffix(filename, "pkg/api/handlers/auth.go")
+	var baseDir string
+
+	if strings.Contains(filename, "auth.go") {
+		baseDir, _ = strings.CutSuffix(filename, "pkg/api/handlers/auth.go")
+	} else if strings.Contains(filename, "post.go") {
+		baseDir, _ = strings.CutSuffix(filename, "pkg/api/handlers/post.go")
+	} else {
+
+		baseDir, _ = strings.CutSuffix(filename, "pkg/api/handlers/auth.go")
+	}
+
 	dbPath := baseDir + config.DBPath + "/" + config.DBName
+	log.Printf("Attempting to connect to database at: %s", dbPath)
+
 	return sql.Open("sqlite3", dbPath)
 }

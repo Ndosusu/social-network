@@ -42,8 +42,12 @@ func InitRouter() *http.ServeMux {
 
 	// Post routes
 	mux.HandleFunc("POST /posts", corsMiddleware(handlers.CreatePostHandler))
-	mux.HandleFunc("GET /posts", corsMiddleware(handlers.PostHandler))
-	mux.HandleFunc("OPTIONS /posts", corsMiddleware(handlers.PostHandler))
+	mux.HandleFunc("GET /posts", corsMiddleware(handlers.PostsHandler))
+	mux.HandleFunc("GET /posts/single", corsMiddleware(handlers.PostHandler))
+	mux.HandleFunc("PUT /posts", corsMiddleware(handlers.UpdatePostHandler))
+	mux.HandleFunc("DELETE /posts", corsMiddleware(handlers.DeletePostHandler))
+	mux.HandleFunc("OPTIONS /posts", corsMiddleware(handlers.PostsHandler))
+	mux.HandleFunc("OPTIONS /posts/single", corsMiddleware(handlers.PostHandler))
 
 	// Comment routes
 	mux.HandleFunc("GET /comments", corsMiddleware(handlers.CommentsHandler))
