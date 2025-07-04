@@ -1,8 +1,10 @@
 "use client"
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Home() {
   const [loginForm, setLogin] = useState(true)
+  const router = useRouter()
 
   const loginResolve = async (event) => {
     event.preventDefault()
@@ -27,7 +29,8 @@ export default function Home() {
       console.log("Login response:", response)
       
       if (response.success) {
-        alert("Login successful!")
+        localStorage.setItem("logToken", response.data.uuid)
+        router.push("home")
       } else {
         alert("Login failed: " + response.error)
       }
@@ -52,8 +55,8 @@ export default function Home() {
       console.log("Register response:", response)
       
       if (response.success) {
-        alert("Registration successful!")
-        setLogin(true)
+        localStorage.setItem("logToken", response.data.uuid)
+        router.push("home")
       } else {
         alert("Registration failed: " + response.error)
       }
@@ -63,42 +66,38 @@ export default function Home() {
     }
   }
 
-  // const registerResolve = async (event) => {
-  //   event.preventDefault()
-
-  //   const formData = new FormData(event.currentTarget)
-  //   let body = {}
-
-  //   formData.forEach((val, key) =>{
-  //       body[key] = val
-  //   })
-
-  //   let result = await fetch("http://localhost:8080/auth/register",{
-  //     method: 'POST',
-  //     data: body,
-  //   })
-  //   console.log(result)
-  // }
-
   const changedFile = async (event) => {
-      const preview = document.querySelector("#preview")
-      const fileName = document.querySelector("#fileName")
-      const file = event.target.files[0]
-      if (file) {
-        let reader = new FileReader()
-        preview.classList.remove("hidden")
-        fileName.textContent = file.name
-        reader.onload = (e) => {
-          preview.setAttribute("src", e.target.result)
-        };
-        reader.readAsDataURL(file);
-      } else {
-        preview.setAttribute("src", "")
-        preview.classList.add("hidden")
-        fileName.textContent = "None"
-        console.log("no file")
-      }
+    const preview = document.querySelector("#preview")
+    const fileName = document.querySelector("#fileName")
+    const file = event.target.files[0]
+    if (file) {
+      let reader = new FileReader()
+      preview.classList.remove("hidden")
+      fileName.textContent = file.name
+      reader.onload = (e) => {
+        preview.setAttribute("src", e.target.result)
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.setAttribute("src", "")
+      preview.classList.add("hidden")
+      fileName.textContent = "None"
+      console.log("no file")
+    }
   }
+
+  const checkNumber = async (event) => {
+    const input = event.target
+    if(input.value.length >= input.getAttribute("maxLength")) {
+      input.value = input.value.slice(0, input.getAttribute("maxLength"))
+      const next = input.getAttribute("next")
+      if(next) {
+        document.getElementById(next).focus()
+      }
+    }
+  }
+
+  const curYear = new Date().getFullYear()
 
   if (loginForm) {
     return (
@@ -142,9 +141,9 @@ export default function Home() {
                   <div className="col-span-2">
                   <p>Date of Birth:</p>
                     <div className="w-full flex flex-row gap-4">
-                      <input name="Day" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Day" required/>
-                      <input name="Month" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Month" required/>
-                      <input name="Year" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-max" placeholder="Year" required/>
+                      <input id="day" name="Day" type="number" min={1} maxLength={2} onInput={checkNumber} next="month" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Day" required/>
+                      <input id="month" name="Month" type="number" min={1} max={12} maxLength={2} onInput={checkNumber} next="year" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Month" required/>
+                      <input id="year" name="Year" type="number" min={curYear-150} max={curYear} maxLength={4} onInput={checkNumber} className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-max" placeholder="Year" required/>
                     </div> 
                   </div>   
                 </div>

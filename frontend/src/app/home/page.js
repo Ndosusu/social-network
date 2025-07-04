@@ -1,4 +1,10 @@
+"use client"
+import { useRouter } from "next/navigation"
+import { CheckLogToken } from "../checkToken"
+
 export default function Home() {
+    const router = useRouter()
+    CheckLogToken(router)
     let temp = [{
         id: 1,
         user: "wiz",
@@ -11,15 +17,165 @@ export default function Home() {
         content: "abcd",
         nbLike: "1.8k",
         nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
+    },{
+        id: 2,
+        user: "ziw",
+        content: "abcd",
+        nbLike: "1.8k",
+        nbCom: "90"
     }]
+
+    const logOut = async () => {
+        localStorage.removeItem("logToken")
+        router.push("/")
+    }
 
     return (
         <div className="text-white h-full w-full grid items-center">
-            <div className="bg-primaryT h-5/4 w-2/3 neon-xl center grid items-center">
+            <div className="bg-primaryT h-6/4 w-2/3 neon-xl center grid items-center">
                 <div className="w-full h-screen overflow-scroll flex flex-col items-center p-4 gap-7">
-                    {temp.map((obj, index) => (<CreatePost post={obj} key={obj.id}/>))}
+                    {temp.map((obj, index) => (<CreatePost post={obj} key={index}/>))}
                 </div>
             </div>
+            <div className="fixed neon-xl w-1/10 h-fit max-h-5/6 left-5/6 top-1/12 postAction p-7">
+                <div className="neon-sm p-5 rounded-xl flex flex-col items-center">
+                    <img src="/new.svg" className="h-max"></img>
+                    <p className="text-sm text-center">New post</p>
+                </div>
+            </div>
+            <button className="bg-red-500 absolute w-10 h-10" onClick={logOut}></button>
         </div>
     )
 }
