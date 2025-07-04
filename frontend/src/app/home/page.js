@@ -1,172 +1,51 @@
 "use client"
 import { useRouter } from "next/navigation"
 import { CheckLogToken } from "../checkToken"
+import { useEffect, useState } from "react"
 
 export default function Home() {
     const router = useRouter()
+    const [loading, setLoading] = useState(true)
+    const [posts, setPosts] = useState(null)
+
     CheckLogToken(router)
-    let temp = [{
-        id: 1,
-        user: "wiz",
-        content: "text",
-        nbLike: "132k",
-        nbCom: "123"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    },{
-        id: 2,
-        user: "ziw",
-        content: "abcd",
-        nbLike: "1.8k",
-        nbCom: "90"
-    }]
+    
+    useEffect(() => {
+        fetch("http://localhost:8080/posts?limit=15",{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }}).then(data => data.json()).then(data => {
+            if(data.success) {
+                setLoading(false)
+                setPosts(data.data)
+            }
+        })
+    })
+
+    console.log(loading)
+    console.log(posts)
 
     const logOut = async () => {
         localStorage.removeItem("logToken")
         router.push("/")
     }
 
+    const CheckState = () => {
+        if (loading) {
+            return <p>loading...</p>
+        }
+        if (!posts) {
+            return <p>no data.</p>
+        }
+        return posts.map((obj, i) => <CreatePost post={obj} key={i} />)
+    }
+
     return (
         <div className="text-white h-full w-full grid items-center">
             <div className="bg-primaryT h-6/4 w-2/3 neon-xl center grid items-center">
                 <div className="w-full h-screen overflow-scroll flex flex-col items-center p-4 gap-7">
-                    {temp.map((obj, index) => (<CreatePost post={obj} key={index}/>))}
+                    <CheckState />
                 </div>
             </div>
             <div className="fixed neon-xl w-1/10 h-fit max-h-5/6 left-5/6 top-1/12 postAction p-7">
