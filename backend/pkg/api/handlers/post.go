@@ -110,6 +110,19 @@ func PostsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Support for cursor-based pagination
+	if lastIDStr := r.URL.Query().Get("last_id"); lastIDStr != "" {
+		if lastID, err := strconv.Atoi(lastIDStr); err == nil {
+			queryParams["last_id"] = lastID
+		}
+	}
+
+	// Support for timestamp-based pagination
+	if beforeStr := r.URL.Query().Get("before"); beforeStr != "" {
+		queryParams["before"] = beforeStr
+	}
+
+	// Keep offset for backward compatibility, but warn about potential issues
 	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
 		if offset, err := strconv.Atoi(offsetStr); err == nil {
 			queryParams["offset"] = float64(offset)
