@@ -49,10 +49,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	// Set defaults
-	if postData["group_id"] == nil {
-		postData["group_id"] = 0
-	}
+	// Set defaults - group_id will be NULL if not provided
 
 	dbInstance := &models.DB{Conn: db}
 	result := dbInstance.InsertPost(postData)

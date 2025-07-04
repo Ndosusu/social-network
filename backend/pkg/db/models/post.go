@@ -12,7 +12,7 @@ type Post struct {
 	Image       *string
 	Date        string
 	PrivacyMode int
-	GroupId     int
+	GroupId     *int
 }
 
 func (db *DB) InsertPost(obj map[string]any) Response {
@@ -23,7 +23,7 @@ func (db *DB) InsertPost(obj map[string]any) Response {
 			message : string,
 			image : string (optional),
 			privacy_mode : int,
-			group_id : int,
+			group_id : int (optional),
 		}
 	*/
 	var imageValue interface{}
@@ -33,8 +33,15 @@ func (db *DB) InsertPost(obj map[string]any) Response {
 		imageValue = nil
 	}
 
+	var groupIdValue interface{}
+	if obj["group_id"] != nil && obj["group_id"] != 0 {
+		groupIdValue = obj["group_id"]
+	} else {
+		groupIdValue = nil
+	}
+
 	stmt := "INSERT INTO posts (author_id, message, image, privacy_mode, group_id, date) VALUES (?, ?, ?, ?, ?, ?);"
-	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["message"], imageValue, obj["privacy_mode"], obj["group_id"], utils.GetCurrentTime())
+	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["message"], imageValue, obj["privacy_mode"], groupIdValue, utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
 		return Response{0}
@@ -365,7 +372,11 @@ func (db *DB) UpdatePost(obj map[string]any) Response {
 
 	if obj["group_id"] != nil {
 		setParts = append(setParts, "group_id = ?")
-		values = append(values, obj["group_id"])
+		if obj["group_id"] == 0 {
+			values = append(values, nil)
+		} else {
+			values = append(values, obj["group_id"])
+		}
 	}
 
 	if len(setParts) == 0 {
@@ -390,4 +401,63 @@ func (db *DB) UpdatePost(obj map[string]any) Response {
 
 	// Return the updated post
 	return db.SelectPostById(map[string]any{"id": obj["id"]})
+}
+
+func (db *DB) SelectPostsWithoutGroup(obj map[string]any) Response {
+	/*
+		expected input (as json object) :
+		{
+			limit : int (optional),
+			offset : int (optional), // kept for backward compatibility
+			last_id : int (optional), // cursor-based pagination
+			before : string (optional), // timestamp-based pagination
+		}
+	*/
+	limit := 50 // default limit
+
+	if obj["limit"] != nil {
+		limit = int(obj["limit"].(float64))
+	}
+
+	var stmt string
+	var args []interface{}
+
+	// Priority: cursor-based > timestamp-based > offset-based
+	if obj["last_id"] != nil {
+		// Cursor-based pagination using last_id
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id IS NULL AND id < ? ORDER BY id DESC LIMIT ?;"
+		args = []interface{}{obj["last_id"], limit}
+	} else if obj["before"] != nil {
+		// Timestamp-based pagination
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id IS NULL AND date < ? ORDER BY date DESC LIMIT ?;"
+		args = []interface{}{obj["before"], limit}
+	} else {
+		// Fallback to offset-based pagination for backward compatibility
+		offset := 0
+		if obj["offset"] != nil {
+			offset = int(obj["offset"].(float64))
+		}
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id IS NULL ORDER BY date DESC LIMIT ? OFFSET ?;"
+		args = []interface{}{limit, offset}
+	}
+
+	rows, err := db.Conn.Query(stmt, args...)
+	if err != nil {
+		fmt.Println(err)
+		return Response{[]Post{}}
+	}
+	defer rows.Close()
+
+	var posts []Post
+	for rows.Next() {
+		post := Post{}
+		err := rows.Scan(&post.Id, &post.AuthorId, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.GroupId)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		posts = append(posts, post)
+	}
+
+	return Response{posts}
 }
