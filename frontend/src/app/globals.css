@@ -63,3 +63,14 @@ input.neon-sm:hover, textarea.neon-sm:hover, label.neon-sm:hover {
   border-top-right-radius: 0.75rem;
   border-bottom-right-radius: 0.75rem;
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

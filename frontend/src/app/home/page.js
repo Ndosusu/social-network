@@ -1,4 +1,10 @@
+"use client"
+import { useRouter } from "next/navigation"
+import { CheckLogToken } from "../checkToken"
+
 export default function Home() {
+    const router = useRouter()
+    CheckLogToken(router)
     let temp = [{
         id: 1,
         user: "wiz",
@@ -151,6 +157,11 @@ export default function Home() {
         nbCom: "90"
     }]
 
+    const logOut = async () => {
+        localStorage.removeItem("logToken")
+        router.push("/")
+    }
+
     return (
         <div className="text-white h-full w-full grid items-center">
             <div className="bg-primaryT h-6/4 w-2/3 neon-xl center grid items-center">
@@ -164,6 +175,7 @@ export default function Home() {
                     <p className="text-sm text-center">New post</p>
                 </div>
             </div>
+            <button className="bg-red-500 absolute w-10 h-10" onClick={logOut}></button>
         </div>
     )
 }
