@@ -21,7 +21,7 @@ export default function Home() {
                 setPosts(data.data)
             }
         })
-    })
+    }, [])
 
     console.log(loading)
     console.log(posts)
@@ -64,10 +64,10 @@ function CreatePost(data) {
     return (
         <div className="w-5/6 rounded-xl neon-sm">
             <div className="w-full postHeader bg-primaryT p-2">
-                {post.user}
+                {post.AuthorId}
             </div>
             <div className="w-full h-fit p-4">
-                {post.content}
+                {post.Message}
             </div>
             <div className="p-3 flex w-full gap-4">
                 <div className="w-1/10 flex items-center">

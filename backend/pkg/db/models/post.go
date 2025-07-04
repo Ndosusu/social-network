@@ -82,21 +82,40 @@ func (db *DB) SelectAllPosts(obj map[string]any) Response {
 		expected input (as json object) :
 		{
 			limit : int (optional),
-			offset : int (optional),
+			offset : int (optional), // kept for backward compatibility
+			last_id : int (optional), // cursor-based pagination
+			before : string (optional), // timestamp-based pagination
 		}
 	*/
 	limit := 50 // default limit
-	offset := 0 // default offset
 
 	if obj["limit"] != nil {
 		limit = int(obj["limit"].(float64))
 	}
-	if obj["offset"] != nil {
-		offset = int(obj["offset"].(float64))
+
+	var stmt string
+	var args []interface{}
+
+	// Priority: cursor-based > timestamp-based > offset-based
+	if obj["last_id"] != nil {
+		// Cursor-based pagination using last_id
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE id < ? ORDER BY id DESC LIMIT ?;"
+		args = []interface{}{obj["last_id"], limit}
+	} else if obj["before"] != nil {
+		// Timestamp-based pagination
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE date < ? ORDER BY date DESC LIMIT ?;"
+		args = []interface{}{obj["before"], limit}
+	} else {
+		// Fallback to offset-based pagination for backward compatibility
+		offset := 0
+		if obj["offset"] != nil {
+			offset = int(obj["offset"].(float64))
+		}
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts ORDER BY date DESC LIMIT ? OFFSET ?;"
+		args = []interface{}{limit, offset}
 	}
 
-	stmt := "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts ORDER BY date DESC LIMIT ? OFFSET ?;"
-	rows, err := db.Conn.Query(stmt, limit, offset)
+	rows, err := db.Conn.Query(stmt, args...)
 	if err != nil {
 		fmt.Println(err)
 		return Response{[]Post{}}
@@ -123,21 +142,40 @@ func (db *DB) SelectPostsByUserId(obj map[string]any) Response {
 		{
 			user_id : int,
 			limit : int (optional),
-			offset : int (optional),
+			offset : int (optional), // kept for backward compatibility
+			last_id : int (optional), // cursor-based pagination
+			before : string (optional), // timestamp-based pagination
 		}
 	*/
 	limit := 50 // default limit
-	offset := 0 // default offset
 
 	if obj["limit"] != nil {
 		limit = int(obj["limit"].(float64))
 	}
-	if obj["offset"] != nil {
-		offset = int(obj["offset"].(float64))
+
+	var stmt string
+	var args []interface{}
+
+	// Priority: cursor-based > timestamp-based > offset-based
+	if obj["last_id"] != nil {
+		// Cursor-based pagination using last_id
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE author_id = ? AND id < ? ORDER BY id DESC LIMIT ?;"
+		args = []interface{}{obj["user_id"], obj["last_id"], limit}
+	} else if obj["before"] != nil {
+		// Timestamp-based pagination
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE author_id = ? AND date < ? ORDER BY date DESC LIMIT ?;"
+		args = []interface{}{obj["user_id"], obj["before"], limit}
+	} else {
+		// Fallback to offset-based pagination for backward compatibility
+		offset := 0
+		if obj["offset"] != nil {
+			offset = int(obj["offset"].(float64))
+		}
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE author_id = ? ORDER BY date DESC LIMIT ? OFFSET ?;"
+		args = []interface{}{obj["user_id"], limit, offset}
 	}
 
-	stmt := "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE author_id = ? ORDER BY date DESC LIMIT ? OFFSET ?;"
-	rows, err := db.Conn.Query(stmt, obj["user_id"], limit, offset)
+	rows, err := db.Conn.Query(stmt, args...)
 	if err != nil {
 		fmt.Println(err)
 		return Response{[]Post{}}
@@ -164,21 +202,40 @@ func (db *DB) SelectPostsByGroupId(obj map[string]any) Response {
 		{
 			group_id : int,
 			limit : int (optional),
-			offset : int (optional),
+			offset : int (optional), // kept for backward compatibility
+			last_id : int (optional), // cursor-based pagination
+			before : string (optional), // timestamp-based pagination
 		}
 	*/
 	limit := 50 // default limit
-	offset := 0 // default offset
 
 	if obj["limit"] != nil {
 		limit = int(obj["limit"].(float64))
 	}
-	if obj["offset"] != nil {
-		offset = int(obj["offset"].(float64))
+
+	var stmt string
+	var args []interface{}
+
+	// Priority: cursor-based > timestamp-based > offset-based
+	if obj["last_id"] != nil {
+		// Cursor-based pagination using last_id
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id = ? AND id < ? ORDER BY id DESC LIMIT ?;"
+		args = []interface{}{obj["group_id"], obj["last_id"], limit}
+	} else if obj["before"] != nil {
+		// Timestamp-based pagination
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id = ? AND date < ? ORDER BY date DESC LIMIT ?;"
+		args = []interface{}{obj["group_id"], obj["before"], limit}
+	} else {
+		// Fallback to offset-based pagination for backward compatibility
+		offset := 0
+		if obj["offset"] != nil {
+			offset = int(obj["offset"].(float64))
+		}
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id = ? ORDER BY date DESC LIMIT ? OFFSET ?;"
+		args = []interface{}{obj["group_id"], limit, offset}
 	}
 
-	stmt := "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id = ? ORDER BY date DESC LIMIT ? OFFSET ?;"
-	rows, err := db.Conn.Query(stmt, obj["group_id"], limit, offset)
+	rows, err := db.Conn.Query(stmt, args...)
 	if err != nil {
 		fmt.Println(err)
 		return Response{[]Post{}}
@@ -206,21 +263,40 @@ func (db *DB) SelectPostsByPrivacyMode(obj map[string]any) Response {
 			privacy_mode : int,
 			user_id : int (optional, for filtering accessible posts),
 			limit : int (optional),
-			offset : int (optional),
+			offset : int (optional), // kept for backward compatibility
+			last_id : int (optional), // cursor-based pagination
+			before : string (optional), // timestamp-based pagination
 		}
 	*/
 	limit := 50 // default limit
-	offset := 0 // default offset
 
 	if obj["limit"] != nil {
 		limit = int(obj["limit"].(float64))
 	}
-	if obj["offset"] != nil {
-		offset = int(obj["offset"].(float64))
+
+	var stmt string
+	var args []interface{}
+
+	// Priority: cursor-based > timestamp-based > offset-based
+	if obj["last_id"] != nil {
+		// Cursor-based pagination using last_id
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE privacy_mode = ? AND id < ? ORDER BY id DESC LIMIT ?;"
+		args = []interface{}{obj["privacy_mode"], obj["last_id"], limit}
+	} else if obj["before"] != nil {
+		// Timestamp-based pagination
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE privacy_mode = ? AND date < ? ORDER BY date DESC LIMIT ?;"
+		args = []interface{}{obj["privacy_mode"], obj["before"], limit}
+	} else {
+		// Fallback to offset-based pagination for backward compatibility
+		offset := 0
+		if obj["offset"] != nil {
+			offset = int(obj["offset"].(float64))
+		}
+		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE privacy_mode = ? ORDER BY date DESC LIMIT ? OFFSET ?;"
+		args = []interface{}{obj["privacy_mode"], limit, offset}
 	}
 
-	stmt := "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE privacy_mode = ? ORDER BY date DESC LIMIT ? OFFSET ?;"
-	rows, err := db.Conn.Query(stmt, obj["privacy_mode"], limit, offset)
+	rows, err := db.Conn.Query(stmt, args...)
 	if err != nil {
 		fmt.Println(err)
 		return Response{[]Post{}}
