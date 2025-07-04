@@ -50,9 +50,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	// Set defaults
-	if postData["image"] == nil {
-		postData["image"] = ""
-	}
 	if postData["group_id"] == nil {
 		postData["group_id"] = 0
 	}

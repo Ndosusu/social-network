@@ -9,7 +9,7 @@ type Post struct {
 	Id          int
 	AuthorId    int
 	Message     string
-	Image       string
+	Image       *string
 	Date        string
 	PrivacyMode int
 	GroupId     int
@@ -21,13 +21,20 @@ func (db *DB) InsertPost(obj map[string]any) Response {
 		{
 			author_id : int,
 			message : string,
-			image : string,
+			image : string (optional),
 			privacy_mode : int,
 			group_id : int,
 		}
 	*/
+	var imageValue interface{}
+	if obj["image"] != nil && obj["image"] != "" {
+		imageValue = obj["image"]
+	} else {
+		imageValue = nil
+	}
+
 	stmt := "INSERT INTO posts (author_id, message, image, privacy_mode, group_id, date) VALUES (?, ?, ?, ?, ?, ?);"
-	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["message"], obj["image"], obj["privacy_mode"], obj["group_id"], utils.GetCurrentTime())
+	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["message"], imageValue, obj["privacy_mode"], obj["group_id"], utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
 		return Response{0}
@@ -344,7 +351,11 @@ func (db *DB) UpdatePost(obj map[string]any) Response {
 
 	if obj["image"] != nil {
 		setParts = append(setParts, "image = ?")
-		values = append(values, obj["image"])
+		if obj["image"] == "" {
+			values = append(values, nil)
+		} else {
+			values = append(values, obj["image"])
+		}
 	}
 
 	if obj["privacy_mode"] != nil {
