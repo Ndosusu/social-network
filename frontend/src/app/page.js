@@ -5,80 +5,63 @@ export default function Home() {
   const [loginForm, setLogin] = useState(true)
 
   const loginResolve = async (event) => {
-  event.preventDefault()
+    event.preventDefault()
 
-  const formData = new FormData(event.currentTarget)
-  let body = {}
+    const formData = new FormData(event.currentTarget)
+    let body = {}
 
-  formData.forEach((val, key) => {
-    body[key] = val
-  })
-
-  try {
-    let result = await fetch("http://localhost:8080/auth/login", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body) // CORRECTION: body au lieu de data
+    formData.forEach((val, key) => {
+      body[key] = val
     })
-    
-    const response = await result.json()
-    console.log("Login response:", response)
-    
-    if (response.success) {
-      alert("Login successful!")
-    } else {
-      alert("Login failed: " + response.error)
+
+    try {
+      let result = await fetch("http://localhost:8080/auth/login", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body) // CORRECTION: body au lieu de data
+      })
+      
+      const response = await result.json()
+      console.log("Login response:", response)
+      
+      if (response.success) {
+        alert("Login successful!")
+      } else {
+        alert("Login failed: " + response.error)
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+      alert("Connection error")
     }
-  } catch (error) {
-    console.error("Login error:", error)
-    alert("Connection error")
   }
-}
-
-  // const loginResolve = async (event) => {
-  //   event.preventDefault()
-
-  //   const formData = new FormData(event.currentTarget)
-  //   let body = {}
-
-  //   formData.forEach((val, key) =>{
-  //       body[key] = val
-  //   })
-
-  //   let result = await fetch("http://localhost:8080/auth/login", {
-  //       method: 'POST',
-  //       data: JSON.stringify(body)
-  //   })
-  //   console.log(result)
-  // }
 
   const registerResolve = async (event) => {
-  event.preventDefault()
+    event.preventDefault()
 
-  const formData = new FormData(event.currentTarget)
-  
-  try {
-    let result = await fetch("http://localhost:8080/auth/register", {
-      method: 'POST',
-      body: formData //body au lieu de data
-    })
+    const formData = new FormData(event.currentTarget)
     
-    const response = await result.json()
-    console.log("Register response:", response)
-    
-    if (response.success) {
-      alert("Registration successful!")
-      setLogin(true)
-    } else {
-      alert("Registration failed: " + response.error)
+    try {
+      let result = await fetch("http://localhost:8080/auth/register", {
+        method: 'POST',
+        body: formData //body au lieu de data
+      })
+      
+      const response = await result.json()
+      console.log("Register response:", response)
+      
+      if (response.success) {
+        alert("Registration successful!")
+        setLogin(true)
+      } else {
+        alert("Registration failed: " + response.error)
+      }
+    } catch (error) {
+      console.error("Registration error:", error)
+      alert("Connection error")
     }
-  } catch (error) {
-    console.error("Registration error:", error)
-    alert("Connection error")
   }
-}
 
   // const registerResolve = async (event) => {
   //   event.preventDefault()
