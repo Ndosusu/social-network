@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation"
 import { CheckLogToken } from "../checkToken"
 import { useEffect, useState } from "react"
+import ActionMenu from "../actionMenu"
 
 export default function Home() {
     const router = useRouter()
@@ -34,11 +35,6 @@ export default function Home() {
         })
     }, [])
 
-    const logOut = async () => {
-        localStorage.removeItem("logToken")
-        router.push("/")
-    }
-
     const CheckState = () => {
         if (loading) {
             return <p>loading...</p>
@@ -62,7 +58,8 @@ export default function Home() {
                     <p className="text-sm text-center">New post</p>
                 </div>
             </div>
-            <button className="bg-red-500 absolute w-10 h-10" onClick={logOut}></button>
+            <ActionMenu />
+            
         </div>
     )
 }

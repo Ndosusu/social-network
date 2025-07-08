@@ -22,7 +22,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body) // CORRECTION: body au lieu de data
+        body: JSON.stringify(body) 
       })
       
       const response = await result.json()
