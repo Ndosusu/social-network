@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation"
 import { CheckLogToken } from "../checkToken"
 import { useEffect, useState } from "react"
 import ActionMenu from "../actionMenu"
+import NewPostModal from "./newPostModal"
 
 export default function Home() {
     const router = useRouter()
@@ -30,7 +31,7 @@ export default function Home() {
                 setPosts(data.data)
             } else {
                 setLoading(false)
-                throw new Error("Failed to fetch posts.")
+                throw new Error("No data.")
             }
         })
     }, [])
@@ -53,13 +54,13 @@ export default function Home() {
                 </div>
             </div>
             <div className="fixed neon-xl w-1/10 h-fit max-h-5/6 left-5/6 top-1/12 postAction p-7">
-                <div className="neon-sm p-5 rounded-xl flex flex-col items-center">
+                <div className="neon-sm p-5 rounded-xl flex flex-col items-center" onClick={async () => {document.getElementById("newPostModal").classList.remove("hidden")}}>
                     <img src="/new.svg" className="h-max"></img>
                     <p className="text-sm text-center">New post</p>
                 </div>
             </div>
             <ActionMenu />
-            
+            <NewPostModal />
         </div>
     )
 }
