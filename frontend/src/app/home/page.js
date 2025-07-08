@@ -15,16 +15,24 @@ export default function Home() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-            }}).then(data => data.json()).then(data => {
-            if(data.success) {
+            }})
+            .catch(error => {
                 setLoading(false)
+                throw new Error(error)
+            })
+
+            .then(data => data.json())
+
+            .then(data => {
+            if(data.success) {
+                setLoading(false)    
                 setPosts(data.data)
+            } else {
+                setLoading(false)
+                throw new Error("Failed to fetch posts.")
             }
         })
     }, [])
-
-    console.log(loading)
-    console.log(posts)
 
     const logOut = async () => {
         localStorage.removeItem("logToken")
@@ -36,7 +44,7 @@ export default function Home() {
             return <p>loading...</p>
         }
         if (!posts) {
-            return <p>no data.</p>
+            return <p>failed to fetch data.</p>
         }
         return posts.map((obj, i) => <CreatePost post={obj} key={i} />)
     }
