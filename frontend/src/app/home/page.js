@@ -4,6 +4,7 @@ import { CheckLogToken } from "../checkToken"
 import { useEffect, useState } from "react"
 import ActionMenu from "../actionMenu"
 import NewPostModal from "./newPostModal"
+import DetailPostModal, { CreateCom } from "./detailPostModal"
 
 export default function Home() {
     const router = useRouter()
@@ -46,11 +47,6 @@ export default function Home() {
         return posts.map((obj, i) => <CreatePost post={obj} key={i} />)
     }
 
-    const showModal = (modalId) => {
-        document.getElementById("modalDiv").classList.remove("hidden")
-        document.getElementById(modalId).classList.remove("hidden")
-    }
-
     const hideModal = async () => {
         document.getElementById("modalDiv").classList.add("hidden")
         document.querySelectorAll(".modal").forEach(obj => {
@@ -75,15 +71,45 @@ export default function Home() {
             <div id="modalDiv" className="w-screen h-screen absolute hidden ">
                 <div className="w-full h-full bg-black opacity-80 absolute z-5" onClick={hideModal}/>
                 <NewPostModal />
+                <DetailPostModal />
             </div>
         </div>
     )
 }
 
+const showModal = (modalId) => {
+    document.getElementById("modalDiv").classList.remove("hidden")
+    document.getElementById(modalId).classList.remove("hidden")
+}
+
 function CreatePost(data) {
     const post = data.post
+    const updateModal = () => {
+        document.getElementById("detailAuthor").textContent = post.AuthorId
+        document.getElementById("detailMessage").textContent = post.Message
+        fetch("http://localhost:8080/comments?post_id="+post.Id, {
+            method: "GET"
+        })
+        .catch(error => {
+            throw new Error("Failed to fetch comments.")
+        })
+        .then(data => {
+            data.json()
+        })
+        .then(data => {
+            if(data.success) {
+                document.getElementById("detailCommentList").innerHTML = data.data.map((obj, i) => <CreateCom com={obj} key={i} />)
+            } else {
+                throw new Error("No data.")
+            }
+        })
+    }
+
     return (
-        <div className="w-5/6 rounded-xl neon-sm">
+        <div className="w-5/6 rounded-xl neon-sm" onClick={async () => {
+            showModal("detailPostModal")
+            updateModal()
+        }}>
             <div className="w-full postHeader bg-primaryT p-2">
                 {post.AuthorId}
             </div>
