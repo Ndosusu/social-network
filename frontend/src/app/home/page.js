@@ -2,6 +2,9 @@
 import { useRouter } from "next/navigation"
 import { CheckLogToken } from "../checkToken"
 import { useEffect, useState } from "react"
+import ActionMenu from "../actionMenu"
+import NewPostModal from "./newPostModal"
+import DetailPostModal, { CreateCom } from "./detailPostModal"
 
 export default function Home() {
     const router = useRouter()
@@ -29,15 +32,10 @@ export default function Home() {
                 setPosts(data.data)
             } else {
                 setLoading(false)
-                throw new Error("Failed to fetch posts.")
+                throw new Error("No data.")
             }
         })
     }, [])
-
-    const logOut = async () => {
-        localStorage.removeItem("logToken")
-        router.push("/")
-    }
 
     const CheckState = () => {
         if (loading) {
@@ -49,6 +47,13 @@ export default function Home() {
         return posts.map((obj, i) => <CreatePost post={obj} key={i} />)
     }
 
+    const hideModal = async () => {
+        document.getElementById("modalDiv").classList.add("hidden")
+        document.querySelectorAll(".modal").forEach(obj => {
+            obj.classList.add("hidden")
+        })
+    }
+
     return (
         <div className="text-white h-full w-full grid items-center">
             <div className="bg-primaryT h-6/4 w-2/3 neon-xl center grid items-center">
@@ -57,20 +62,54 @@ export default function Home() {
                 </div>
             </div>
             <div className="fixed neon-xl w-1/10 h-fit max-h-5/6 left-5/6 top-1/12 postAction p-7">
-                <div className="neon-sm p-5 rounded-xl flex flex-col items-center">
+                <div className="neon-sm p-5 rounded-xl flex flex-col items-center" onClick={async () => {showModal("newPostModal")}}>
                     <img src="/new.svg" className="h-max"></img>
                     <p className="text-sm text-center">New post</p>
                 </div>
             </div>
-            <button className="bg-red-500 absolute w-10 h-10" onClick={logOut}></button>
+            <ActionMenu />
+            <div id="modalDiv" className="w-screen h-screen absolute hidden ">
+                <div className="w-full h-full bg-black opacity-80 absolute z-5" onClick={hideModal}/>
+                <NewPostModal />
+                <DetailPostModal />
+            </div>
         </div>
     )
 }
 
+const showModal = (modalId) => {
+    document.getElementById("modalDiv").classList.remove("hidden")
+    document.getElementById(modalId).classList.remove("hidden")
+}
+
 function CreatePost(data) {
     const post = data.post
+    const updateModal = () => {
+        document.getElementById("detailAuthor").textContent = post.AuthorId
+        document.getElementById("detailMessage").textContent = post.Message
+        fetch("http://localhost:8080/comments?post_id="+post.Id, {
+            method: "GET"
+        })
+        .catch(error => {
+            throw new Error("Failed to fetch comments.")
+        })
+        .then(data => {
+            data.json()
+        })
+        .then(data => {
+            if(data.success) {
+                document.getElementById("detailCommentList").innerHTML = data.data.map((obj, i) => <CreateCom com={obj} key={i} />)
+            } else {
+                throw new Error("No data.")
+            }
+        })
+    }
+
     return (
-        <div className="w-5/6 rounded-xl neon-sm">
+        <div className="w-5/6 rounded-xl neon-sm" onClick={async () => {
+            showModal("detailPostModal")
+            updateModal()
+        }}>
             <div className="w-full postHeader bg-primaryT p-2">
                 {post.AuthorId}
             </div>

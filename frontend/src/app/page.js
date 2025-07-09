@@ -22,7 +22,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body) // CORRECTION: body au lieu de data
+        body: JSON.stringify(body) 
       })
       
       const response = await result.json()
@@ -99,7 +99,7 @@ export default function Home() {
 
   const curYear = new Date().getFullYear()
 
-  if (loginForm) {
+  if (loginForm) { //login form
     return (
       <div className="h-full w-full flex flex-col justify-center items-center text-white gap-10">
         <section className="w-1/3 h-2/4">
@@ -125,7 +125,7 @@ export default function Home() {
       </div>
     )
   }
-  else if(!loginForm) {
+  else if(!loginForm) { //register form
     return (
       <div className="h-full w-full flex flex-col justify-center items-center text-white">
         <section className="w-fit h-5/6">
