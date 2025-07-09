@@ -3,9 +3,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
+	"os"
 	"social-network/pkg/db/models"
 	"strconv"
+	"strings"
 )
 
 // Helper functions for post handlers
@@ -31,12 +34,72 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var postData map[string]interface{}
-	if err := json.NewDecoder(r.Body).Decode(&postData); err != nil {
-		writeErrorResponse(w, http.StatusBadRequest, "Invalid JSON format")
+	// Parse multipart form data to handle file uploads
+	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB max
+		writeErrorResponse(w, http.StatusBadRequest, "Failed to parse form data")
 		return
 	}
 
+	// Extract form data
+	postData := make(map[string]interface{})
+	postData["author_id"] = r.FormValue("author_id")
+	postData["message"] = r.FormValue("message")
+	postData["privacy_mode"] = r.FormValue("privacy_mode")
+
+	// Group ID is optional
+	if groupID := r.FormValue("group_id"); groupID != "" {
+		postData["group_id"] = groupID
+	}
+
+	// Convert string values to appropriate types
+	if authorID, err := strconv.Atoi(postData["author_id"].(string)); err != nil {
+		writeErrorResponse(w, http.StatusBadRequest, "Invalid author_id format")
+		return
+	} else {
+		postData["author_id"] = authorID
+	}
+
+	if privacyMode, err := strconv.Atoi(postData["privacy_mode"].(string)); err != nil {
+		writeErrorResponse(w, http.StatusBadRequest, "Invalid privacy_mode format")
+		return
+	} else {
+		postData["privacy_mode"] = privacyMode
+	}
+
+	if groupIDStr, ok := postData["group_id"].(string); ok && groupIDStr != "" {
+		if groupID, err := strconv.Atoi(groupIDStr); err != nil {
+			writeErrorResponse(w, http.StatusBadRequest, "Invalid group_id format")
+			return
+		} else {
+			postData["group_id"] = groupID
+		}
+	}
+
+	// Handle image upload if present
+	file, header, err := r.FormFile("image")
+	if err == nil {
+		defer file.Close()
+
+		// Validate image file
+		if err := validateImageFile(file, header); err != nil {
+			writeErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		// Save the image
+		imagePath, err := saveImageFile(file, header)
+		if err != nil {
+			writeErrorResponse(w, http.StatusInternalServerError, "Failed to save image: "+err.Error())
+			return
+		}
+
+		postData["image"] = imagePath
+	} else if err != http.ErrMissingFile {
+		writeErrorResponse(w, http.StatusBadRequest, "Error processing image file")
+		return
+	}
+
+	// Validate required fields
 	if errMsg := validateRequiredFields(postData, []string{"author_id", "message", "privacy_mode"}); errMsg != "" {
 		writeErrorResponse(w, http.StatusBadRequest, errMsg)
 		return
@@ -48,8 +111,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer db.Close()
-
-	// Set defaults - group_id will be NULL if not provided
 
 	dbInstance := &models.DB{Conn: db}
 	result := dbInstance.InsertPost(postData)
@@ -241,4 +302,47 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeSuccessResponse(w, http.StatusOK, "Post updated successfully", result.Result)
+}
+
+// ServeImageHandler serves uploaded images
+func ServeImageHandler(w http.ResponseWriter, r *http.Request) {
+	if !validateMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	// Get the image path from URL parameter
+	imagePath := r.URL.Query().Get("path")
+	if imagePath == "" {
+		writeErrorResponse(w, http.StatusBadRequest, "Missing image path parameter")
+		return
+	}
+
+	// Security check - ensure path is within uploads directory
+	if !strings.HasPrefix(imagePath, "uploads/images/") {
+		writeErrorResponse(w, http.StatusForbidden, "Invalid image path")
+		return
+	}
+
+	// Check if file exists
+	if _, err := os.Stat(imagePath); os.IsNotExist(err) {
+		writeErrorResponse(w, http.StatusNotFound, "Image not found")
+		return
+	}
+
+	// Open the file
+	file, err := os.Open(imagePath)
+	if err != nil {
+		writeErrorResponse(w, http.StatusInternalServerError, "Failed to open image file")
+		return
+	}
+	defer file.Close()
+
+	// Set content type based on file extension using utility function
+	w.Header().Set("Content-Type", getImageContentType(imagePath))
+
+	// Copy file content to response
+	if _, err := io.Copy(w, file); err != nil {
+		writeErrorResponse(w, http.StatusInternalServerError, "Failed to serve image")
+		return
+	}
 }
