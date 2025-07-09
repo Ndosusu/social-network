@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"os"
@@ -18,6 +19,24 @@ func parsePostID(r *http.Request) (int, error) {
 		return 0, nil
 	}
 	return strconv.Atoi(postIDStr)
+}
+
+func getAuthorIDFromUUID(uuid string) (int, error) {
+	db, err := getDBConnection()
+	if err != nil {
+		return 0, err
+	}
+	defer db.Close()
+
+	dbInstance := &models.DB{Conn: db}
+	result := dbInstance.SelectUserByUuid(map[string]any{"uuid": uuid})
+
+	user, ok := result.Result.(models.User)
+	if !ok || user.Id == 0 {
+		return 0, errors.New("user not found")
+	}
+
+	return user.Id, nil
 }
 
 func validateRequiredFields(data map[string]interface{}, fields []string) string {
@@ -42,7 +61,20 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Extract form data
 	postData := make(map[string]interface{})
-	postData["author_id"] = r.FormValue("author_id")
+	authorUuid := r.FormValue("author_uuid")
+	if authorUuid == "" {
+		writeErrorResponse(w, http.StatusBadRequest, "Missing required field: author_uuid")
+		return
+	}
+
+	// Get author_id from UUID
+	authorID, err := getAuthorIDFromUUID(authorUuid)
+	if err != nil {
+		writeErrorResponse(w, http.StatusBadRequest, "Invalid author UUID or user not found")
+		return
+	}
+
+	postData["author_id"] = authorID
 	postData["message"] = r.FormValue("message")
 	postData["privacy_mode"] = r.FormValue("privacy_mode")
 
@@ -52,13 +84,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Convert string values to appropriate types
-	if authorID, err := strconv.Atoi(postData["author_id"].(string)); err != nil {
-		writeErrorResponse(w, http.StatusBadRequest, "Invalid author_id format")
-		return
-	} else {
-		postData["author_id"] = authorID
-	}
-
 	if privacyMode, err := strconv.Atoi(postData["privacy_mode"].(string)); err != nil {
 		writeErrorResponse(w, http.StatusBadRequest, "Invalid privacy_mode format")
 		return
@@ -141,8 +166,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	dbInstance := &models.DB{Conn: db}
-	result := dbInstance.SelectPostById(map[string]any{"id": postID})
-	post, ok := result.Result.(models.Post)
+	result := dbInstance.SelectPostWithAuthorById(map[string]any{"id": postID})
+	post, ok := result.Result.(models.PostWithAuthor)
 	if !ok || post.Id == 0 {
 		writeErrorResponse(w, http.StatusNotFound, "Post not found")
 		return
@@ -199,7 +224,7 @@ func PostsHandler(w http.ResponseWriter, r *http.Request) {
 	case r.URL.Query().Get("user_id") != "":
 		if userID, err := strconv.Atoi(r.URL.Query().Get("user_id")); err == nil {
 			queryParams["user_id"] = userID
-			result = dbInstance.SelectPostsByUserId(queryParams)
+			result = dbInstance.SelectPostsByUserIdWithAuthors(queryParams)
 		} else {
 			writeErrorResponse(w, http.StatusBadRequest, "Invalid user ID format")
 			return
@@ -207,7 +232,7 @@ func PostsHandler(w http.ResponseWriter, r *http.Request) {
 	case r.URL.Query().Get("group_id") != "":
 		if groupID, err := strconv.Atoi(r.URL.Query().Get("group_id")); err == nil {
 			queryParams["group_id"] = groupID
-			result = dbInstance.SelectPostsByGroupId(queryParams)
+			result = dbInstance.SelectPostsByGroupIdWithAuthors(queryParams)
 		} else {
 			writeErrorResponse(w, http.StatusBadRequest, "Invalid group ID format")
 			return
@@ -221,7 +246,7 @@ func PostsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	default:
-		result = dbInstance.SelectAllPosts(queryParams)
+		result = dbInstance.SelectAllPostsWithAuthors(queryParams)
 	}
 
 	writeSuccessResponse(w, http.StatusOK, "", result.Result)

@@ -1,3 +1,8 @@
+// Package models contains the database models and their associated methods.
+// This file (post.go) contains the core Post functionality including:
+// - Post and PostWithAuthor struct definitions
+// - Basic CRUD operations (Create, Read, Update, Delete)
+// - Essential post management functions
 package models
 
 import (
@@ -15,6 +20,17 @@ type Post struct {
 	GroupId     *int
 }
 
+type PostWithAuthor struct {
+	Id          int
+	AuthorId    int
+	Message     string
+	Image       *string
+	Date        string
+	PrivacyMode int
+	GroupId     *int
+	Author      User
+}
+
 func (db *DB) InsertPost(obj map[string]any) Response {
 	/*
 		expected input (as json object) :
@@ -29,15 +45,11 @@ func (db *DB) InsertPost(obj map[string]any) Response {
 	var imageValue interface{}
 	if obj["image"] != nil && obj["image"] != "" {
 		imageValue = obj["image"]
-	} else {
-		imageValue = nil
 	}
 
 	var groupIdValue interface{}
 	if obj["group_id"] != nil && obj["group_id"] != 0 {
 		groupIdValue = obj["group_id"]
-	} else {
-		groupIdValue = nil
 	}
 
 	stmt := "INSERT INTO posts (author_id, message, image, privacy_mode, group_id, date) VALUES (?, ?, ?, ?, ?, ?);"
@@ -52,7 +64,7 @@ func (db *DB) InsertPost(obj map[string]any) Response {
 		fmt.Println(err)
 		return Response{0}
 	}
-	return db.SelectPostById(map[string]any{"id": newPostId})
+	return db.SelectPostWithAuthorById(map[string]any{"id": newPostId})
 }
 
 func (db *DB) SelectPostById(obj map[string]any) Response {
@@ -91,245 +103,13 @@ func (db *DB) DeletePost(obj map[string]any) Response {
 	return Response{1}
 }
 
-func (db *DB) SelectAllPosts(obj map[string]any) Response {
-	/*
-		expected input (as json object) :
-		{
-			limit : int (optional),
-			offset : int (optional), // kept for backward compatibility
-			last_id : int (optional), // cursor-based pagination
-			before : string (optional), // timestamp-based pagination
-		}
-	*/
-	limit := 50 // default limit
+// SelectAllPosts moved to post_queries.go
 
-	if obj["limit"] != nil {
-		limit = int(obj["limit"].(float64))
-	}
+// SelectPostsByUserId moved to post_queries.go
 
-	var stmt string
-	var args []interface{}
+// SelectPostsByGroupId moved to post_queries.go
 
-	// Priority: cursor-based > timestamp-based > offset-based
-	if obj["last_id"] != nil {
-		// Cursor-based pagination using last_id
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE id < ? ORDER BY id DESC LIMIT ?;"
-		args = []interface{}{obj["last_id"], limit}
-	} else if obj["before"] != nil {
-		// Timestamp-based pagination
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE date < ? ORDER BY date DESC LIMIT ?;"
-		args = []interface{}{obj["before"], limit}
-	} else {
-		// Fallback to offset-based pagination for backward compatibility
-		offset := 0
-		if obj["offset"] != nil {
-			offset = int(obj["offset"].(float64))
-		}
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts ORDER BY date DESC LIMIT ? OFFSET ?;"
-		args = []interface{}{limit, offset}
-	}
-
-	rows, err := db.Conn.Query(stmt, args...)
-	if err != nil {
-		fmt.Println(err)
-		return Response{[]Post{}}
-	}
-	defer rows.Close()
-
-	var posts []Post
-	for rows.Next() {
-		post := Post{}
-		err := rows.Scan(&post.Id, &post.AuthorId, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.GroupId)
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		posts = append(posts, post)
-	}
-
-	return Response{posts}
-}
-
-func (db *DB) SelectPostsByUserId(obj map[string]any) Response {
-	/*
-		expected input (as json object) :
-		{
-			user_id : int,
-			limit : int (optional),
-			offset : int (optional), // kept for backward compatibility
-			last_id : int (optional), // cursor-based pagination
-			before : string (optional), // timestamp-based pagination
-		}
-	*/
-	limit := 50 // default limit
-
-	if obj["limit"] != nil {
-		limit = int(obj["limit"].(float64))
-	}
-
-	var stmt string
-	var args []interface{}
-
-	// Priority: cursor-based > timestamp-based > offset-based
-	if obj["last_id"] != nil {
-		// Cursor-based pagination using last_id
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE author_id = ? AND id < ? ORDER BY id DESC LIMIT ?;"
-		args = []interface{}{obj["user_id"], obj["last_id"], limit}
-	} else if obj["before"] != nil {
-		// Timestamp-based pagination
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE author_id = ? AND date < ? ORDER BY date DESC LIMIT ?;"
-		args = []interface{}{obj["user_id"], obj["before"], limit}
-	} else {
-		// Fallback to offset-based pagination for backward compatibility
-		offset := 0
-		if obj["offset"] != nil {
-			offset = int(obj["offset"].(float64))
-		}
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE author_id = ? ORDER BY date DESC LIMIT ? OFFSET ?;"
-		args = []interface{}{obj["user_id"], limit, offset}
-	}
-
-	rows, err := db.Conn.Query(stmt, args...)
-	if err != nil {
-		fmt.Println(err)
-		return Response{[]Post{}}
-	}
-	defer rows.Close()
-
-	var posts []Post
-	for rows.Next() {
-		post := Post{}
-		err := rows.Scan(&post.Id, &post.AuthorId, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.GroupId)
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		posts = append(posts, post)
-	}
-
-	return Response{posts}
-}
-
-func (db *DB) SelectPostsByGroupId(obj map[string]any) Response {
-	/*
-		expected input (as json object) :
-		{
-			group_id : int,
-			limit : int (optional),
-			offset : int (optional), // kept for backward compatibility
-			last_id : int (optional), // cursor-based pagination
-			before : string (optional), // timestamp-based pagination
-		}
-	*/
-	limit := 50 // default limit
-
-	if obj["limit"] != nil {
-		limit = int(obj["limit"].(float64))
-	}
-
-	var stmt string
-	var args []interface{}
-
-	// Priority: cursor-based > timestamp-based > offset-based
-	if obj["last_id"] != nil {
-		// Cursor-based pagination using last_id
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id = ? AND id < ? ORDER BY id DESC LIMIT ?;"
-		args = []interface{}{obj["group_id"], obj["last_id"], limit}
-	} else if obj["before"] != nil {
-		// Timestamp-based pagination
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id = ? AND date < ? ORDER BY date DESC LIMIT ?;"
-		args = []interface{}{obj["group_id"], obj["before"], limit}
-	} else {
-		// Fallback to offset-based pagination for backward compatibility
-		offset := 0
-		if obj["offset"] != nil {
-			offset = int(obj["offset"].(float64))
-		}
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id = ? ORDER BY date DESC LIMIT ? OFFSET ?;"
-		args = []interface{}{obj["group_id"], limit, offset}
-	}
-
-	rows, err := db.Conn.Query(stmt, args...)
-	if err != nil {
-		fmt.Println(err)
-		return Response{[]Post{}}
-	}
-	defer rows.Close()
-
-	var posts []Post
-	for rows.Next() {
-		post := Post{}
-		err := rows.Scan(&post.Id, &post.AuthorId, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.GroupId)
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		posts = append(posts, post)
-	}
-
-	return Response{posts}
-}
-
-func (db *DB) SelectPostsByPrivacyMode(obj map[string]any) Response {
-	/*
-		expected input (as json object) :
-		{
-			privacy_mode : int,
-			user_id : int (optional, for filtering accessible posts),
-			limit : int (optional),
-			offset : int (optional), // kept for backward compatibility
-			last_id : int (optional), // cursor-based pagination
-			before : string (optional), // timestamp-based pagination
-		}
-	*/
-	limit := 50 // default limit
-
-	if obj["limit"] != nil {
-		limit = int(obj["limit"].(float64))
-	}
-
-	var stmt string
-	var args []interface{}
-
-	// Priority: cursor-based > timestamp-based > offset-based
-	if obj["last_id"] != nil {
-		// Cursor-based pagination using last_id
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE privacy_mode = ? AND id < ? ORDER BY id DESC LIMIT ?;"
-		args = []interface{}{obj["privacy_mode"], obj["last_id"], limit}
-	} else if obj["before"] != nil {
-		// Timestamp-based pagination
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE privacy_mode = ? AND date < ? ORDER BY date DESC LIMIT ?;"
-		args = []interface{}{obj["privacy_mode"], obj["before"], limit}
-	} else {
-		// Fallback to offset-based pagination for backward compatibility
-		offset := 0
-		if obj["offset"] != nil {
-			offset = int(obj["offset"].(float64))
-		}
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE privacy_mode = ? ORDER BY date DESC LIMIT ? OFFSET ?;"
-		args = []interface{}{obj["privacy_mode"], limit, offset}
-	}
-
-	rows, err := db.Conn.Query(stmt, args...)
-	if err != nil {
-		fmt.Println(err)
-		return Response{[]Post{}}
-	}
-	defer rows.Close()
-
-	var posts []Post
-	for rows.Next() {
-		post := Post{}
-		err := rows.Scan(&post.Id, &post.AuthorId, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.GroupId)
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		posts = append(posts, post)
-	}
-
-	return Response{posts}
-}
+// SelectPostsByPrivacyMode moved to post_queries.go
 
 func (db *DB) UpdatePost(obj map[string]any) Response {
 	/*
@@ -387,7 +167,7 @@ func (db *DB) UpdatePost(obj map[string]any) Response {
 	// Add ID to the end of values for WHERE clause
 	values = append(values, obj["id"])
 
-	stmt := "UPDATE posts SET " + fmt.Sprintf("%s", setParts[0])
+	stmt := "UPDATE posts SET " + setParts[0]
 	for i := 1; i < len(setParts); i++ {
 		stmt += ", " + setParts[i]
 	}
@@ -403,61 +183,12 @@ func (db *DB) UpdatePost(obj map[string]any) Response {
 	return db.SelectPostById(map[string]any{"id": obj["id"]})
 }
 
-func (db *DB) SelectPostsWithoutGroup(obj map[string]any) Response {
-	/*
-		expected input (as json object) :
-		{
-			limit : int (optional),
-			offset : int (optional), // kept for backward compatibility
-			last_id : int (optional), // cursor-based pagination
-			before : string (optional), // timestamp-based pagination
-		}
-	*/
-	limit := 50 // default limit
+// SelectPostsWithoutGroup moved to post_queries.go
 
-	if obj["limit"] != nil {
-		limit = int(obj["limit"].(float64))
-	}
+// SelectPostWithAuthorById moved to post_with_author.go
 
-	var stmt string
-	var args []interface{}
+// SelectAllPostsWithAuthors moved to post_with_author.go
 
-	// Priority: cursor-based > timestamp-based > offset-based
-	if obj["last_id"] != nil {
-		// Cursor-based pagination using last_id
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id IS NULL AND id < ? ORDER BY id DESC LIMIT ?;"
-		args = []interface{}{obj["last_id"], limit}
-	} else if obj["before"] != nil {
-		// Timestamp-based pagination
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id IS NULL AND date < ? ORDER BY date DESC LIMIT ?;"
-		args = []interface{}{obj["before"], limit}
-	} else {
-		// Fallback to offset-based pagination for backward compatibility
-		offset := 0
-		if obj["offset"] != nil {
-			offset = int(obj["offset"].(float64))
-		}
-		stmt = "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE group_id IS NULL ORDER BY date DESC LIMIT ? OFFSET ?;"
-		args = []interface{}{limit, offset}
-	}
+// SelectPostsByUserIdWithAuthors moved to post_with_author.go
 
-	rows, err := db.Conn.Query(stmt, args...)
-	if err != nil {
-		fmt.Println(err)
-		return Response{[]Post{}}
-	}
-	defer rows.Close()
-
-	var posts []Post
-	for rows.Next() {
-		post := Post{}
-		err := rows.Scan(&post.Id, &post.AuthorId, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.GroupId)
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		posts = append(posts, post)
-	}
-
-	return Response{posts}
-}
+// SelectPostsByGroupIdWithAuthors moved to post_with_author.go

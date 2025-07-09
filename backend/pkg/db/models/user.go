@@ -85,6 +85,27 @@ func (db *DB) SelectUserById(obj map[string]any) Response {
 	return Response{user}
 }
 
+func (db *DB) SelectUserByUuid(obj map[string]any) Response {
+	/*
+		expected input (as json object) :
+		{
+			uuid : string,
+		}
+	*/
+
+	stmt := "SELECT id, uuid, email, first_name, last_name, date_birth, avatar, nick_name, about, date_creation, private_mode FROM users WHERE uuid = ?;"
+	result := db.Conn.QueryRow(stmt, obj["uuid"])
+
+	user := User{}
+	err := result.Scan(&user.Id, &user.Uuid, &user.Email, &user.First_name, &user.Last_name, &user.Birth_date, &user.Avatar, &user.Nickname, &user.About, &user.Created_date, &user.Private_mode)
+	if err != nil {
+		fmt.Println(err)
+		return Response{User{}}
+	}
+
+	return Response{user}
+}
+
 func (db *DB) Authenticate(obj map[string]any) Response {
 	/*
 		expected input (as json object) :
