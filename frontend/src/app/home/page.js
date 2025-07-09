@@ -18,15 +18,15 @@ export default function Home() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-            }})
-            .catch(error => {
-                setLoading(false)
-                throw new Error(error)
-            })
+        }})
+        .catch(error => {
+            setLoading(false)
+            throw new Error(error)
+        })
 
-            .then(data => data.json())
+        .then(data => data.json())
 
-            .then(data => {
+        .then(data => {
             if(data.success) {
                 setLoading(false)    
                 setPosts(data.data)
@@ -82,7 +82,7 @@ const showModal = (modalId) => {
     document.getElementById(modalId).classList.remove("hidden")
 }
 
-function CreatePost(data) {
+export function CreatePost(data) {
     const post = data.post
     const updateModal = () => {
         document.getElementById("detailAuthor").textContent = post.AuthorId
@@ -94,10 +94,11 @@ function CreatePost(data) {
             throw new Error("Failed to fetch comments.")
         })
         .then(data => {
-            data.json()
+            return data.json()
         })
         .then(data => {
-            if(data.success) {
+            console.log(data)
+            if(data && data.success) {
                 document.getElementById("detailCommentList").innerHTML = data.data.map((obj, i) => <CreateCom com={obj} key={i} />)
             } else {
                 throw new Error("No data.")

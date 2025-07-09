@@ -15,7 +15,7 @@ export default function ActionMenu() {
     }  
 
     return (
-        <div className="neon-xl h-fit w-12 absolute">
+        <div className="neon-xl h-fit w-12 absolute top-1/3">
             <button className="neon-sm w-10 h-10" target="home" onClick={moveTo}>H</button> {/*home page*/}
             <button className="neon-sm w-10 h-10" target="profile" onClick={moveTo}>P</button> {/*profile page*/}
             <button className="neon-sm w-10 h-10" target="search" onClick={moveTo}>S</button> {/*search page*/}
