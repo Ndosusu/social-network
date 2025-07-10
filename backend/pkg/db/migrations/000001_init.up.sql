@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS "users" (
-    "id" INTEGER NOT NULL UNIQUE,
-    "uuid" VARCHAR(36) NOT NULL UNIQUE,
+    "id" INTEGER NOT NULL,
     "email" VARCHAR(255) NOT NULL UNIQUE,
     "password" VARCHAR(60) NOT NULL UNIQUE,
     "first_name" VARCHAR(64) NOT NULL,
