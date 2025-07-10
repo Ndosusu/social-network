@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS "sessions" (
+    "id" INTEGER NOT NULL UNIQUE,
+    "uuid" VARCHAR(36) NOT NULL UNIQUE,
+    "user_id" INTEGER NOT NULL,
+    "date_creation" VARCHAR(25) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "date_expiration" VARCHAR(25),
+    PRIMARY KEY("id"),
+    FOREIGN KEY ("user_id") REFERENCES "users"("id")
+        ON UPDATE NO ACTION ON DELETE CASCADE
+);
