@@ -5,7 +5,7 @@ import { CreatePost } from "../home/page"
 import DetailPostModal from "../home/detailPostModal"
 
 export default function ProfilePage() {
-    const temp = [
+    const posts = [ // fetch user's posts
         {
             Id:1,
             AuthorId: 3,
@@ -61,7 +61,7 @@ export default function ProfilePage() {
                 </div>
             </div>
             <div className="neon-xl w-8/10 min-h-5 h-fit mt-10 rounded-xl center py-5 flex flex-col items-center gap-8">
-                {temp.map((obj, i) => <CreatePost post={obj} key={i} />)}
+                {posts.map((obj, i) => <CreatePost post={obj} key={i} />)}
             </div>
             <ActionMenu />
             <div id="modalDiv" className="w-screen h-screen absolute hidden top-0">
