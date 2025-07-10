@@ -24,8 +24,8 @@ export default function ChatPage() {
             <div className="neon-xl bg-primaryT w-1/5 rounded-xl flex flex-col overflow-scroll p-4 gap-5">
                 {userList.map((obj, i) => <CreateUser user={obj} key={i} onclick={setChat} />)}
             </div>
-            <div className="neon-xl bg-primaryT h-full w-4/5 rounded-xl flex flex-col p-4">
-                <div className="h-full w-full flex flex-col gap-5">
+            <div className="neon-xl bg-primaryT h-full w-4/5 rounded-xl flex flex-col p-4 gap-4">
+                <div className="h-full w-full flex flex-col gap-5 overflow-scroll rounded-xl p-4">
                     <CreateMessageHistory chatList={chatList} />
                 </div>
                 <textarea id="chatInput" className="neon-sm bg-primaryT w-full rounded-xl text-xl p-3 h-15 break-all resize-none hidden" />
@@ -45,6 +45,70 @@ function CreateUser(data) {
         {
             message: "okok2",
             author: "ziw",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
+        },
+        {
+            message: "nonon",
+            author: "wiz",
         },
         {
             message: "nonon",
@@ -73,9 +137,9 @@ function CreateUser(data) {
 function CreateMessageHistory(data) {
     const chatList = data.chatList
     if (!chatList) {
-        return <p>No chat selected</p>
+        return <p className="text-2xl">No chat selected</p>
     } else if (chatList.length == 0) {
-        return <p>Start the conversation !</p>
+        return <p className="text-2xl">Start the conversation !</p>
     } else {
         return (
             chatList.map((obj, i) => <CreateMessage chat={obj} key={i} />)
