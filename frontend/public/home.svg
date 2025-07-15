@@ -1,0 +1,6 @@
+<svg role="img" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+    <title>home</title>
+    <rect x="0" y="0" width="1" height="1" fill="white" />
+    <!-- <path fill="red" d="M25 25 L0 25 L25 0 L50 25 Z" /> -->
+    <path fill="white" d="M25 25 L7 25 C3 25, 3 22, 5 20 L20 5 C25 0, 25 0, 30 5 L45 20 C47 22, 47 25, 43 25 Z" />
+</svg>
