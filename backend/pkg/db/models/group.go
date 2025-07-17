@@ -2,14 +2,6 @@ package models
 
 import "fmt"
 
-type Group struct {
-	Id           int
-	AdminId      int
-	Title        string
-	About        string
-	DateCreation string
-}
-
 func (db *DB) InsertGroup(obj map[string]any) Response {
 	/*
 		expected input (as json object) :

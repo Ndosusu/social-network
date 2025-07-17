@@ -16,21 +16,21 @@ import (
 )
 
 // Helper functions to reduce code duplication
-func writeJSONResponse(w http.ResponseWriter, statusCode int, data map[string]interface{}) {
+func writeJSONResponse(w http.ResponseWriter, statusCode int, data map[string]any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	_ = json.NewEncoder(w).Encode(data)
 }
 
 func writeErrorResponse(w http.ResponseWriter, statusCode int, message string) {
-	writeJSONResponse(w, statusCode, map[string]interface{}{
+	writeJSONResponse(w, statusCode, map[string]any{
 		"success": false,
 		"error":   message,
 	})
 }
 
-func writeSuccessResponse(w http.ResponseWriter, statusCode int, message string, data interface{}) {
-	response := map[string]interface{}{
+func writeSuccessResponse(w http.ResponseWriter, statusCode int, message string, data any) {
+	response := map[string]any{
 		"success": true,
 		"message": message,
 	}
@@ -63,7 +63,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var loginData map[string]interface{}
+	var loginData map[string]any
 	if err := json.NewDecoder(r.Body).Decode(&loginData); err != nil {
 		writeErrorResponse(w, http.StatusBadRequest, "Invalid JSON data")
 		return
@@ -102,7 +102,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeSuccessResponse(w, http.StatusOK, "Login successful", map[string]interface{}{
+	writeSuccessResponse(w, http.StatusOK, "Login successful", map[string]any{
 		"user_id":   user.Id,
 		"uuid":      user.Uuid,
 		"email":     user.Email,
@@ -123,7 +123,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Extract form data
-	registrationData := map[string]interface{}{
+	registrationData := map[string]any{
 		"FirstName": r.FormValue("FirstName"),
 		"LastName":  r.FormValue("LastName"),
 		"Mail":      r.FormValue("Mail"),
@@ -186,7 +186,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeSuccessResponse(w, http.StatusCreated, "Registration successful", map[string]interface{}{
+	writeSuccessResponse(w, http.StatusCreated, "Registration successful", map[string]any{
 		"user_id":   user.Id,
 		"uuid":      user.Uuid,
 		"email":     user.Email,

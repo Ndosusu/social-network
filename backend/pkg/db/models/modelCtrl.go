@@ -4,8 +4,22 @@ import (
 	"database/sql"
 	"fmt"
 	"social-network/config"
+	"social-network/pkg/db/models/types"
 
 	_ "github.com/mattn/go-sqlite3"
+)
+
+type (
+	User    = types.User
+	Session = types.Session
+	Post    = types.Post
+	Comment = types.Comment
+	Like    = types.Like
+	Notif   = types.Notif
+	Group   = types.Group
+	Event   = types.Event
+	Chat    = types.Chat
+	Log     = types.Log
 )
 
 // Struct to contain any type that result from database operations

@@ -5,14 +5,6 @@ import (
 	"social-network/pkg/utils"
 )
 
-type Log struct {
-	Id       int
-	ChatId   int
-	AuthorId int
-	Message  string
-	Date     string
-}
-
 func (db *DB) InsertLog(obj map[string]any) Response {
 	/*
 		expected input (as json object) :

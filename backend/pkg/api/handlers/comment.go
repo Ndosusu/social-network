@@ -62,7 +62,7 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		// Créer un nouveau commentaire
-		var commentData map[string]interface{}
+		var commentData map[string]any
 		if err := json.NewDecoder(r.Body).Decode(&commentData); err != nil {
 			writeErrorResponse(w, http.StatusBadRequest, "Invalid JSON format")
 			return

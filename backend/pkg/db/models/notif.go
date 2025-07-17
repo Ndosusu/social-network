@@ -5,16 +5,6 @@ import (
 	"social-network/pkg/utils"
 )
 
-type Notif struct {
-	Id           int
-	NotifType    int
-	ReceiverId   int
-	SenderId     int
-	GroupId      int
-	EventId      int
-	DateCreation string
-}
-
 func (db *DB) InsertNotif(obj map[string]any) Response {
 	/*
 		expected input (as json object) :

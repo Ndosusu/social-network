@@ -39,7 +39,7 @@ func getAuthorIDFromUUID(uuid string) (int, error) {
 	return user.Id, nil
 }
 
-func validateRequiredFields(data map[string]interface{}, fields []string) string {
+func validateRequiredFields(data map[string]any, fields []string) string {
 	for _, field := range fields {
 		if data[field] == nil {
 			return "Missing required field: " + field
@@ -60,7 +60,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Extract form data
-	postData := make(map[string]interface{})
+	postData := make(map[string]any)
 	authorUuid := r.FormValue("author_uuid")
 	if authorUuid == "" {
 		writeErrorResponse(w, http.StatusBadRequest, "Missing required field: author_uuid")
@@ -298,7 +298,7 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var updateData map[string]interface{}
+	var updateData map[string]any
 	if err := json.NewDecoder(r.Body).Decode(&updateData); err != nil {
 		writeErrorResponse(w, http.StatusBadRequest, "Invalid JSON format")
 		return

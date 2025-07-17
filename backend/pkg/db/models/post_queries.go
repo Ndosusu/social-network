@@ -9,33 +9,33 @@ package models
 import "fmt"
 
 // buildPaginationQuery builds SQL query with pagination support
-func buildPaginationQuery(baseQuery string, whereClause string, obj map[string]any) (string, []interface{}) {
+func buildPaginationQuery(baseQuery string, whereClause string, obj map[string]any) (string, []any) {
 	limit := 50 // default limit
 	if obj["limit"] != nil {
 		limit = int(obj["limit"].(float64))
 	}
 
 	var stmt string
-	var args []interface{}
+	var args []any
 
 	// Priority: cursor-based > timestamp-based > offset-based
 	if obj["last_id"] != nil {
 		// Cursor-based pagination using last_id
 		if whereClause != "" {
 			stmt = baseQuery + " WHERE " + whereClause + " AND id < ? ORDER BY id DESC LIMIT ?;"
-			args = []interface{}{obj["last_id"], limit}
+			args = []any{obj["last_id"], limit}
 		} else {
 			stmt = baseQuery + " WHERE id < ? ORDER BY id DESC LIMIT ?;"
-			args = []interface{}{obj["last_id"], limit}
+			args = []any{obj["last_id"], limit}
 		}
 	} else if obj["before"] != nil {
 		// Timestamp-based pagination
 		if whereClause != "" {
 			stmt = baseQuery + " WHERE " + whereClause + " AND date < ? ORDER BY date DESC LIMIT ?;"
-			args = []interface{}{obj["before"], limit}
+			args = []any{obj["before"], limit}
 		} else {
 			stmt = baseQuery + " WHERE date < ? ORDER BY date DESC LIMIT ?;"
-			args = []interface{}{obj["before"], limit}
+			args = []any{obj["before"], limit}
 		}
 	} else {
 		// Fallback to offset-based pagination for backward compatibility
@@ -45,10 +45,10 @@ func buildPaginationQuery(baseQuery string, whereClause string, obj map[string]a
 		}
 		if whereClause != "" {
 			stmt = baseQuery + " WHERE " + whereClause + " ORDER BY date DESC LIMIT ? OFFSET ?;"
-			args = []interface{}{limit, offset}
+			args = []any{limit, offset}
 		} else {
 			stmt = baseQuery + " ORDER BY date DESC LIMIT ? OFFSET ?;"
-			args = []interface{}{limit, offset}
+			args = []any{limit, offset}
 		}
 	}
 
@@ -56,24 +56,24 @@ func buildPaginationQuery(baseQuery string, whereClause string, obj map[string]a
 }
 
 // buildPaginationQueryWithParam builds SQL query with pagination support and a parameter
-func buildPaginationQueryWithParam(baseQuery string, whereClause string, param interface{}, obj map[string]any) (string, []interface{}) {
+func buildPaginationQueryWithParam(baseQuery string, whereClause string, param any, obj map[string]any) (string, []any) {
 	limit := 50 // default limit
 	if obj["limit"] != nil {
 		limit = int(obj["limit"].(float64))
 	}
 
 	var stmt string
-	var args []interface{}
+	var args []any
 
 	// Priority: cursor-based > timestamp-based > offset-based
 	if obj["last_id"] != nil {
 		// Cursor-based pagination using last_id
 		stmt = baseQuery + " WHERE " + whereClause + " AND id < ? ORDER BY id DESC LIMIT ?;"
-		args = []interface{}{param, obj["last_id"], limit}
+		args = []any{param, obj["last_id"], limit}
 	} else if obj["before"] != nil {
 		// Timestamp-based pagination
 		stmt = baseQuery + " WHERE " + whereClause + " AND date < ? ORDER BY date DESC LIMIT ?;"
-		args = []interface{}{param, obj["before"], limit}
+		args = []any{param, obj["before"], limit}
 	} else {
 		// Fallback to offset-based pagination for backward compatibility
 		offset := 0
@@ -81,7 +81,7 @@ func buildPaginationQueryWithParam(baseQuery string, whereClause string, param i
 			offset = int(obj["offset"].(float64))
 		}
 		stmt = baseQuery + " WHERE " + whereClause + " ORDER BY date DESC LIMIT ? OFFSET ?;"
-		args = []interface{}{param, limit, offset}
+		args = []any{param, limit, offset}
 	}
 
 	return stmt, args

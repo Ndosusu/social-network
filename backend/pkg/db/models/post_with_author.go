@@ -9,7 +9,7 @@ package models
 import "fmt"
 
 // scanPostWithAuthor scans a row into PostWithAuthor struct
-func scanPostWithAuthor(rows interface{}, post *PostWithAuthor) error {
+func scanPostWithAuthor(rows any, post *Post) error {
 	switch r := rows.(type) {
 	case interface {
 		Scan(dest ...any) error
@@ -34,33 +34,33 @@ func buildPostWithAuthorQuery() string {
 }
 
 // buildPostWithAuthorPaginationQuery builds SQL query with pagination for PostWithAuthor
-func buildPostWithAuthorPaginationQuery(baseQuery string, whereClause string, obj map[string]any) (string, []interface{}) {
+func buildPostWithAuthorPaginationQuery(baseQuery string, whereClause string, obj map[string]any) (string, []any) {
 	limit := 50 // default limit
 	if obj["limit"] != nil {
 		limit = int(obj["limit"].(float64))
 	}
 
 	var stmt string
-	var args []interface{}
+	var args []any
 
 	// Priority: cursor-based > timestamp-based > offset-based
 	if obj["last_id"] != nil {
 		// Cursor-based pagination using last_id
 		if whereClause != "" {
 			stmt = baseQuery + " WHERE " + whereClause + " AND p.id < ? ORDER BY p.id DESC LIMIT ?;"
-			args = []interface{}{obj["last_id"], limit}
+			args = []any{obj["last_id"], limit}
 		} else {
 			stmt = baseQuery + " WHERE p.id < ? ORDER BY p.id DESC LIMIT ?;"
-			args = []interface{}{obj["last_id"], limit}
+			args = []any{obj["last_id"], limit}
 		}
 	} else if obj["before"] != nil {
 		// Timestamp-based pagination
 		if whereClause != "" {
 			stmt = baseQuery + " WHERE " + whereClause + " AND p.date < ? ORDER BY p.date DESC LIMIT ?;"
-			args = []interface{}{obj["before"], limit}
+			args = []any{obj["before"], limit}
 		} else {
 			stmt = baseQuery + " WHERE p.date < ? ORDER BY p.date DESC LIMIT ?;"
-			args = []interface{}{obj["before"], limit}
+			args = []any{obj["before"], limit}
 		}
 	} else {
 		// Fallback to offset-based pagination for backward compatibility
@@ -70,10 +70,10 @@ func buildPostWithAuthorPaginationQuery(baseQuery string, whereClause string, ob
 		}
 		if whereClause != "" {
 			stmt = baseQuery + " WHERE " + whereClause + " ORDER BY p.date DESC LIMIT ? OFFSET ?;"
-			args = []interface{}{limit, offset}
+			args = []any{limit, offset}
 		} else {
 			stmt = baseQuery + " ORDER BY p.date DESC LIMIT ? OFFSET ?;"
-			args = []interface{}{limit, offset}
+			args = []any{limit, offset}
 		}
 	}
 
@@ -81,24 +81,24 @@ func buildPostWithAuthorPaginationQuery(baseQuery string, whereClause string, ob
 }
 
 // buildPostWithAuthorPaginationQueryWithParam builds SQL query with pagination and a parameter for PostWithAuthor
-func buildPostWithAuthorPaginationQueryWithParam(baseQuery string, whereClause string, param interface{}, obj map[string]any) (string, []interface{}) {
+func buildPostWithAuthorPaginationQueryWithParam(baseQuery string, whereClause string, param any, obj map[string]any) (string, []any) {
 	limit := 50 // default limit
 	if obj["limit"] != nil {
 		limit = int(obj["limit"].(float64))
 	}
 
 	var stmt string
-	var args []interface{}
+	var args []any
 
 	// Priority: cursor-based > timestamp-based > offset-based
 	if obj["last_id"] != nil {
 		// Cursor-based pagination using last_id
 		stmt = baseQuery + " WHERE " + whereClause + " AND p.id < ? ORDER BY p.id DESC LIMIT ?;"
-		args = []interface{}{param, obj["last_id"], limit}
+		args = []any{param, obj["last_id"], limit}
 	} else if obj["before"] != nil {
 		// Timestamp-based pagination
 		stmt = baseQuery + " WHERE " + whereClause + " AND p.date < ? ORDER BY p.date DESC LIMIT ?;"
-		args = []interface{}{param, obj["before"], limit}
+		args = []any{param, obj["before"], limit}
 	} else {
 		// Fallback to offset-based pagination for backward compatibility
 		offset := 0
@@ -106,7 +106,7 @@ func buildPostWithAuthorPaginationQueryWithParam(baseQuery string, whereClause s
 			offset = int(obj["offset"].(float64))
 		}
 		stmt = baseQuery + " WHERE " + whereClause + " ORDER BY p.date DESC LIMIT ? OFFSET ?;"
-		args = []interface{}{param, limit, offset}
+		args = []any{param, limit, offset}
 	}
 
 	return stmt, args

@@ -4,13 +4,6 @@ import (
 	"fmt"
 )
 
-type Chat struct {
-	Id         int
-	ReceiverId int
-	SenderId   int
-	GroupId    int
-}
-
 func (db *DB) InsertChat(obj map[string]any) Response {
 	/*
 		expected input (as json object) :
@@ -53,4 +46,21 @@ func (db *DB) SelectChatById(obj map[string]any) Response {
 	}
 
 	return Response{chat}
+}
+
+func (db *DB) DeleteChat(obj map[string]any) Response {
+	/*
+		expected input (as json object) :
+		{
+			id : int,
+		}
+	*/
+	stmt := "DELETE FROM chat WHERE id = ?;"
+	_, err := db.Conn.Exec(stmt, obj["id"])
+	if err != nil {
+		fmt.Println(err)
+		return Response{0}
+	}
+
+	return Response{1}
 }

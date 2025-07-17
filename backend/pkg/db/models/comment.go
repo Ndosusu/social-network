@@ -5,16 +5,6 @@ import (
 	"social-network/pkg/utils"
 )
 
-type Comment struct {
-	Id       int
-	AuthorId int
-	PostId   int
-	Message  string
-	Image    string
-	Date     string
-	GroupId  int
-}
-
 type CommentWithAuthor struct {
 	Id           int    `json:"id"`
 	AuthorId     int    `json:"author_id"`
@@ -65,7 +55,7 @@ func (db *DB) SelectCommentById(obj map[string]any) Response {
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
 	comment := Comment{}
-	err := result.Scan(&comment.Id, &comment.AuthorId, &comment.PostId, &comment.Message, &comment.Image, &comment.Date, &comment.GroupId)
+	err := result.Scan(&comment.Id, &comment.AuthorId, &comment.PostId, &comment.Message, &comment.Image, &comment.Date)
 	if err != nil {
 		fmt.Println(err)
 		return Response{Comment{}}
@@ -109,7 +99,7 @@ func (db *DB) SelectCommentsByPostId(obj map[string]any) Response {
 	var comments []Comment
 	for rows.Next() {
 		comment := Comment{}
-		err := rows.Scan(&comment.Id, &comment.AuthorId, &comment.PostId, &comment.Message, &comment.Image, &comment.Date, &comment.GroupId)
+		err := rows.Scan(&comment.Id, &comment.AuthorId, &comment.PostId, &comment.Message, &comment.Image, &comment.Date)
 		if err != nil {
 			fmt.Println(err)
 			continue

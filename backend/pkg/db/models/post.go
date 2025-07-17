@@ -10,27 +10,6 @@ import (
 	"social-network/pkg/utils"
 )
 
-type Post struct {
-	Id          int
-	AuthorId    int
-	Message     string
-	Image       *string
-	Date        string
-	PrivacyMode int
-	GroupId     *int
-}
-
-type PostWithAuthor struct {
-	Id          int
-	AuthorId    int
-	Message     string
-	Image       *string
-	Date        string
-	PrivacyMode int
-	GroupId     *int
-	Author      User
-}
-
 func (db *DB) InsertPost(obj map[string]any) Response {
 	/*
 		expected input (as json object) :
@@ -42,12 +21,12 @@ func (db *DB) InsertPost(obj map[string]any) Response {
 			group_id : int (optional),
 		}
 	*/
-	var imageValue interface{}
+	var imageValue any
 	if obj["image"] != nil && obj["image"] != "" {
 		imageValue = obj["image"]
 	}
 
-	var groupIdValue interface{}
+	var groupIdValue any
 	if obj["group_id"] != nil && obj["group_id"] != 0 {
 		groupIdValue = obj["group_id"]
 	}
@@ -129,7 +108,7 @@ func (db *DB) UpdatePost(obj map[string]any) Response {
 
 	// Build dynamic update query
 	setParts := []string{}
-	values := []interface{}{}
+	values := []any{}
 
 	if obj["message"] != nil {
 		setParts = append(setParts, "message = ?")

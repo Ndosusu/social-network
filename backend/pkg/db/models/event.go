@@ -5,15 +5,6 @@ import (
 	"social-network/pkg/utils"
 )
 
-type Event struct {
-	Id           int
-	GroupId      int
-	Title        string
-	About        string
-	DateSchedule string
-	DateCreation string
-}
-
 func (db *DB) InsertEvent(obj map[string]any) Response {
 	/*
 		expected input (as json object) :

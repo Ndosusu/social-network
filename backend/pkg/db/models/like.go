@@ -4,13 +4,6 @@ import (
 	"fmt"
 )
 
-type Like struct {
-	Id        int
-	UserId    int
-	PostId    int
-	CommentId int
-}
-
 func (db *DB) InsertLike(obj map[string]any) Response {
 	/*
 		expected input (as json object) :
