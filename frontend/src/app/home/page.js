@@ -1,5 +1,5 @@
 "use client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { CheckLogToken } from "../checkToken"
 import { useEffect, useState } from "react"
 import ActionMenu from "../actionMenu"
@@ -8,10 +8,10 @@ import DetailPostModal, { CreateCom } from "./detailPostModal"
 
 export default function Home() {
     const router = useRouter()
+    CheckLogToken(router)
+    
     const [loading, setLoading] = useState(true)
     const [posts, setPosts] = useState(null)
-
-    CheckLogToken(router)
     
     useEffect(() => {
         fetch("http://localhost:8080/posts?limit=15",{

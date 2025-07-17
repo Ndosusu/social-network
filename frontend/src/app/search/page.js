@@ -1,8 +1,13 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import ActionMenu from "../actionMenu"
+import { CheckLogToken } from "../checkToken"
 
 export default function SearchPage() {
+    const router = useRouter()
+    CheckLogToken(router)
+
     const result = [
         {
             nickname: "wiz",

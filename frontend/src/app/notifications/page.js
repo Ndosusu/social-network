@@ -1,8 +1,12 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import ActionMenu from "../actionMenu"
+import { CheckLogToken } from "../checkToken"
 
 export default function NotificationPage() {
+    const router = useRouter()
+    CheckLogToken(router)
 
     const notifs = [ //replace with a fetch
         {

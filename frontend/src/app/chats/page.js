@@ -2,8 +2,13 @@
 
 import { useState } from "react"
 import ActionMenu from "../actionMenu"
+import { CheckLogToken } from "../checkToken"
+import { useRouter } from "next/navigation"
 
 export default function ChatPage() {
+    const router = useRouter()
+    CheckLogToken(router)
+
     const userList = [
         {
             uuid:0,

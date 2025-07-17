@@ -4,15 +4,17 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 let opened = false
+let chatModals = []
 
 export default function ActionMenu() {
     const router = useRouter()
-    const [chatModals, setChatModal] = useState([])
+
+    const [chatModalsNb, setChatModalNb] = useState(chatModals.length)
 
     const moveTo = async (event) => {
         router.push(event.target.getAttribute("target"))
     }
-
+    
     const logOut = async () => {
         localStorage.removeItem("logToken")
         router.push("/")
@@ -41,20 +43,24 @@ export default function ActionMenu() {
     }
 
     const newChatModal = async () => {
-        const mainContainer = document.getElementById("mainContainer")
-        const modal = document.createElement("div")
+        const key = chatModals.length
 
         let selDiv = null
         let posX = 0
         let posY = 0
 
-        modal.className = "absolute resize bg-white h-50 w-50 top-0 left-0 z-40"
-
         const setDrag = async (event) => {
-            event.preventDefault()
-            selDiv = event.target
+            document.getSelection().removeAllRanges()
+            selDiv = document.getElementById("chatModal"+key)
             posX = event.clientX
             posY = event.clientY
+
+            if(!selDiv.style.left || !selDiv.style.top) {
+                let rect = selDiv.getBoundingClientRect()
+                selDiv.classList.remove("inset-1/2", "-translate-1/2")
+                selDiv.style.left = posX - (posX - rect.left) + "px"
+                selDiv.style.top = posY - (posY - rect.top) + "px"
+            }
 
             window.addEventListener("mousemove", followMouse)
         }
@@ -66,6 +72,8 @@ export default function ActionMenu() {
         }
 
         const followMouse = (event) => {
+            event.preventDefault()
+            document.getSelection().removeAllRanges()
             if(selDiv) {
                 let offsetX = posX - selDiv.style.left.replace("px", "")
                 let offsetY = posY - selDiv.style.top.replace("px", "")
@@ -74,17 +82,25 @@ export default function ActionMenu() {
 
                 selDiv.style.left = posX - offsetX +"px"
                 selDiv.style.top = posY - offsetY +"px"
-
-                console.log(offsetX, offsetY)
             }
         }
 
-        modal.onmousedown = setDrag
-        modal.onmouseup = dragEnd
+        const modal = (
+            <div id={"chatModal"+key} className="chatModal absolute resize bg-primaryT h-90 w-75 inset-1/2 -translate-1/2 z-40 rounded-xl overflow-auto flex flex-col neon-sm" key={key}>
+                <div className="bg-secondary w-full h-fit text-xl neon-sm p-1 flex flex-row justify-between items-center" onMouseDown={setDrag} onMouseUp={dragEnd} >
+                    <p className="w-fit cursor-default">User123</p>
+                    <img src="cross.svg" className="h-5" onClick={() => {document.getElementById("chatModal"+key).remove()}} />
+                </div>
+                <div className="flex-grow">
 
-        mainContainer.append(modal)
-        setChatModal(chatModals.concat(modal))
-        console.log(chatModals)
+                </div>
+                <form id={"chatInput"+key} className="p-3 hidden">
+                    <textarea id="chatInput" className="neon-sm bg-primaryT w-full rounded-xl text-xl p-1 h-10 break-normal resize-none" placeholder="Send a message to User123" />
+                </form>
+            </div>
+        )
+
+        setChatModalNb(chatModals.push(modal))
     }
 
     let defaultState = "-translate-x-1/1"
@@ -93,16 +109,21 @@ export default function ActionMenu() {
     }
 
     return (
-        <div id="ActionMenu" opened="true" onMouseOut={hideMenu} onMouseOver={showMenu} className={"bg-primaryT h-fit w-fit absolute inset-y-1/2 -translate-y-1/2 left-0 flex flex-col p-4 gap-4 rounded-br-xl rounded-tr-xl duration-500 z-50 "+defaultState}>
-            <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="home" onClick={moveTo}>H</button>
-            <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="profile" onClick={moveTo}>P</button>
-            <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="search" onClick={moveTo}>S</button>
-            <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="notifications" onClick={moveTo}>N</button>
-            <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="chats" onClick={moveTo}>C</button>
-            <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" onClick={newChatModal}>CM</button>
-            <button className="neon-sm bg-red-500 w-12 h-12 rounded-xl" onClick={logOut}></button>
-            <div id="ActionOpen" className="bg-secondary neon-sm w-1/3 h-1/5 absolute -right-1/3 rounded-br-xl rounded-tr-xl p-1">
-                <img id="arrow" src="rightArrow.svg" className="h-full" />
+        <div>
+            <div id="ActionMenu" opened="true" onMouseOut={hideMenu} onMouseOver={showMenu} className={"bg-primaryT h-fit w-fit absolute inset-y-1/2 -translate-y-1/2 left-0 flex flex-col p-4 gap-4 rounded-br-xl rounded-tr-xl duration-500 z-50 "+defaultState}>
+                <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="home" onClick={moveTo}>H</button>
+                <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="profile" onClick={moveTo}>P</button>
+                <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="search" onClick={moveTo}>S</button>
+                <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="notifications" onClick={moveTo}>N</button>
+                <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="chats" onClick={moveTo}>C</button>
+                <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" onClick={newChatModal}>CM</button>
+                <button className="neon-sm bg-red-500 w-12 h-12 rounded-xl" onClick={logOut}></button>
+                <div id="ActionOpen" className="bg-secondary neon-sm w-1/3 h-1/5 absolute -right-1/3 rounded-br-xl rounded-tr-xl p-1">
+                    <img id="arrow" src="rightArrow.svg" className="h-full" />
+                </div>
+            </div>
+            <div>
+                {chatModals}
             </div>
         </div>
     )
