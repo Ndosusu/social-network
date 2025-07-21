@@ -146,7 +146,7 @@ function CreateChatModal(data) {
                 <p className="w-fit cursor-default">User123</p>
                 <img src="cross.svg" className="h-5" onClick={() => {removeModal(key)}} />
             </div>
-            <div className="flex-grow">
+            <div className="flex-grow"> {/* rajouter le contenu dynamique */}
 
             </div>
             <form id={"chatInput"+key} className="p-3 hidden">
