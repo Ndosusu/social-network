@@ -55,7 +55,7 @@ export default function Home() {
     }
 
     return (
-        <div className="text-white h-full w-full grid items-center">
+        <div className="text-white h-full w-full grid items-center text-xl">
             <div className="bg-primaryT h-6/4 w-2/3 neon-xl center grid items-center">
                 <div className="w-full h-screen overflow-scroll flex flex-col items-center p-4 gap-7">
                     <CheckState />
