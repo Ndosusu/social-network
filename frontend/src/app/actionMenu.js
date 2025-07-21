@@ -134,11 +134,16 @@ function CreateChatModal(data) {
         }
     }
 
+    const removeModal = () => {
+        chatModals.splice(key, 1)
+        document.getElementById("chatModal"+key).remove()
+    }
+
     return (
         <div id={"chatModal"+key} className={"chatModal absolute bg-primaryT h-90 w-75 z-40 rounded-xl overflow-scroll flex flex-col neon-sm"+initialState} key={key} style={{top: obj.y, left: obj.x}}>
             <div className="bg-secondary w-full h-fit text-xl neon-sm p-1 flex flex-row justify-between items-center" onMouseDown={setDrag} onMouseUp={dragEnd} >
                 <p className="w-fit cursor-default">User123</p>
-                <img src="cross.svg" className="h-5" onClick={() => {document.getElementById("chatModal"+key).remove()}} />
+                <img src="cross.svg" className="h-5" onClick={() => {removeModal(key)}} />
             </div>
             <div className="flex-grow">
 
