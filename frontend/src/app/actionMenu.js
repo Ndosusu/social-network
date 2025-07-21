@@ -72,7 +72,7 @@ export default function ActionMenu() {
                 </div>
             </div>
             <div>
-                {chatModals.map((obj, i) => <CreateChatModal obj={obj} id={i} key={i} />)}
+                {chatModals.map((obj, i) => <CreateChatModal obj={obj} id={i} key={i} fn={setChatModalNb} />)}
             </div>
         </div>
     )
@@ -81,6 +81,7 @@ export default function ActionMenu() {
 function CreateChatModal(data) {
     const obj = data.obj
     const key = data.id
+    const fn = data.fn
 
     let selDiv = null
     let posX = 0
@@ -136,7 +137,7 @@ function CreateChatModal(data) {
 
     const removeModal = () => {
         chatModals.splice(key, 1)
-        document.getElementById("chatModal"+key).remove()
+        fn(chatModals.length)
     }
 
     return (
