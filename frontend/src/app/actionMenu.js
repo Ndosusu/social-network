@@ -43,64 +43,13 @@ export default function ActionMenu() {
     }
 
     const newChatModal = async () => {
-        const key = chatModals.length
-
-        let selDiv = null
-        let posX = 0
-        let posY = 0
-
-        const setDrag = async (event) => {
-            document.getSelection().removeAllRanges()
-            selDiv = document.getElementById("chatModal"+key)
-            posX = event.clientX
-            posY = event.clientY
-
-            if(!selDiv.style.left || !selDiv.style.top) {
-                let rect = selDiv.getBoundingClientRect()
-                selDiv.classList.remove("inset-1/2", "-translate-1/2")
-                selDiv.style.left = posX - (posX - rect.left) + "px"
-                selDiv.style.top = posY - (posY - rect.top) + "px"
-            }
-
-            window.addEventListener("mousemove", followMouse)
+        const obj = {
+            x: null,
+            y: null,
+            with: null,
         }
 
-        const dragEnd = async (event) => {
-            event.preventDefault()
-            selDiv = null
-            window.removeEventListener("mousemove", followMouse)
-        }
-
-        const followMouse = (event) => {
-            event.preventDefault()
-            document.getSelection().removeAllRanges()
-            if(selDiv) {
-                let offsetX = posX - selDiv.style.left.replace("px", "")
-                let offsetY = posY - selDiv.style.top.replace("px", "")
-                posX = event.clientX
-                posY = event.clientY
-
-                selDiv.style.left = posX - offsetX +"px"
-                selDiv.style.top = posY - offsetY +"px"
-            }
-        }
-
-        const modal = (
-            <div id={"chatModal"+key} className="chatModal absolute resize bg-primaryT h-90 w-75 inset-1/2 -translate-1/2 z-40 rounded-xl overflow-auto flex flex-col neon-sm" key={key}>
-                <div className="bg-secondary w-full h-fit text-xl neon-sm p-1 flex flex-row justify-between items-center" onMouseDown={setDrag} onMouseUp={dragEnd} >
-                    <p className="w-fit cursor-default">User123</p>
-                    <img src="cross.svg" className="h-5" onClick={() => {document.getElementById("chatModal"+key).remove()}} />
-                </div>
-                <div className="flex-grow">
-
-                </div>
-                <form id={"chatInput"+key} className="p-3 hidden">
-                    <textarea id="chatInput" className="neon-sm bg-primaryT w-full rounded-xl text-xl p-1 h-10 break-normal resize-none" placeholder="Send a message to User123" />
-                </form>
-            </div>
-        )
-
-        setChatModalNb(chatModals.push(modal))
+        setChatModalNb(chatModals.push(obj))
     }
 
     let defaultState = "-translate-x-1/1"
@@ -123,8 +72,80 @@ export default function ActionMenu() {
                 </div>
             </div>
             <div>
-                {chatModals}
+                {chatModals.map((obj, i) => <CreateChatModal obj={obj} id={i} key={i} />)}
             </div>
+        </div>
+    )
+}
+
+function CreateChatModal(data) {
+    const obj = data.obj
+    const key = data.id
+
+    let selDiv = null
+    let posX = 0
+    let posY = 0
+    let initialState = " inset-1/2 -translate-1/2"
+    if(obj.x && obj.y) {
+        initialState = ""
+    }
+
+    const setDrag = async (event) => {
+        document.getSelection().removeAllRanges()
+        selDiv = document.getElementById("chatModal"+key)
+        posX = event.clientX
+        posY = event.clientY
+
+        if(!selDiv.style.left || !selDiv.style.top) {
+            let rect = selDiv.getBoundingClientRect()
+            selDiv.classList.remove("inset-1/2", "-translate-1/2")
+
+            selDiv.style.left = posX - (posX - rect.left) + "px"
+            selDiv.style.top = posY - (posY - rect.top) + "px"
+
+            chatModals[key].x = selDiv.style.left
+            chatModals[key].y = selDiv.style.top
+        }
+
+        window.addEventListener("mousemove", followMouse)
+    }
+
+    const dragEnd = async (event) => {
+        event.preventDefault()
+        selDiv = null
+        window.removeEventListener("mousemove", followMouse)
+    }
+
+    const followMouse = (event) => {
+        event.preventDefault()
+        document.getSelection().removeAllRanges()
+        if(selDiv) {
+            let offsetX = posX - selDiv.style.left.replace("px", "")
+            let offsetY = posY - selDiv.style.top.replace("px", "")
+
+            posX = event.clientX
+            posY = event.clientY
+
+            selDiv.style.left = posX - offsetX +"px"
+            selDiv.style.top = posY - offsetY +"px"
+
+            chatModals[key].x = selDiv.style.left
+            chatModals[key].y = selDiv.style.top
+        }
+    }
+
+    return (
+        <div id={"chatModal"+key} className={"chatModal absolute bg-primaryT h-90 w-75 z-40 rounded-xl overflow-scroll flex flex-col neon-sm"+initialState} key={key} style={{top: obj.y, left: obj.x}}>
+            <div className="bg-secondary w-full h-fit text-xl neon-sm p-1 flex flex-row justify-between items-center" onMouseDown={setDrag} onMouseUp={dragEnd} >
+                <p className="w-fit cursor-default">User123</p>
+                <img src="cross.svg" className="h-5" onClick={() => {document.getElementById("chatModal"+key).remove()}} />
+            </div>
+            <div className="flex-grow">
+
+            </div>
+            <form id={"chatInput"+key} className="p-3 hidden">
+                <textarea id="chatInput" className="neon-sm bg-primaryT w-full rounded-xl text-xl p-1 h-10 break-normal resize-none" placeholder="Send a message to User123" />
+            </form>
         </div>
     )
 }
