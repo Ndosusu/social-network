@@ -4,7 +4,7 @@ import { CheckLogToken } from "../checkToken"
 import { useEffect, useState } from "react"
 import ActionMenu from "../actionMenu"
 import NewPostModal from "./newPostModal"
-import DetailPostModal, { CreateCom } from "./detailPostModal"
+import DetailPostModal from "./detailPostModal"
 
 export default function Home() {
     const router = useRouter()
@@ -12,6 +12,7 @@ export default function Home() {
     
     const [loading, setLoading] = useState(true)
     const [posts, setPosts] = useState(null)
+    const [curDetail, setDetail] = useState(null)
     
     useEffect(() => {
         fetch("http://localhost:8080/posts?limit=15",{
@@ -44,13 +45,24 @@ export default function Home() {
         if (!posts) {
             return <p>failed to fetch data.</p>
         }
-        return posts.map((obj, i) => <CreatePost post={obj} key={i} />)
+        return posts.map((obj, i) => <CreatePost post={obj} key={i} fn={setDetail} />)
     }
 
     const hideModal = async () => {
         document.getElementById("modalDiv").classList.add("hidden")
         document.querySelectorAll(".modal").forEach(obj => {
             obj.classList.add("hidden")
+        })
+
+        document.querySelectorAll("form").forEach(obj => {
+            obj.reset()
+        })
+        document.querySelectorAll(".preview").forEach(obj => {
+            obj.setAttribute("src", "")
+            obj.classList.add("hidden")
+        })
+        document.querySelectorAll(".fileName").forEach(obj => {
+            obj.textContent = "None"
         })
     }
 
@@ -71,7 +83,7 @@ export default function Home() {
             <div id="modalDiv" className="w-screen h-screen absolute hidden ">
                 <div className="w-full h-full bg-black opacity-80 absolute z-5" onClick={hideModal}/>
                 <NewPostModal />
-                <DetailPostModal />
+                <DetailPostModal post={curDetail} />
             </div>
         </div>
     )
@@ -84,47 +96,27 @@ const showModal = (modalId) => {
 
 export function CreatePost(data) {
     const post = data.post
-    const updateModal = () => {
-        document.getElementById("detailAuthor").textContent = post.AuthorId
-        document.getElementById("detailMessage").textContent = post.Message
-        fetch("http://localhost:8080/comments?post_id="+post.Id, {
-            method: "GET"
-        })
-        .catch(error => {
-            throw new Error("Failed to fetch comments.")
-        })
-        .then(data => {
-            return data.json()
-        })
-        .then(data => {
-            console.log(data)
-            if(data && data.success) {
-                document.getElementById("detailCommentList").innerHTML = data.data.map((obj, i) => <CreateCom com={obj} key={i} />)
-            } else {
-                throw new Error("No data.")
-            }
-        })
-    }
+    const fn = data.fn
 
     return (
-        <div className="w-5/6 rounded-xl neon-sm" onClick={async () => {
+        <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={async () => {
             showModal("detailPostModal")
-            updateModal()
-        }}>
+            fn(post)
+            }}>
             <div className="w-full postHeader bg-primaryT p-2">
-                {post.AuthorId}
+                {post.AuthorId || "no"}
             </div>
             <div className="w-full h-fit p-4">
-                {post.Message}
+                {post.Message || "no"}
             </div>
             <div className="p-3 flex w-full gap-4">
-                <div className="w-1/10 flex items-center">
+                <div className="min-w-1/10 flex items-center">
                     <img src="/like.svg" className="h-8"></img>
-                    <p>{post.nbLike}</p>
+                    <p>{post.nbLike || "0"}</p>
                 </div>
-                <div className="w-1/10 flex items-center gap-1">
+                <div className="min-w-1/10 flex items-center gap-1">
                     <img src="/comment.svg" className="h-8"></img>
-                    <p>{post.nbCom}</p>
+                    <p>{post.nbCom || "0"}</p>
                 </div>
             </div>
         </div>

@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root{
-  --primary: rgb(0, 0, 0);
-  --primaryT: rgba(0, 0, 0, 0.6);
-  --secondary: rgb(191, 81, 251);
-  --secondaryT: rgba(191, 81, 251, 0.6);
-  --secondaryL: rgb(218, 149, 255);
-  --secondaryLT: rgba(218, 149, 255, 0.6);
+  --primary: hsl(0, 0%, 0%);
+  --primaryT: hsla(0, 0%, 0%, 0.6);
+  --secondary: hsl(279, 96%, 65%);
+  --secondaryT: hsla(279, 96%, 65%, 0.6);
+  --secondaryL: hsl(279, 100%, 79%);
+  --secondaryLT: hsla(279, 100%, 79%, 0.6);
 }
 
 @theme {
@@ -18,10 +18,6 @@
 
 *::-webkit-scrollbar {
   display:none;
-}
-
-input:focus {
-  border: none;
 }
 
 .neon-xl {
@@ -38,14 +34,14 @@ input:focus {
   background-color: #7289DA;
 }
 
-input.neon-xl:hover, textarea.neon-xl:hover, label.neon-xl:hover {
+input.neon-xl:hover, textarea.neon-xl:hover, label.neon-xl:hover, .neon-xl.hoverable:hover {
   box-shadow: 0px 0px 20px 10px var(--secondaryLT), inset 0px 0px 8px 4px var(--secondaryLT);
   border: 2px solid var(--secondaryLT);
 }
 
-input.neon-sm:hover, textarea.neon-sm:hover, label.neon-sm:hover {
+input.neon-sm:hover, textarea.neon-sm:hover, label.neon-sm:hover, .neon-sm.hoverable:hover {
   box-shadow: 0px 0px 10px 4px var(--secondaryLT), inset 0px 0px 8px 4px var(--secondaryLT);
-  border: 1px solid var(--secondaryLT);
+  border: 1px solid var(--secondaryLT); 
 }
 
 .center {

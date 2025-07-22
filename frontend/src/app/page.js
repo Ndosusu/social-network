@@ -160,7 +160,6 @@ export default function Home() {
                         <img id="preview" className="w-full h-full rounded-xl hidden"></img>
                       </div>
                     </label>
-                    
                   </div>
                 </div>
               </div>

@@ -52,10 +52,10 @@ export default function NewPostModal() {
                     <label htmlFor="postImage" className="bg-primaryT h-fit neon-sm rounded-xl w-8/10 p-2 flex flex-row justify-between" >
                         <div>
                             <input name="image" type="file" id="postImage" className="hidden" onChange={changedFile} accept=".gif,.jpg,.jpeg,.png"/>
-                            <p>Chosen file (optional): </p><p id="fileName">None</p>
+                            <p>Chosen file (optional): </p><p id="fileName" className="fileName">None</p>
                         </div>
                         <div className="w-25 h-25">
-                            <img id="preview" className="w-full h-full rounded-xl hidden"></img>
+                            <img id="preview" className="preview w-full h-full rounded-xl hidden"></img>
                         </div>
                     </label>
                 </div>
