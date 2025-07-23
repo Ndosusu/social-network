@@ -7,6 +7,7 @@
   --secondaryT: hsla(279, 96%, 65%, 0.6);
   --secondaryL: hsl(279, 100%, 79%);
   --secondaryLT: hsla(279, 100%, 79%, 0.6);
+  --hovered: hsla(0, 0%, 78%, 0.3);
 }
 
 @theme {
@@ -14,6 +15,7 @@
   --color-primaryT: var(--primaryT);
   --color-secondary: var(--secondary);
   --color-secondaryT: var(--secondaryT);
+  --color-hovered: var(--hovered);
 }
 
 *::-webkit-scrollbar {
@@ -73,10 +75,24 @@ input[type=number] {
   appearance: textfield;
 }
 
-label:has(input[type=radio]:checked) {
+label:has(input[type=radio]:checked), label:has(input[type=checkbox]:checked) {
   background-color: var(--secondary);
+}
+
+label:has(input[type=radio]:checked:hover), label:has(input[type=checkbox]:checked:hover) {
+  background-color: var(--secondaryL);
 }
 
 label:has(input[type=radio]) {
   background-color: var(--primaryT);
+}
+
+#userCheckBox:first-child {
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+#userCheckBox:last-child {
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
 }

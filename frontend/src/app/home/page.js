@@ -13,6 +13,7 @@ export default function Home() {
     const [loading, setLoading] = useState(true)
     const [posts, setPosts] = useState(null)
     const [curDetail, setDetail] = useState(null)
+    const [curModal, setModal]= useState("")
     
     useEffect(() => {
         fetch("http://localhost:8080/posts?limit=15",{
@@ -38,6 +39,7 @@ export default function Home() {
         })
     }, [])
 
+    console.log(curModal)
     const CheckState = () => {
         if (loading) {
             return <p>loading...</p>
@@ -45,25 +47,29 @@ export default function Home() {
         if (!posts) {
             return <p>failed to fetch data.</p>
         }
-        return posts.map((obj, i) => <CreatePost post={obj} key={i} fn={setDetail} />)
+        return posts.map((obj, i) => <CreatePost post={obj} key={i} setDetail={setDetail} setModal={setModal} />)
     }
 
-    const hideModal = async () => {
-        document.getElementById("modalDiv").classList.add("hidden")
-        document.querySelectorAll(".modal").forEach(obj => {
-            obj.classList.add("hidden")
-        })
+    const CreateModal = () => {
+        return (
+            <div id="modalDiv" className="w-screen h-screen absolute ">
+                <div className="w-full h-full bg-black opacity-80 absolute z-5" onClick={async () => {setModal("")}}/>
+                <CheckModalState />
+            </div>
+        )
+    }
 
-        document.querySelectorAll("form").forEach(obj => {
-            obj.reset()
-        })
-        document.querySelectorAll(".preview").forEach(obj => {
-            obj.setAttribute("src", "")
-            obj.classList.add("hidden")
-        })
-        document.querySelectorAll(".fileName").forEach(obj => {
-            obj.textContent = "None"
-        })
+    const CheckModalState = () => {
+        switch(curModal) {
+            case "newPostModal": {
+                console.log("ok")
+                return <NewPostModal />
+            }
+
+            case "detailModal": {
+                return <DetailPostModal post={curDetail} />
+            }
+        }
     }
 
     return (
@@ -74,34 +80,30 @@ export default function Home() {
                 </div>
             </div>
             <div className="fixed neon-xl w-1/10 h-fit max-h-5/6 left-5/6 top-1/12 postAction p-7">
-                <div className="neon-sm p-5 rounded-xl flex flex-col items-center" onClick={async () => {showModal("newPostModal")}}>
+                <div className="neon-sm p-5 rounded-xl flex flex-col items-center" onClick={() => {setModal("newPostModal")}}>
                     <img src="/new.svg" className="h-max"></img>
                     <p className="text-sm text-center">New post</p>
                 </div>
             </div>
             <ActionMenu />
-            <div id="modalDiv" className="w-screen h-screen absolute hidden ">
-                <div className="w-full h-full bg-black opacity-80 absolute z-5" onClick={hideModal}/>
-                <NewPostModal />
-                <DetailPostModal post={curDetail} />
-            </div>
+            {
+                curModal != "" 
+                ? <CreateModal /> 
+                : null
+            }
         </div>
     )
 }
 
-const showModal = (modalId) => {
-    document.getElementById("modalDiv").classList.remove("hidden")
-    document.getElementById(modalId).classList.remove("hidden")
-}
-
 export function CreatePost(data) {
     const post = data.post
-    const fn = data.fn
+    const setDetail = data.setDetail
+    const setModal = data.setModal
 
     return (
         <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={async () => {
-            showModal("detailPostModal")
-            fn(post)
+            setDetail(post)
+            setModal("detailModal")
         }}>
             <div className="w-full postHeader bg-primaryT p-2">
                 {post.AuthorId || "no"}

@@ -6,7 +6,7 @@ export default function DetailPostModal(data) {
     const post = data.post
     
     return (
-        <div id="detailPostModal" className="modal neon-xl bg-primaryT min-h-9/10 h-fit w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl hidden overflow-scroll">
+        <div className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl overflow-scroll">
             {post ? <DetailContent post={post} /> : <PostNotFound /> }
         </div>
     )
