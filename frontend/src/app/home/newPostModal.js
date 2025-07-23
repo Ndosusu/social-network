@@ -15,7 +15,10 @@ export default function NewPostModal() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: formData,
+            body: {
+                user: localStorage.getItem("logToken"),
+                formData : formData,
+            },
         })
         .catch(error => {
             throw new Error(error)
@@ -51,7 +54,7 @@ export default function NewPostModal() {
     return (
         <div className="modal absolute w-full h-full z-10 inset-1/2 -translate-1/2 flex items-center justify-center pointer-events-none gap-7">
             <div className="neon-xl bg-primaryT h-9/10 w-3/5 rounded-xl pointer-events-auto">
-                <form id="newPostForm" className="w-full h-full flex flex-col justify-between items-center p-7 gap-7" onSubmit={newPostResolve}>
+                <form id="newPostForm" encType="multipart/form-data" className="w-full h-full flex flex-col justify-between items-center p-7 gap-7" onSubmit={newPostResolve}>
                     <div className="w-full h-3/4 flex flex-col items-center gap-7 flex-grow">
                         <textarea name="message" className="w-full h-full bg-primaryT neon-sm resize-none rounded-xl flex-grow p-3" placeholder="Content"></textarea>
                         <label htmlFor="postImage" className="bg-primaryT h-fit neon-sm rounded-xl w-8/10 p-2 flex flex-row justify-between" >
@@ -139,7 +142,7 @@ function PrivateUserList() {
     const CreateUserCheckbox = ({user, init = false}) => {
         return (
             <label id="userCheckBox" className="w-full flex flex-row p-3 hover:bg-hovered text-xl items-center gap-3">
-                <input form="newPostForm" name="checkboxUser" id={"checkbox"+user.id} type="checkbox" className="hidden" defaultChecked={init ? true : false} />
+                <input form="newPostForm" name="checkboxUser" value={user.id} id={"checkbox"+user.id} type="checkbox" className="hidden" defaultChecked={init ? true : false} />
                 <img src="discord.svg" className="bg-discord h-10 rounded-xl" />
                 <p>{user.name}</p>
             </label>
