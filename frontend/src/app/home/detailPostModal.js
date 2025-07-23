@@ -6,7 +6,7 @@ export default function DetailPostModal(data) {
     const post = data.post
     
     return (
-        <div id="detailPostModal" className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl hidden overflow-scroll">
+        <div id="detailPostModal" className="modal neon-xl bg-primaryT min-h-9/10 h-fit w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl hidden overflow-scroll">
             {post ? <DetailContent post={post} /> : <PostNotFound /> }
         </div>
     )
@@ -149,7 +149,7 @@ function NewComInput() {
 
     return (
         <form className="w-full h-full flex flex-col gap-5" onSubmit={handleForm}>
-            <textarea name="Message" className="w-full resize-none neon-sm rounded-xl bg-primaryT h-25 overflow-scroll p-3 flex-grow" placeholder="Write your comment here" maxLength={1024} />
+            <textarea name="Message" className="w-full resize-none neon-sm rounded-xl bg-primaryT h-25 overflow-scroll p-3 flex-grow" placeholder="Write your comment here" maxLength={1024} required />
             <div className="col-span-2 grid align-center h-fit">
                 <label htmlFor="file" className="bg-primaryT h-fit neon-sm rounded-xl w-full p-2 flex flex-row justify-between" >
                     <div>

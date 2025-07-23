@@ -102,7 +102,7 @@ export function CreatePost(data) {
         <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={async () => {
             showModal("detailPostModal")
             fn(post)
-            }}>
+        }}>
             <div className="w-full postHeader bg-primaryT p-2">
                 {post.AuthorId || "no"}
             </div>
