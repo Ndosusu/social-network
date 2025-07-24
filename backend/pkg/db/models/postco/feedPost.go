@@ -10,6 +10,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 			{
 				session_uuid : string,
 				last_id : int,
+				limit : int
 			}
 	*/
 
@@ -46,8 +47,8 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 				AND p.id < ?
 			GROUP BY p.id
 			ORDER BY p.id DESC
-			LIMIT 20;`
-	rows, err := db.Conn.Query(query, obj["session_uuid"], obj["last_id"])
+			LIMIT ?;`
+	rows, err := db.Conn.Query(query, obj["session_uuid"], obj["last_id"], obj["limit"])
 	if err != nil {
 		return nil, err
 	}
@@ -131,8 +132,8 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 				AND p.id < ?
 			GROUP BY p.id
 			ORDER BY p.id DESC
-			LIMIT 20;`
-	rows, err := db.Conn.Query(query, obj["session_uuid"], obj["last_id"])
+			LIMIT ?;`
+	rows, err := db.Conn.Query(query, obj["session_uuid"], obj["last_id"], obj["limit"])
 	if err != nil {
 		return nil, err
 	}
@@ -206,8 +207,8 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 				AND p.id < ?
 			GROUP BY p.id
 			ORDER BY p.id DESC
-			LIMIT 20;`
-	rows, err := db.Conn.Query(query, obj["group_id"], obj["last_id"])
+			LIMIT ?;`
+	rows, err := db.Conn.Query(query, obj["group_id"], obj["last_id"], obj["limit"])
 	if err != nil {
 		return nil, err
 	}
