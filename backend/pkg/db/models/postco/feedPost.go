@@ -17,18 +17,18 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 	fmt.Println(obj)
 
 	query := `SELECT 
-				posts.id,
-				posts.author_id,
-				users.nick_name,
-				users.avatar,
-				posts.message,
-				COALESCE(posts.image, ''),
-				posts.date,
-				posts.privacy_mode,
-				COALESCE(posts.group_id, 0),
-				COUNT(DISTINCT likes.id),
-				COUNT(DISTINCT comments.id),
-				COALESCE(groups.title, '')
+				p.id,
+				p.author_id,
+				u.nick_name,
+				u.avatar,
+				p.message,
+				COALESCE(p.image, ''),
+				p.date,
+				p.privacy_mode,
+				COALESCE(p.group_id, 0),
+				COUNT(DISTINCT l.id),
+				COUNT(DISTINCT c.id),
+				COALESCE(g.title, '')
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			JOIN sessions s ON s.uuid = ?
