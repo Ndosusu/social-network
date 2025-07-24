@@ -39,7 +39,6 @@ export default function Home() {
         })
     }, [])
 
-    console.log(curModal)
     const CheckState = () => {
         if (loading) {
             return <p>loading...</p>
@@ -62,7 +61,6 @@ export default function Home() {
     const CheckModalState = () => {
         switch(curModal) {
             case "newPostModal": {
-                console.log("ok")
                 return <NewPostModal />
             }
 

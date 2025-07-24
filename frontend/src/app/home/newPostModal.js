@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import PrivateUserList from "./userList"
 
 export default function NewPostModal() {
     const [privacyState, setPrivacy] = useState(1)
@@ -9,16 +10,14 @@ export default function NewPostModal() {
         event.preventDefault()
 
         const formData = new FormData(event.currentTarget)
+        formData.append("author_uuid", localStorage.getItem("logToken"))
 
         fetch("http://localhost:8080/posts", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: {
-                user: localStorage.getItem("logToken"),
-                formData : formData,
-            },
+            body: formData,
         })
         .catch(error => {
             throw new Error(error)
@@ -88,7 +87,7 @@ function CreateOptionList({opts, fn}) {
 function CreateOption({text, val, fn}) {
     return (
         <label htmlFor={"radio"+val} className="neon-sm rounded-xl p-2 w-2/10">
-            <input type="radio" name="radioPrivacy" id={"radio"+val} value={val} defaultChecked={val == 1 ? true : false} onClick={() => {fn(val)}} className="hidden" />
+            <input type="radio" name="privacy_mode" id={"radio"+val} value={val} defaultChecked={val == 1 ? true : false} onClick={() => {fn(val)}} className="hidden" />
             <p>{text}</p>
         </label>
     )
@@ -104,59 +103,6 @@ function CheckPrivacyState({privacy}) {
             return <PrivateGroupList />
         }
     }
-}
-
-function PrivateUserList() {
-    const [selectedUsers, setSelectedUsers] = useState([])
-    const [userList, setUsers] = useState([])
-
-    //fetch users
-    const tempUser = [
-        {
-            id:"5",
-            name:"wiz",
-        },
-        {
-            id:"8",
-            name:"ziw",
-        },
-        {
-            id:"8",
-            name:"ziw",
-        },
-        {
-            id:"8",
-            name:"ziw",
-        },
-        {
-            id:"8",
-            name:"ziw",
-        }
-    ]
-
-    const selectUser = (event) => {
-        const div = event.target
-        div.setAttribute("selected", "true")
-    }
-
-    const CreateUserCheckbox = ({user, init = false}) => {
-        return (
-            <label id="userCheckBox" className="w-full flex flex-row p-3 hover:bg-hovered text-xl items-center gap-3">
-                <input form="newPostForm" name="checkboxUser" value={user.id} id={"checkbox"+user.id} type="checkbox" className="hidden" defaultChecked={init ? true : false} />
-                <img src="discord.svg" className="bg-discord h-10 rounded-xl" />
-                <p>{user.name}</p>
-            </label>
-        )
-    }
-
-    return (
-        <div className="w-1/5 h-9/10 neon-xl rounded-xl flex flex-col pointer-events-auto p-2">
-            <p>Selected users :</p>
-            {selectedUsers.map((obj, i) => <CreateUserCheckbox user={obj} key={i} init={true} />)}
-            <p>Available users :</p>
-            {tempUser.map((obj, i) => <CreateUserCheckbox user={obj} key={i} />)}
-        </div>
-    )
 }
 
 function PrivateGroupList() {

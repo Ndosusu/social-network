@@ -86,13 +86,3 @@ label:has(input[type=radio]:checked:hover), label:has(input[type=checkbox]:check
 label:has(input[type=radio]) {
   background-color: var(--primaryT);
 }
-
-#userCheckBox:first-child {
-  border-top-left-radius: 0.75rem;
-  border-top-right-radius: 0.75rem;
-}
-
-#userCheckBox:last-child {
-  border-bottom-left-radius: 0.75rem;
-  border-bottom-right-radius: 0.75rem;
-}
