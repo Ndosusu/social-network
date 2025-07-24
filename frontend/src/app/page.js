@@ -54,11 +54,11 @@ export default function Home() {
       const response = await result.json()
       console.log("Register response:", response)
       
-      if (response.success) {
-        localStorage.setItem("logToken", response.data.uuid)
+      if (response.session_uuid) {
+        localStorage.setItem("logToken", response.session_uuid)
         router.push("home")
       } else {
-        alert("Registration failed: " + response.error)
+        alert("Registration failed :c")
       }
     } catch (error) {
       console.error("Registration error:", error)
