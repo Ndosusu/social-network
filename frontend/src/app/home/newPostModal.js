@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import PrivateUserList from "./userList"
+import PrivateGroupList from "./groupList"
 
 export default function NewPostModal() {
     const [privacyState, setPrivacy] = useState(1)
@@ -103,16 +104,4 @@ function CheckPrivacyState({privacy}) {
             return <PrivateGroupList />
         }
     }
-}
-
-function PrivateGroupList() {
-    const [selectedGroup, setGroup] = useState(null)
-
-    //fetch groups
-
-    return (
-        <div className="w-1/5 h-9/10 neon-xl rounded-xl flex flex-col pointer-events-auto">
-
-        </div>
-    )
 }

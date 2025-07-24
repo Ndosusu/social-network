@@ -82,7 +82,3 @@ label:has(input[type=radio]:checked), label:has(input[type=checkbox]:checked) {
 label:has(input[type=radio]:checked:hover), label:has(input[type=checkbox]:checked:hover) {
   background-color: var(--secondaryL);
 }
-
-label:has(input[type=radio]) {
-  background-color: var(--primaryT);
-}

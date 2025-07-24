@@ -1,6 +1,6 @@
 "use client"
 
-const { useState } = require("react")
+import { useState } from "react"
 
 export default function PrivateUserList() {
     const [userList, setUsers] = useState([])
@@ -61,23 +61,6 @@ export default function PrivateUserList() {
         }
     ]
 
-    const CreateUserCheckbox = ({user}) => {
-        return (
-            <label id="userCheckBox" htmlFor={"checkbox"+user.id} className="w-full flex flex-row p-3 hover:bg-hovered text-xl items-center gap-3 select-none">
-                <input name="checkboxUser" form="newPostForm" value={user.id} id={"checkbox"+user.id} type="checkbox" className="hidden" onClick={async (event) => {
-                    const div = event.target
-                    if(!div.checked) {
-                        document.getElementById("userList").append(div.parentNode)
-                    } else {
-                        document.getElementById("selectedList").append(div.parentNode)
-                    }
-                }} />
-                <img src="discord.svg" className="bg-discord h-10 rounded-xl" />
-                <p>{user.name}</p>
-            </label>
-        )
-    }
-
     return (
         <div className="w-1/5 h-9/10 neon-xl rounded-xl flex flex-col pointer-events-auto p-2">
             <div className="max-h-1/2 h-fit flex flex-col">
@@ -95,3 +78,20 @@ export default function PrivateUserList() {
         </div>
     )
 }
+
+function CreateUserCheckbox({user}) {
+        return (
+            <label id="userCheckBox" htmlFor={"checkbox"+user.id} className="w-full flex flex-row p-3 hover:bg-hovered text-xl items-center gap-3 select-none">
+                <input name="followers_id" form="newPostForm" value={user.id} id={"checkbox"+user.id} type="checkbox" className="hidden" onClick={async (event) => {
+                    const div = event.target
+                    if(!div.checked) {
+                        document.getElementById("userList").append(div.parentNode)
+                    } else {
+                        document.getElementById("selectedList").append(div.parentNode)
+                    }
+                }} />
+                <img src="discord.svg" className="bg-discord h-10 rounded-xl" />
+                <p>{user.name}</p>
+            </label>
+        )
+    }
