@@ -16,11 +16,16 @@ export default function Home() {
     const [curModal, setModal]= useState("")
     
     useEffect(() => {
-        fetch("http://localhost:8080/posts?limit=15",{
-            method: 'GET',
+        fetch("http://localhost:8080/feed/global",{
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-        }})
+            },
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                limit: 15,
+            })
+        })
         .catch(error => {
             setLoading(false)
             throw new Error(error)
