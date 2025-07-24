@@ -28,11 +28,11 @@ export default function Home() {
       const response = await result.json()
       console.log("Login response:", response)
       
-      if (response.success) {
-        localStorage.setItem("logToken", response.data.uuid)
+      if (response.session_uuid) {
+        localStorage.setItem("logToken", response.session_uuid)
         router.push("home")
       } else {
-        alert("Login failed: " + response.error)
+        alert("Login failed :c")
       }
     } catch (error) {
       console.error("Login error:", error)
