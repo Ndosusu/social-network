@@ -28,8 +28,8 @@ export default function Home() {
       const response = await result.json()
       console.log("Login response:", response)
       
-      if (response.session_uuid) {
-        localStorage.setItem("logToken", response.session_uuid)
+      if (response.data) {
+        localStorage.setItem("logToken", response.data.session_uuid)
         router.push("home")
       } else {
         alert("Login failed :c")
@@ -54,8 +54,8 @@ export default function Home() {
       const response = await result.json()
       console.log("Register response:", response)
       
-      if (response.session_uuid) {
-        localStorage.setItem("logToken", response.session_uuid)
+      if (response.data) {
+        localStorage.setItem("logToken", response.data.session_uuid)
         router.push("home")
       } else {
         alert("Registration failed :c")
