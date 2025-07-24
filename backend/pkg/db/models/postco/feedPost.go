@@ -1,6 +1,7 @@
 package models_post
 
 import (
+	"fmt"
 	"social-network/pkg/db/models"
 )
 
@@ -13,6 +14,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 				limit : int
 			}
 	*/
+	fmt.Println(obj)
 
 	query := `SELECT 
 				posts.id,
