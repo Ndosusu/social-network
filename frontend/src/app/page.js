@@ -28,11 +28,11 @@ export default function Home() {
       const response = await result.json()
       console.log("Login response:", response)
       
-      if (response.success) {
-        localStorage.setItem("logToken", response.data.uuid)
+      if (response.data) {
+        localStorage.setItem("logToken", response.data.session_uuid)
         router.push("home")
       } else {
-        alert("Login failed: " + response.error)
+        alert("Login failed :c")
       }
     } catch (error) {
       console.error("Login error:", error)
@@ -54,11 +54,11 @@ export default function Home() {
       const response = await result.json()
       console.log("Register response:", response)
       
-      if (response.success) {
-        localStorage.setItem("logToken", response.data.uuid)
+      if (response.data) {
+        localStorage.setItem("logToken", response.data.session_uuid)
         router.push("home")
       } else {
-        alert("Registration failed: " + response.error)
+        alert("Registration failed :c")
       }
     } catch (error) {
       console.error("Registration error:", error)
