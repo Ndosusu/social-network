@@ -28,9 +28,9 @@ func InitRouter() *http.ServeMux {
 	mux.HandleFunc("DELETE /posts", middleware.Cors(handlers.DeletePostHandler))
 	mux.HandleFunc("GET /posts/image", middleware.Cors(handlers.ServeImageHandler))
 
-	mux.HandleFunc("GET /feed/global", middleware.Cors(handlers.GlobalFeedHandler))
-	mux.HandleFunc("GET /feed/follow", middleware.Cors(handlers.FollowFeedHandler))
-	mux.HandleFunc("GET /feed/group", middleware.Cors(handlers.GroupFeedHandler))
+	mux.HandleFunc("POST /feed/global", middleware.Cors(handlers.GlobalFeedHandler))
+	mux.HandleFunc("POST /feed/follow", middleware.Cors(handlers.FollowFeedHandler))
+	mux.HandleFunc("POST /feed/group", middleware.Cors(handlers.GroupFeedHandler))
 
 	/* 	mux.HandleFunc("GET /posts", middleware.Cors(handlers.PostsHandler))
 
