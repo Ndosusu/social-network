@@ -34,7 +34,7 @@ type DB struct {
 }
 
 func (db *DB) OpenConn() {
-	conn, err := sql.Open("sqlite3", config.DBPath)
+	conn, err := sql.Open("sqlite3", config.DBPath+config.DBName)
 	if err != nil {
 		fmt.Println(err)
 		return

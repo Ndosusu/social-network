@@ -29,7 +29,7 @@ func (db *UserDB) InsertUser(obj map[string]any) (*models.Response, error) {
 		return nil, err
 	}
 
-	stmt := "INSERT INTO users (email, password, first_name, last_name, date_birth, avatar, nick_name, about, date_creation, private_mode) VALUES (?,?,?,?,?,?,?,?,?,?,?);"
+	stmt := "INSERT INTO users (email, password, first_name, last_name, date_birth, avatar, nick_name, about, date_creation, private_mode) VALUES (?,?,?,?,?,?,?,?,?,?);"
 	result, err := db.Conn.Exec(stmt, obj["email"], passwordHash, obj["first_name"], obj["last_name"], obj["date_birth"], obj["avatar"], obj["nickname"], obj["about"], utils.GetCurrentTime(), false)
 	if err != nil {
 		fmt.Println(err)

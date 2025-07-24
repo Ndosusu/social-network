@@ -83,6 +83,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	session := result.Result.(models.Session)
 
 	utils.JSONResponse(w, http.StatusCreated, "Registration successful", map[string]any{
-		"session_id": session.Uuid,
+		"session_uuid": session.Uuid,
 	})
 }
