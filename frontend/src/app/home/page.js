@@ -33,10 +33,11 @@ export default function Home() {
 
         .then(data => data.json())
 
-        .then(data => {
-            if(data.success) {
+        .then(result => {
+            console.log(result)
+            if(result.data) {
                 setLoading(false)    
-                setPosts(data.data)
+                setPosts(result.data.Result)
             } else {
                 setLoading(false)
                 throw new Error("No data.")
@@ -51,7 +52,7 @@ export default function Home() {
         if (!posts) {
             return <p>failed to fetch data.</p>
         }
-        return posts.map((obj, i) => <CreatePost post={obj} key={i} setDetail={setDetail} setModal={setModal} />)
+        return posts.map((obj, i) => <CreatePost postFeed={obj} key={i} setDetail={setDetail} setModal={setModal} />)
     }
 
     const CreateModal = () => {
@@ -99,7 +100,8 @@ export default function Home() {
 }
 
 export function CreatePost(data) {
-    const post = data.post
+    const postFeed = data.postFeed
+    const post = postFeed.Post
     const setDetail = data.setDetail
     const setModal = data.setModal
 
@@ -117,11 +119,11 @@ export function CreatePost(data) {
             <div className="p-3 flex w-full gap-4">
                 <div className="min-w-1/10 flex items-center">
                     <img src="/like.svg" className="h-8"></img>
-                    <p>{post.nbLike || "0"}</p>
+                    <p>{postFeed.LikeCount || "0"}</p>
                 </div>
                 <div className="min-w-1/10 flex items-center gap-1">
                     <img src="/comment.svg" className="h-8"></img>
-                    <p>{post.nbCom || "0"}</p>
+                    <p>{postFeed.CommentCount || "0"}</p>
                 </div>
             </div>
         </div>

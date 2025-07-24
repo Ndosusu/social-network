@@ -34,7 +34,7 @@ type Post struct {
 }
 
 type PostFeed struct {
-	Post
+	Post         Post
 	LikeCount    int
 	CommentCount int
 	GroupTitle   string
