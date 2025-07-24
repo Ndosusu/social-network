@@ -3,14 +3,16 @@
 // - Post and PostWithAuthor struct definitions
 // - Basic CRUD operations (Create, Read, Update, Delete)
 // - Essential post management functions
-package models
+package models_post
 
 import (
+	"errors"
 	"fmt"
+	"social-network/pkg/db/models"
 	"social-network/pkg/utils"
 )
 
-func (db *DB) InsertPost(obj map[string]any) Response {
+func (db *PostDB) InsertPost(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -35,18 +37,18 @@ func (db *DB) InsertPost(obj map[string]any) Response {
 	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["message"], imageValue, obj["privacy_mode"], groupIdValue, utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
 	newPostId, err := result.LastInsertId()
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
-	return db.SelectPostWithAuthorById(map[string]any{"id": newPostId})
+	return db.SelectPostById(map[string]any{"id": newPostId})
 }
 
-func (db *DB) SelectPostById(obj map[string]any) Response {
+func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -56,16 +58,16 @@ func (db *DB) SelectPostById(obj map[string]any) Response {
 	stmt := "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	post := Post{}
+	post := models.Post{}
 	err := result.Scan(&post.Id, &post.AuthorId, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.GroupId)
 	if err != nil {
 		fmt.Println(err)
-		return Response{Post{}}
+		return nil, err
 	}
 
-	return Response{post}
+	return &models.Response{Result: post}, nil
 }
-func (db *DB) DeletePost(obj map[string]any) Response {
+func (db *PostDB) DeletePost(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -76,21 +78,13 @@ func (db *DB) DeletePost(obj map[string]any) Response {
 	_, err := db.Conn.Exec(stmt, obj["id"])
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
-	return Response{1}
+	return &models.Response{Result: "Ok"}, nil
 }
 
-// SelectAllPosts moved to post_queries.go
-
-// SelectPostsByUserId moved to post_queries.go
-
-// SelectPostsByGroupId moved to post_queries.go
-
-// SelectPostsByPrivacyMode moved to post_queries.go
-
-func (db *DB) UpdatePost(obj map[string]any) Response {
+func (db *PostDB) UpdatePost(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -101,10 +95,6 @@ func (db *DB) UpdatePost(obj map[string]any) Response {
 			group_id : int (optional),
 		}
 	*/
-	if obj["id"] == nil {
-		fmt.Println("Post ID is required for update")
-		return Response{0}
-	}
 
 	// Build dynamic update query
 	setParts := []string{}
@@ -139,8 +129,9 @@ func (db *DB) UpdatePost(obj map[string]any) Response {
 	}
 
 	if len(setParts) == 0 {
+		err := errors.New("no fields to update")
 		fmt.Println("No fields to update")
-		return Response{0}
+		return nil, err
 	}
 
 	// Add ID to the end of values for WHERE clause
@@ -155,19 +146,9 @@ func (db *DB) UpdatePost(obj map[string]any) Response {
 	_, err := db.Conn.Exec(stmt, values...)
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
 	// Return the updated post
 	return db.SelectPostById(map[string]any{"id": obj["id"]})
 }
-
-// SelectPostsWithoutGroup moved to post_queries.go
-
-// SelectPostWithAuthorById moved to post_with_author.go
-
-// SelectAllPostsWithAuthors moved to post_with_author.go
-
-// SelectPostsByUserIdWithAuthors moved to post_with_author.go
-
-// SelectPostsByGroupIdWithAuthors moved to post_with_author.go

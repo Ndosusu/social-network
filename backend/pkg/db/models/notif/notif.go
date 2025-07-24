@@ -1,11 +1,12 @@
-package models
+package models_notif
 
 import (
 	"fmt"
+	"social-network/pkg/db/models"
 	"social-network/pkg/utils"
 )
 
-func (db *DB) InsertNotif(obj map[string]any) Response {
+func (db *NotifDB) InsertNotif(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -20,18 +21,18 @@ func (db *DB) InsertNotif(obj map[string]any) Response {
 	result, err := db.Conn.Exec(stmt, obj["type"], obj["user_to"], obj["user_from"], obj["group_id"], obj["event_id"], utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
 	newNotifId, err := result.LastInsertId()
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 	return db.SelectNotifById(map[string]any{"id": newNotifId})
 }
 
-func (db *DB) SelectNotifById(obj map[string]any) Response {
+func (db *NotifDB) SelectNotifById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -41,16 +42,16 @@ func (db *DB) SelectNotifById(obj map[string]any) Response {
 	stmt := "SELECT id, type, user_to, user_from, group_id, event_id, date_creation FROM notifications WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	notif := Notif{}
+	notif := models.Notif{}
 	err := result.Scan(&notif.Id, &notif.NotifType, &notif.ReceiverId, &notif.SenderId, &notif.GroupId, &notif.EventId, &notif.DateCreation)
 	if err != nil {
 		fmt.Println(err)
-		return Response{Notif{}}
+		return nil, err
 	}
 
-	return Response{notif}
+	return &models.Response{Result: notif}, nil
 }
-func (db *DB) DeleteNotif(obj map[string]any) Response {
+func (db *NotifDB) DeleteNotif(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -61,8 +62,8 @@ func (db *DB) DeleteNotif(obj map[string]any) Response {
 	_, err := db.Conn.Exec(stmt, obj["id"])
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
-	return Response{1}
+	return &models.Response{Result: "Ok"}, nil
 }

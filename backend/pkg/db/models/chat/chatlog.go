@@ -1,11 +1,12 @@
-package models
+package models_chat
 
 import (
 	"fmt"
+	"social-network/pkg/db/models"
 	"social-network/pkg/utils"
 )
 
-func (db *DB) InsertLog(obj map[string]any) Response {
+func (db *ChatDB) InsertLog(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -18,18 +19,18 @@ func (db *DB) InsertLog(obj map[string]any) Response {
 	result, err := db.Conn.Exec(stmt, obj["chat_id"], obj["author_id"], obj["log"], utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
 	newLogId, err := result.LastInsertId()
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 	return db.SelectLogById(map[string]any{"id": newLogId})
 }
 
-func (db *DB) SelectLogById(obj map[string]any) Response {
+func (db *ChatDB) SelectLogById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -39,16 +40,16 @@ func (db *DB) SelectLogById(obj map[string]any) Response {
 	stmt := "SELECT id, chat_id, author_id, log, date FROM chat_log WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	log := Log{}
+	log := models.Log{}
 	err := result.Scan(&log.Id, &log.ChatId, &log.AuthorId, &log.Message, &log.Date)
 	if err != nil {
 		fmt.Println(err)
-		return Response{Log{}}
+		return nil, err
 	}
 
-	return Response{log}
+	return &models.Response{Result: log}, nil
 }
-func (db *DB) DeleteLog(obj map[string]any) Response {
+func (db *ChatDB) DeleteLog(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -59,8 +60,8 @@ func (db *DB) DeleteLog(obj map[string]any) Response {
 	_, err := db.Conn.Exec(stmt, obj["id"])
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
-	return Response{1}
+	return &models.Response{Result: "Ok"}, nil
 }

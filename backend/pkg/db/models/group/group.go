@@ -1,8 +1,11 @@
-package models
+package models_group
 
-import "fmt"
+import (
+	"fmt"
+	"social-network/pkg/db/models"
+)
 
-func (db *DB) InsertGroup(obj map[string]any) Response {
+func (db *GroupDB) InsertGroup(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -15,18 +18,17 @@ func (db *DB) InsertGroup(obj map[string]any) Response {
 	result, err := db.Conn.Exec(stmt, obj["admin_id"], obj["title"], obj["about"])
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
-
 	newGroupId, err := result.LastInsertId()
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 	return db.SelectGroupById(map[string]any{"id": newGroupId})
 }
 
-func (db *DB) SelectGroupById(obj map[string]any) Response {
+func (db *GroupDB) SelectGroupById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -36,12 +38,12 @@ func (db *DB) SelectGroupById(obj map[string]any) Response {
 	stmt := "SELECT id, admin_id, title, about, date_creation FROM groups WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	group := Group{}
+	group := models.Group{}
 	err := result.Scan(&group.Id, &group.AdminId, &group.Title, &group.About, &group.DateCreation)
 	if err != nil {
 		fmt.Println(err)
-		return Response{Group{}}
+		return nil, err
 	}
 
-	return Response{group}
+	return &models.Response{Result: group}, nil
 }

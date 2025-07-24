@@ -1,10 +1,11 @@
-package models
+package models_post
 
 import (
 	"fmt"
+	"social-network/pkg/db/models"
 )
 
-func (db *DB) InsertLike(obj map[string]any) Response {
+func (db *PostDB) InsertLike(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -17,18 +18,17 @@ func (db *DB) InsertLike(obj map[string]any) Response {
 	result, err := db.Conn.Exec(stmt, obj["user_id"], obj["post_id"], obj["comment_id"])
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
-
 	newLikeId, err := result.LastInsertId()
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 	return db.SelectLikeById(map[string]any{"id": newLikeId})
 }
 
-func (db *DB) SelectLikeById(obj map[string]any) Response {
+func (db *PostDB) SelectLikeById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -38,17 +38,17 @@ func (db *DB) SelectLikeById(obj map[string]any) Response {
 	stmt := "SELECT id, user_id, post_id, comment_id FROM likes WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	like := Like{}
+	like := models.Like{}
 	err := result.Scan(&like.Id, &like.UserId, &like.PostId, &like.CommentId)
 	if err != nil {
 		fmt.Println(err)
-		return Response{Like{}}
+		return nil, err
 	}
 
-	return Response{like}
+	return &models.Response{Result: like}, nil
 }
 
-func (db *DB) DeleteLike(obj map[string]any) Response {
+func (db *PostDB) DeleteLike(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -59,8 +59,8 @@ func (db *DB) DeleteLike(obj map[string]any) Response {
 	_, err := db.Conn.Exec(stmt, obj["id"])
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
-	return Response{1}
+	return &models.Response{Result: "Ok"}, nil
 }

@@ -1,5 +1,7 @@
 package handlers
 
+//PRELOAD LISTE DE GROUPE SUR INDEX
+
 import "net/http"
 
 func GroupHandler(w http.ResponseWriter, r *http.Request) {

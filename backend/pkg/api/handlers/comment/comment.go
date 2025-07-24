@@ -1,9 +1,11 @@
 package handlers
 
+/*
 import (
 	"encoding/json"
 	"net/http"
 	"social-network/pkg/db/models"
+	"social-network/pkg/utils"
 	"strconv"
 )
 
@@ -18,13 +20,13 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 		// Récupérer les commentaires d'un post
 		postIDStr := r.URL.Query().Get("post_id")
 		if postIDStr == "" {
-			writeErrorResponse(w, http.StatusBadRequest, "Missing post_id parameter")
+			utils.JSONResponse(w, http.StatusBadRequest, "Missing post_id parameter")
 			return
 		}
 
 		postID, err := strconv.Atoi(postIDStr)
 		if err != nil {
-			writeErrorResponse(w, http.StatusBadRequest, "Invalid post_id parameter")
+			utils.JSONResponse(w, http.StatusBadRequest, "Invalid post_id parameter")
 			return
 		}
 
@@ -33,7 +35,7 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 
 		db, err := getDBConnection()
 		if err != nil {
-			writeErrorResponse(w, http.StatusInternalServerError, "Database connection failed")
+			utils.JSONResponse(w, http.StatusInternalServerError, "Database connection failed")
 			return
 		}
 		defer db.Close()
@@ -44,7 +46,7 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 			result := dbInstance.SelectCommentsByPostIdWithAuthor(map[string]any{"post_id": postID})
 			comments, ok := result.Result.([]models.CommentWithAuthor)
 			if !ok {
-				writeErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve comments")
+				utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve comments")
 				return
 			}
 			writeSuccessResponse(w, http.StatusOK, "", comments)
@@ -52,7 +54,7 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 			result := dbInstance.SelectCommentsByPostId(map[string]any{"post_id": postID})
 			comments, ok := result.Result.([]models.Comment)
 			if !ok {
-				writeErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve comments")
+				utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve comments")
 				return
 			}
 			writeSuccessResponse(w, http.StatusOK, "", comments)
@@ -64,7 +66,7 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 		// Créer un nouveau commentaire
 		var commentData map[string]any
 		if err := json.NewDecoder(r.Body).Decode(&commentData); err != nil {
-			writeErrorResponse(w, http.StatusBadRequest, "Invalid JSON format")
+			utils.JSONResponse(w, http.StatusBadRequest, "Invalid JSON format")
 			return
 		}
 
@@ -72,7 +74,7 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 		requiredFields := []string{"author_id", "post_id", "message"}
 		for _, field := range requiredFields {
 			if commentData[field] == nil {
-				writeErrorResponse(w, http.StatusBadRequest, "Missing required field: "+field)
+				utils.JSONResponse(w, http.StatusBadRequest, "Missing required field: "+field)
 				return
 			}
 		}
@@ -87,7 +89,7 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 
 		db, err := getDBConnection()
 		if err != nil {
-			writeErrorResponse(w, http.StatusInternalServerError, "Database connection failed")
+			utils.JSONResponse(w, http.StatusInternalServerError, "Database connection failed")
 			return
 		}
 		defer db.Close()
@@ -97,7 +99,7 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 
 		comment, ok := result.Result.(models.Comment)
 		if !ok || comment.Id == 0 {
-			writeErrorResponse(w, http.StatusInternalServerError, "Failed to create comment")
+			utils.JSONResponse(w, http.StatusInternalServerError, "Failed to create comment")
 			return
 		}
 
@@ -113,19 +115,19 @@ func DeleteCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 	commentIDStr := r.URL.Query().Get("id")
 	if commentIDStr == "" {
-		writeErrorResponse(w, http.StatusBadRequest, "Missing comment ID")
+		utils.JSONResponse(w, http.StatusBadRequest, "Missing comment ID")
 		return
 	}
 
 	commentID, err := strconv.Atoi(commentIDStr)
 	if err != nil {
-		writeErrorResponse(w, http.StatusBadRequest, "Invalid comment ID format")
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid comment ID format")
 		return
 	}
 
 	db, err := getDBConnection()
 	if err != nil {
-		writeErrorResponse(w, http.StatusInternalServerError, "Database connection failed")
+		utils.JSONResponse(w, http.StatusInternalServerError, "Database connection failed")
 		return
 	}
 	defer db.Close()
@@ -135,14 +137,14 @@ func DeleteCommentHandler(w http.ResponseWriter, r *http.Request) {
 	result := dbInstance.SelectCommentById(map[string]any{"id": commentID})
 	comment, ok := result.Result.(models.Comment)
 	if !ok || comment.Id == 0 {
-		writeErrorResponse(w, http.StatusNotFound, "Comment not found")
+		utils.JSONResponse(w, http.StatusNotFound, "Comment not found")
 		return
 	}
 
 	// Supprimer le commentaire
 	deleteResult := dbInstance.DeleteComment(map[string]any{"id": commentID})
 	if deleteResult.Result == 0 {
-		writeErrorResponse(w, http.StatusInternalServerError, "Failed to delete comment")
+		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to delete comment")
 		return
 	}
 
@@ -156,19 +158,19 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 
 	commentIDStr := r.URL.Query().Get("id")
 	if commentIDStr == "" {
-		writeErrorResponse(w, http.StatusBadRequest, "Missing comment ID")
+		utils.JSONResponse(w, http.StatusBadRequest, "Missing comment ID")
 		return
 	}
 
 	commentID, err := strconv.Atoi(commentIDStr)
 	if err != nil {
-		writeErrorResponse(w, http.StatusBadRequest, "Invalid comment ID format")
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid comment ID format")
 		return
 	}
 
 	db, err := getDBConnection()
 	if err != nil {
-		writeErrorResponse(w, http.StatusInternalServerError, "Database connection failed")
+		utils.JSONResponse(w, http.StatusInternalServerError, "Database connection failed")
 		return
 	}
 	defer db.Close()
@@ -177,9 +179,10 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	result := dbInstance.SelectCommentById(map[string]any{"id": commentID})
 	comment, ok := result.Result.(models.Comment)
 	if !ok || comment.Id == 0 {
-		writeErrorResponse(w, http.StatusNotFound, "Comment not found")
+		utils.JSONResponse(w, http.StatusNotFound, "Comment not found")
 		return
 	}
 
 	writeSuccessResponse(w, http.StatusOK, "", comment)
 }
+*/

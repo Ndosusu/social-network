@@ -33,6 +33,13 @@ type Post struct {
 	Author      *User
 }
 
+type PostFeed struct {
+	Post
+	LikeCount    int
+	CommentCount int
+	GroupTitle   string
+}
+
 type Comment struct {
 	Id       int
 	AuthorId int

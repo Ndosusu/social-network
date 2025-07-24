@@ -1,10 +1,11 @@
-package models
+package models_chat
 
 import (
 	"fmt"
+	"social-network/pkg/db/models"
 )
 
-func (db *DB) InsertChat(obj map[string]any) Response {
+func (db *ChatDB) InsertChat(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -17,18 +18,18 @@ func (db *DB) InsertChat(obj map[string]any) Response {
 	result, err := db.Conn.Exec(stmt, obj["user_to"], obj["user_from"], obj["group_id"])
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
 	newChatId, err := result.LastInsertId()
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 	return db.SelectChatById(map[string]any{"id": newChatId})
 }
 
-func (db *DB) SelectChatById(obj map[string]any) Response {
+func (db *ChatDB) SelectChatById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -38,17 +39,17 @@ func (db *DB) SelectChatById(obj map[string]any) Response {
 	stmt := "SELECT id, user_to, user_from, group_id FROM chats WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	chat := Chat{}
+	chat := models.Chat{}
 	err := result.Scan(&chat.Id, &chat.ReceiverId, &chat.SenderId, &chat.GroupId)
 	if err != nil {
 		fmt.Println(err)
-		return Response{Chat{}}
+		return nil, err
 	}
 
-	return Response{chat}
+	return &models.Response{Result: chat}, nil
 }
 
-func (db *DB) DeleteChat(obj map[string]any) Response {
+func (db *ChatDB) DeleteChat(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -59,8 +60,8 @@ func (db *DB) DeleteChat(obj map[string]any) Response {
 	_, err := db.Conn.Exec(stmt, obj["id"])
 	if err != nil {
 		fmt.Println(err)
-		return Response{0}
+		return nil, err
 	}
 
-	return Response{1}
+	return &models.Response{Result: "Ok"}, nil
 }

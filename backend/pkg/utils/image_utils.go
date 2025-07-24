@@ -1,4 +1,4 @@
-package handlers
+package utils
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 // validateImageFile checks if the uploaded file is a valid image
-func validateImageFile(file multipart.File, header *multipart.FileHeader) error {
+func ValidateImageFile(file multipart.File, header *multipart.FileHeader) error {
 	// Check file size (max 5MB)
 	const maxSize = 5 * 1024 * 1024
 	if header.Size > maxSize {
@@ -38,9 +38,9 @@ func validateImageFile(file multipart.File, header *multipart.FileHeader) error 
 }
 
 // saveImageFile saves the uploaded image and returns the file path
-func saveImageFile(file multipart.File, header *multipart.FileHeader) (string, error) {
+func SaveImageFile(file multipart.File, header *multipart.FileHeader) (string, error) {
 	// Create uploads directory if it doesn't exist
-	uploadDir := "uploads/images"
+	uploadDir := "~/backend/uploads"
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		return "", fmt.Errorf("failed to create upload directory: %v", err)
 	}
@@ -66,7 +66,7 @@ func saveImageFile(file multipart.File, header *multipart.FileHeader) (string, e
 }
 
 // getImageContentType returns the appropriate content type based on file extension
-func getImageContentType(filePath string) string {
+func GetImageContentType(filePath string) string {
 	ext := strings.ToLower(filepath.Ext(filePath))
 	switch ext {
 	case ".jpg", ".jpeg":
