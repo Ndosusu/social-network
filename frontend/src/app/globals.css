@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 :root{
-  --primary: rgb(0, 0, 0);
-  --primaryT: rgba(0, 0, 0, 0.6);
-  --secondary: rgb(191, 81, 251);
-  --secondaryT: rgba(191, 81, 251, 0.6);
-  --secondaryL: rgb(218, 149, 255);
-  --secondaryLT: rgba(218, 149, 255, 0.6);
+  --primary: hsl(0, 0%, 0%);
+  --primaryT: hsla(0, 0%, 0%, 0.6);
+  --secondary: hsl(279, 96%, 65%);
+  --secondaryT: hsla(279, 96%, 65%, 0.6);
+  --secondaryL: hsl(279, 100%, 79%);
+  --secondaryLT: hsla(279, 100%, 79%, 0.6);
+  --hovered: hsla(0, 0%, 78%, 0.3);
 }
 
 @theme {
@@ -14,36 +15,35 @@
   --color-primaryT: var(--primaryT);
   --color-secondary: var(--secondary);
   --color-secondaryT: var(--secondaryT);
+  --color-hovered: var(--hovered);
 }
 
 *::-webkit-scrollbar {
   display:none;
 }
 
-input:focus {
-  border: none;
-}
-
 .neon-xl {
   box-shadow: 0px 0px 20px 10px var(--secondaryT), inset 0px 0px 8px 4px var(--secondaryT);
   border: 2px solid var(--secondaryT);
+  outline: none;
 }
 
 .neon-sm {
   box-shadow: 0px 0px 10px 4px var(--secondaryT), inset 0px 0px 8px 4px var(--secondaryT);
   border: 1px solid var(--secondaryT);
+  outline: none;
 }
 
 .bg-discord {
   background-color: #7289DA;
 }
 
-input.neon-xl:hover, textarea.neon-xl:hover, label.neon-xl:hover {
+input.neon-xl:hover, textarea.neon-xl:hover, label.neon-xl:hover, .neon-xl.hoverable:hover {
   box-shadow: 0px 0px 20px 10px var(--secondaryLT), inset 0px 0px 8px 4px var(--secondaryLT);
   border: 2px solid var(--secondaryLT);
 }
 
-input.neon-sm:hover, textarea.neon-sm:hover, label.neon-sm:hover {
+input.neon-sm:hover, textarea.neon-sm:hover, label.neon-sm:hover, .neon-sm.hoverable:hover {
   box-shadow: 0px 0px 10px 4px var(--secondaryLT), inset 0px 0px 8px 4px var(--secondaryLT);
   border: 1px solid var(--secondaryLT);
 }
@@ -73,4 +73,12 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+label:has(input[type=radio]:checked), label:has(input[type=checkbox]:checked) {
+  background-color: var(--secondary);
+}
+
+label:has(input[type=radio]:checked:hover), label:has(input[type=checkbox]:checked:hover) {
+  background-color: var(--secondaryL);
 }

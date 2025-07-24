@@ -1,0 +1,5 @@
+<svg role="img" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+    <title>cross</title>
+    <line x1="5" y1="5" x2="45" y2="45" stroke="white" stroke-width="4" stroke-linecap="round" />
+    <line x1="45" y1="5" x2="5" y2="45" stroke="white" stroke-width="4" stroke-linecap="round" />
+</svg>

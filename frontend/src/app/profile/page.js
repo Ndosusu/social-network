@@ -3,8 +3,13 @@
 import ActionMenu from "../actionMenu"
 import { CreatePost } from "../home/page"
 import DetailPostModal from "../home/detailPostModal"
+import { useRouter } from "next/navigation"
+import { CheckLogToken } from "../checkToken"
 
 export default function ProfilePage() {
+    const router = useRouter()
+    CheckLogToken(router)
+
     const posts = [ // fetch user's posts
         {
             Id:1,

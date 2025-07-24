@@ -1,27 +1,167 @@
 "use client"
 
-export default function DetailPostModal() {
+import { useState } from "react"
+
+export default function DetailPostModal(data) {
+    const post = data.post
+    
     return (
-        <div id="detailPostModal" postid={0} className="modal neon-xl bg-primaryT h-9/10 w-3/4 absolute z-10 inset-x-1/8 inset-y-1/20 rounded-xl hidden overflow-scroll">
-            <div className="w-5/6 rounded-xl neon-sm">
+        <div className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl overflow-scroll">
+            {post ? <DetailContent post={post} /> : <PostNotFound /> }
+        </div>
+    )
+}
+
+function DetailContent({post}) {
+    const [newCom, setNewCom] = useState(false)
+
+    const coms = [ //replace with fetch
+        {
+            Author: "wiz",
+            Message: "tkt",
+            nbLike: 3,
+        },
+        {
+            Author: "ziw",
+            Message: "inquiète toi",
+            nbLike: 4,
+        },
+        {
+            Author: "ziw",
+            Message: "inquiète toi",
+            nbLike: 4,
+        },
+        {
+            Author: "ziw",
+            Message: "inquiète toi",
+            nbLike: 4,
+        },
+        {
+            Author: "ziw",
+            Message: "inquiète toi",
+            nbLike: 4,
+        },
+        {
+            Author: "ziw",
+            Message: "inquiète toi",
+            nbLike: 4,
+        },
+        {
+            Author: "ziw",
+            Message: "inquiète toi",
+            nbLike: 4,
+        }
+    ]
+
+    return (
+        <div className="w-5/6 h-full flex flex-col items-center p-7 gap-5 center">
+            <div className="w-full min-h-40 rounded-xl neon-sm bg-primaryT">
                 <div className="w-full postHeader bg-primaryT p-2">
-                    <p id="detailAuthor"></p>
+                    <p id="detailAuthor">{post.AuthorId}</p>
                 </div>
                 <div className="w-full h-fit p-4">
-                    <p id="detailMessage"></p>
+                    <p id="detailMessage">{post.Message}</p>
                 </div>
-                <div id="detailCommentList">
+                <div className="p-3 flex w-full gap-1 w-1/10 items-center" >
+                    <img src="like.svg" className="h-8" />
+                    <p>{post.nbLike || "0"}</p>
+                </div>
+            </div>
+            <input type="button" value={newCom? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl self-start duration-100" onClick={() => {setNewCom(!newCom)}} />
+            {
+                newCom 
+                ? <NewComInput />
+                : (coms.length > 0 
+                    ? <CreateComList comList={coms} />
+                    : <NoComs />)
+            }
+        </div>
+    )
+}
 
-                </div>
+function PostNotFound() {
+    return (
+        <div>
+            <p>Post not found :c</p>
+        </div>
+    )
+}
+
+function CreateComList({comList}) {
+    return (
+        <div className="w-5/6 h-fit flex flex-col gap-7 p-2 pt-1">
+            <p className="font-bold">{comList.length} Comments :</p>
+            {comList.map((obj, i) => <CreateCom com={obj} key={i} />)}
+        </div>
+    )
+}
+
+function NoComs() {
+    return (
+        <div className="w-5/6 flex flex-col items-center gap-7 p-5">
+            <p className="font-bold">No comments</p>
+        </div>
+    )
+}
+
+function CreateCom({com}) {
+    return (
+         <div className="w-full h-fit rounded-xl neon-sm bg-primaryT">
+            <div className="w-full postHeader bg-primaryT p-2">
+                <p id="detailAuthor">{com.Author}</p>
+            </div>
+            <div className="w-full h-fit p-4">
+                <p id="detailMessage">{com.Message}</p>
+            </div>
+            <div className="p-3 flex w-full gap-1 w-1/10 items-center">
+                <img src="like.svg" className="h-8" />
+                <p>{com.nbLike}</p>
             </div>
         </div>
     )
 }
 
-export function CreateCom(data) {
+function NewComInput() {
+    const changedFile = async (event) => {
+        const preview = document.querySelector("#previewCom")
+        const fileName = document.querySelector("#fileNameCom")
+        const file = event.target.files[0]
+
+        if (file) {
+            let reader = new FileReader()
+            preview.classList.remove("hidden")
+            fileName.textContent = file.name
+            reader.onload = (e) => {
+                preview.setAttribute("src", e.target.result)
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.setAttribute("src", "")
+            preview.classList.add("hidden")
+            fileName.textContent = "None"
+            console.log("no file")
+        }
+    }
+
+    const handleForm = async (event) => {
+        event.preventDefault()
+    }
+
     return (
-        <div>
-            <p>{data.key}</p>
-        </div>
+        <form className="w-full h-full flex flex-col gap-5" onSubmit={handleForm}>
+            <textarea name="Message" className="w-full resize-none neon-sm rounded-xl bg-primaryT h-25 overflow-scroll p-3 flex-grow" placeholder="Write your comment here" maxLength={1024} required />
+            <div className="col-span-2 grid align-center h-fit">
+                <label htmlFor="file" className="bg-primaryT h-fit neon-sm rounded-xl w-full p-2 flex flex-row justify-between" >
+                    <div>
+                        <input name="File" type="file" id="file" className="hidden" onChange={changedFile} accept=".gif,.jpg,.jpeg,.png"/>
+                        <p>File chosen (optional): </p><p id="fileNameCom" className="fileName">None</p>
+                    </div>
+                    <div className="w-25 h-25">
+                        <img id="previewCom" className="preview w-full h-full rounded-xl hidden"></img>
+                    </div>
+                </label>
+            </div>
+            <input type="submit" value="Send" className="bg-secondary neon-sm rounded-xl px-5 py-3 w-fit self-end" />
+        </form>
     )
 }
