@@ -32,9 +32,9 @@ func InitRouter() *http.ServeMux {
 	mux.HandleFunc("POST /feed/follow", middleware.Cors(handlers.FollowFeedHandler))
 	mux.HandleFunc("POST /feed/group", middleware.Cors(handlers.GroupFeedHandler))
 
-	/* 	mux.HandleFunc("GET /posts", middleware.Cors(handlers.PostsHandler))
+	//mux.HandleFunc("GET /posts", middleware.Cors(handlers.PostsHandler))
 
-	   	mux.HandleFunc("OPTIONS /posts", middleware.Cors(handlers.PostsHandler)) */
+	mux.HandleFunc("OPTIONS /posts", middleware.Cors(handlers.CreatePostHandler))
 	mux.HandleFunc("OPTIONS /posts/image", middleware.Cors(handlers.ServeImageHandler))
 	mux.HandleFunc("OPTIONS /feed/global", middleware.Cors(handlers.GlobalFeedHandler))
 	mux.HandleFunc("OPTIONS /feed/follow", middleware.Cors(handlers.FollowFeedHandler))

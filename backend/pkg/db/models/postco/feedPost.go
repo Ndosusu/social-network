@@ -109,16 +109,16 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 	*/
 
 	query := `SELECT 
-				posts.id,
-				posts.author_id,
-				users.nick_name,
-				users.avatar,
-				posts.message,
-				COALESCE(posts.image, ''),
-				posts.date,
-				posts.privacy_mode,
-				COUNT(DISTINCT likes.id),
-				COUNT(DISTINCT comments.id),
+				p.id,
+				p.author_id,
+				u.nick_name,
+				u.avatar,
+				p.message,
+				COALESCE(p.image, ''),
+				p.date,
+				p.privacy_mode,
+				COUNT(DISTINCT l.id),
+				COUNT(DISTINCT c.id),
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			JOIN sessions s ON s.uuid = ?
@@ -188,15 +188,15 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 	*/
 
 	query := `SELECT 
-				posts.id,
-				posts.author_id,
-				users.nick_name,
-				users.avatar,
-				posts.message,
-				COALESCE(posts.image, ''),
-				posts.date,
-				COUNT(DISTINCT likes.id),
-				COUNT(DISTINCT comments.id),
+				p.id,
+				p.author_id,
+				u.nick_name,
+				u.avatar,
+				p.message,
+				COALESCE(p.image, ''),
+				p.date,
+				COUNT(DISTINCT l.id),
+				COUNT(DISTINCT c.id),
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			LEFT JOIN groups g ON g.id = ? 

@@ -41,11 +41,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, ok := result.Result.(models.Session)
-	if !ok {
-		utils.JSONResponse(w, http.StatusUnauthorized, "Invalid email or password", nil)
-		return
-	}
+	session := result.Result.(models.Session)
 
 	utils.JSONResponse(w, http.StatusOK, "Login successful", map[string]any{
 		"session_uuid": session.Uuid,

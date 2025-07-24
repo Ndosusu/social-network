@@ -101,7 +101,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		rdb := rel.New(&db)
 		for _, followerID := range followersIDs {
 			postRels["user_id"] = followerID
-			result, err = rdb.InsertPrivacyPostRel(postRels)
+			_, err = rdb.InsertPrivacyPostRel(postRels)
 			if err != nil {
 				utils.JSONResponse(w, http.StatusInternalServerError, "Failed to create post privacy relation: "+err.Error(), nil)
 				db.CloseConn()
@@ -109,7 +109,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		db.CloseConn()
-
-		utils.JSONResponse(w, http.StatusCreated, "Post created successfully", result.Result)
 	}
+
+	utils.JSONResponse(w, http.StatusCreated, "Post created successfully", result)
 }

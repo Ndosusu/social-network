@@ -55,7 +55,7 @@ func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
 			id : int,
 		}
 	*/
-	stmt := "SELECT id, author_id, message, image, date, privacy_mode, group_id FROM posts WHERE id = ?;"
+	stmt := "SELECT id, author_id, message, COALESCE(image, ''), date, privacy_mode, COALESCE(group_id, 0) FROM posts WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
 	post := models.Post{}
