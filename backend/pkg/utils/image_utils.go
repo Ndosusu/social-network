@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"social-network/config"
 	"strings"
 	"time"
 )
@@ -40,7 +41,7 @@ func ValidateImageFile(file multipart.File, header *multipart.FileHeader) error 
 // saveImageFile saves the uploaded image and returns the file path
 func SaveImageFile(file multipart.File, header *multipart.FileHeader) (string, error) {
 	// Create uploads directory if it doesn't exist
-	uploadDir := "~/backend/uploads"
+	uploadDir := config.PicPath
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		return "", fmt.Errorf("failed to create upload directory: %v", err)
 	}

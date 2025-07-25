@@ -15,19 +15,14 @@ export default function NewPostModal() {
 
         fetch("http://localhost:8080/posts", {
             method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
             body: formData,
         })
         .catch(error => {
+            console.log(error)
             throw new Error(error)
         })
-        .then(data => {
-            data.body.getReader().read().then((done, value) => {
-                console.log(value)
-            })
-        })
+        .then(data => data.json())
+        .then(data => console.log(data))
     }
 
     const changedFile = async (event) => {

@@ -21,7 +21,7 @@ func (db *UserDB) InsertSession(userId int) (*models.Response, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	return db.GetSessionByUuid(map[string]any{"id": newUUID})
+	return db.GetSessionByUuid(map[string]any{"uuid": newUUID})
 }
 
 func (db *UserDB) GetSessionByUuid(obj map[string]any) (*models.Response, error) {

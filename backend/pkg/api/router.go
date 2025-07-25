@@ -2,12 +2,15 @@ package api
 
 import (
 	"net/http"
+	"social-network/config"
 	"social-network/pkg/api/handlers"
 	"social-network/pkg/api/middleware"
 )
 
 func InitRouter() *http.ServeMux {
 	mux := http.NewServeMux()
+
+	mux.Handle("/"+config.PicPath+"/", http.StripPrefix("/"+config.PicPath+"/", http.FileServer(http.Dir("./"+config.PicPath))))
 
 	// Auth routes
 	mux.HandleFunc("POST /auth/register", middleware.Cors(handlers.RegisterHandler))

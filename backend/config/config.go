@@ -17,6 +17,7 @@ var ( // data from .env, global and "constants"
 	DBPath     string
 	DBName     string
 	MigPath    string
+	PicPath    string
 )
 
 func LoadEnvFile(filepath string) error {
@@ -63,6 +64,7 @@ func LoadEnvFile(filepath string) error {
 	DBName = os.Getenv("DB_NAME")
 	DBPath = os.Getenv("DB_PATH")
 	MigPath = os.Getenv("MIG_PATH")
+	PicPath = os.Getenv("IMG_PATH")
 
 	return nil
 }
