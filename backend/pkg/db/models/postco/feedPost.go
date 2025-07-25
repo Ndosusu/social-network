@@ -28,7 +28,8 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 				COALESCE(p.group_id, 0),
 				COUNT(DISTINCT l.id),
 				COUNT(DISTINCT c.id),
-				COALESCE(g.title, '')
+				COALESCE(g.title, ''),
+				COALESCE(ul.id, 0)
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			JOIN sessions s ON s.uuid = ?
@@ -37,6 +38,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 			LEFT JOIN group_member_rel gmr ON gmr.group_id = p.group_id AND gmr.member_id = s.user_id
 			LEFT JOIN privacy_post_rel pr ON pr.post_id = p.id AND pr.follower_id = s.user_id
 			LEFT JOIN likes l ON l.post_id = p.id
+        	LEFT JOIN likes ul ON ul.post_id = p.id AND ul.user_id = s.user_id 
 			LEFT JOIN comments c ON c.post_id = p.id
 			WHERE
 				(
@@ -64,6 +66,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 		var likeCount, commentCount int
 		var groupTitle string
 		var groupID int
+		var l models.Like
 
 		err := rows.Scan(
 			&p.Id,
@@ -78,6 +81,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 			&likeCount,
 			&commentCount,
 			&groupTitle,
+			&l.Id,
 		)
 		if err != nil {
 			return nil, err
@@ -94,6 +98,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
 			GroupTitle:   groupTitle,
+			Like:         &l,
 		})
 	}
 	return &models.Response{Result: result}, nil
@@ -120,16 +125,18 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 				p.privacy_mode,
 				COUNT(DISTINCT l.id),
 				COUNT(DISTINCT c.id),
+				COALESCE(ul.id, 0)
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			JOIN sessions s ON s.uuid = ?
 			LEFT JOIN follow_rel f ON f.user_from = s.user_id AND f.user_to = p.author_id
 			LEFT JOIN privacy_post_rel pr ON pr.post_id = p.id AND pr.follower_id = s.user_id
 			LEFT JOIN likes l ON l.post_id = p.id
+			LEFT JOIN likes ul ON ul.post_id = p.id AND ul.user_id = s.user_id
 			LEFT JOIN comments c ON c.post_id = p.id
 			WHERE
 				(
-					OR (f.user_to IS NOT NULL AND p.privacy_mode IN (1,2))
+					f.user_to IS NOT NULL AND p.privacy_mode IN (1,2)
 					OR (p.privacy_mode = 3 AND pr.follower_id IS NOT NULL)
 				)
 				AND p.id < ?
@@ -148,6 +155,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 		var postImage string
 		var author models.User
 		var likeCount, commentCount int
+		var l models.Like
 
 		err := rows.Scan(
 			&p.Id,
@@ -160,6 +168,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 			&p.PrivacyMode,
 			&likeCount,
 			&commentCount,
+			&l.Id,
 		)
 		if err != nil {
 			return nil, err
@@ -174,6 +183,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 			Post:         &p,
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
+			Like:         &l,
 		})
 	}
 	return &models.Response{Result: result}, nil
@@ -199,10 +209,12 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 				p.date,
 				COUNT(DISTINCT l.id),
 				COUNT(DISTINCT c.id),
+				COALESCE(ul.id, 0)
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			LEFT JOIN groups g ON g.id = ? 
 			LEFT JOIN likes l ON l.post_id = p.id
+			LEFT JOIN likes ul ON ul.post_id = p.id AND ul.user_id = u.id
 			LEFT JOIN comments c ON c.post_id = p.id
 			WHERE
 				(
@@ -224,6 +236,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 		var postImage string
 		var author models.User
 		var likeCount, commentCount int
+		var l models.Like
 
 		err := rows.Scan(
 			&p.Id,
@@ -235,6 +248,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 			&p.Date,
 			&likeCount,
 			&commentCount,
+			&l.Id,
 		)
 		if err != nil {
 			return nil, err
@@ -249,6 +263,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 			Post:         &p,
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
+			Like:         &l,
 		})
 	}
 	return &models.Response{Result: result}, nil

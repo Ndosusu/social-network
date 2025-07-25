@@ -35,6 +35,7 @@ type Post struct {
 
 type PostFeed struct {
 	Post         *Post
+	Like         *Like
 	LikeCount    int
 	CommentCount int
 	GroupTitle   string
@@ -52,6 +53,7 @@ type Comment struct {
 
 type CommentFeed struct {
 	Comment   *Comment
+	Like      *Like
 	LikeCount int
 }
 
