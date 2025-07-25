@@ -10,17 +10,18 @@ import (
 )
 
 type (
-	User     = types.User
-	Session  = types.Session
-	Post     = types.Post
-	PostFeed = types.PostFeed
-	Comment  = types.Comment
-	Like     = types.Like
-	Notif    = types.Notif
-	Group    = types.Group
-	Event    = types.Event
-	Chat     = types.Chat
-	Log      = types.Log
+	User        = types.User
+	Session     = types.Session
+	Post        = types.Post
+	PostFeed    = types.PostFeed
+	Comment     = types.Comment
+	CommentFeed = types.CommentFeed
+	Like        = types.Like
+	Notif       = types.Notif
+	Group       = types.Group
+	Event       = types.Event
+	Chat        = types.Chat
+	Log         = types.Log
 )
 
 // Struct to contain any type that result from database operations

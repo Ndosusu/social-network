@@ -43,31 +43,33 @@ func InitRouter() *http.ServeMux {
 	mux.HandleFunc("OPTIONS /feed/follow", middleware.Cors(handlers.FollowFeedHandler))
 	mux.HandleFunc("OPTIONS /feed/group", middleware.Cors(handlers.GroupFeedHandler))
 
-	/* // Comment routes
-	mux.HandleFunc("GET /comments", middleware.Cors(handlers.CommentsHandler))
-	mux.HandleFunc("GET /comments/single", middleware.Cors(handlers.CommentHandler))
-	mux.HandleFunc("POST /comments", middleware.Cors(handlers.CommentsHandler))
+	// Comment routes
+	mux.HandleFunc("POST /comments", middleware.Cors(handlers.CreateCommentHandler))
+	//mux.HandleFunc("PUT /comments", middleware.Cors(handlers.UpdateCommentHandler))
 	mux.HandleFunc("DELETE /comments", middleware.Cors(handlers.DeleteCommentHandler))
+
+	mux.HandleFunc("POST /feed/detail", middleware.Cors(handlers.CommentsHandler))
+
 	mux.HandleFunc("OPTIONS /comments", middleware.Cors(handlers.CommentsHandler))
-	mux.HandleFunc("OPTIONS /comments/single", middleware.Cors(handlers.CommentHandler))
+	mux.HandleFunc("OPTIONS /feed/detail", middleware.Cors(handlers.CommentsHandler))
 
-	// Group routes
-	mux.HandleFunc("GET /groups", middleware.Cors(handlers.GroupHandler))
-	mux.HandleFunc("POST /groups", middleware.Cors(handlers.GroupHandler))
-	mux.HandleFunc("POST /groups/create", middleware.Cors(handlers.CreateGroupHandler))
-	mux.HandleFunc("POST /groups/join", middleware.Cors(handlers.RequestJoinGroupHandler))
-	mux.HandleFunc("POST /groups/invite", middleware.Cors(handlers.InviteToGroupHandler))
-	mux.HandleFunc("OPTIONS /groups", middleware.Cors(handlers.GroupHandler))
+	/* 	// Group routes
+	   	mux.HandleFunc("GET /groups", middleware.Cors(handlers.GroupHandler))
+	   	mux.HandleFunc("POST /groups", middleware.Cors(handlers.GroupHandler))
+	   	mux.HandleFunc("POST /groups/create", middleware.Cors(handlers.CreateGroupHandler))
+	   	mux.HandleFunc("POST /groups/join", middleware.Cors(handlers.RequestJoinGroupHandler))
+	   	mux.HandleFunc("POST /groups/invite", middleware.Cors(handlers.InviteToGroupHandler))
+	   	mux.HandleFunc("OPTIONS /groups", middleware.Cors(handlers.GroupHandler))
 
-	// Chat routes - avec CORS ajouté
-	mux.HandleFunc("GET /chat", middleware.Cors(handlers.ChatHandler))
-	mux.HandleFunc("POST /chat", middleware.Cors(handlers.ChatHandler))
-	mux.HandleFunc("OPTIONS /chat", middleware.Cors(handlers.ChatHandler))
+	   	// Chat routes - avec CORS ajouté
+	   	mux.HandleFunc("GET /chat", middleware.Cors(handlers.ChatHandler))
+	   	mux.HandleFunc("POST /chat", middleware.Cors(handlers.ChatHandler))
+	   	mux.HandleFunc("OPTIONS /chat", middleware.Cors(handlers.ChatHandler))
 
-	// Notification routes
-	mux.HandleFunc("GET /notifications", middleware.Cors(handlers.NotificationHandler))
-	mux.HandleFunc("POST /notifications", middleware.Cors(handlers.NotificationHandler))
-	mux.HandleFunc("OPTIONS /notifications", middleware.Cors(handlers.NotificationHandler))
+	   	// Notification routes
+	   	mux.HandleFunc("GET /notifications", middleware.Cors(handlers.NotificationHandler))
+	   	mux.HandleFunc("POST /notifications", middleware.Cors(handlers.NotificationHandler))
+	   	mux.HandleFunc("OPTIONS /notifications", middleware.Cors(handlers.NotificationHandler))
 	*/
 	// Route par défaut
 	mux.HandleFunc("GET /{$}", middleware.Cors(func(w http.ResponseWriter, r *http.Request) {

@@ -1,7 +1,6 @@
 package handlers_post
 
 import (
-	"math"
 	"net/http"
 	"social-network/pkg/db/models"
 	post "social-network/pkg/db/models/postco"
@@ -14,23 +13,43 @@ func GroupFeedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	data := utils.JSONDecode(w, r)
 
-	groupID, groupIDOk := data["SessionUUID"].(int)
-	lastID, lastIDOk := data["LastID"].(int)
-	// Default to max int64 if LastID is not provided or invalid
-	if !lastIDOk || lastID <= 0 {
-		lastID = math.MaxInt64
+	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
+	if !sessionUUIDOk || sessionUUID == "" {
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
+		return
 	}
-	if !groupIDOk || groupID <= 0 {
+	groupID, groupIDOk := data["group_id"].(float64)
+	var groupIDInt int
+	if groupIDOk {
+		groupIDInt = int(groupID)
+	} else {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing group ID", nil)
 		return
+	}
+	lastID, lastIDOk := data["last_id"].(float64)
+	var lastIDInt int
+	if lastIDOk {
+		lastIDInt = int(lastID)
+	} else {
+		// Default to max int if last_id is not provided or invalid
+		lastIDInt = utils.DEFAULT_ID
+	}
+	limit, limitOk := data["limit"].(float64)
+	var limitInt int
+	if limitOk {
+		limitInt = int(limit)
+	} else {
+		// Default to 10 if limit is not provided or invalid
+		limitInt = utils.DEFAULT_LIMIT
 	}
 
 	var db models.DB
 	db.OpenConn()
 	pdb := post.New(&db)
 	result, err := pdb.GetGroupFeed(map[string]any{
-		"group_id": data["GroupID"],
-		"last_id":  lastID,
+		"group_id": groupIDInt,
+		"last_id":  lastIDInt,
+		"limit":    limitInt,
 	})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve group feed", nil)

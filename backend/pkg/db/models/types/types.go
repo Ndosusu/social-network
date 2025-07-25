@@ -34,7 +34,7 @@ type Post struct {
 }
 
 type PostFeed struct {
-	Post         Post
+	Post         *Post
 	LikeCount    int
 	CommentCount int
 	GroupTitle   string
@@ -45,9 +45,14 @@ type Comment struct {
 	AuthorId int
 	PostId   int
 	Message  string
-	Image    string
+	Image    *string
 	Date     string
 	Author   *User
+}
+
+type CommentFeed struct {
+	Comment   *Comment
+	LikeCount int
 }
 
 type Like struct {

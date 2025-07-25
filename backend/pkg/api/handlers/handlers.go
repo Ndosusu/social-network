@@ -2,6 +2,7 @@ package handlers
 
 import (
 	handlers_auth "social-network/pkg/api/handlers/auth"
+	handlers_comment "social-network/pkg/api/handlers/comment"
 	handlers_post "social-network/pkg/api/handlers/post"
 )
 
@@ -20,4 +21,11 @@ var (
 	GlobalFeedHandler = handlers_post.GlobalFeedHandler
 	FollowFeedHandler = handlers_post.FollowFeedHandler
 	GroupFeedHandler  = handlers_post.GroupFeedHandler
+
+	// Handlers comments
+	CreateCommentHandler = handlers_comment.CreateCommentHandler
+	//UpdateCommentHandler = handlers_comment.UpdateCommentHandler
+	DeleteCommentHandler = handlers_comment.DeleteCommentHandler
+
+	CommentsHandler = handlers_comment.CommentsHandler
 )

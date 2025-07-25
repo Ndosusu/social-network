@@ -16,7 +16,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 	*/
 	fmt.Println(obj)
 
-	query := `SELECT 
+	stmt := `SELECT 
 				p.id,
 				p.author_id,
 				u.nick_name,
@@ -50,7 +50,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 			GROUP BY p.id
 			ORDER BY p.id DESC
 			LIMIT ?;`
-	rows, err := db.Conn.Query(query, obj["session_uuid"], obj["last_id"], obj["limit"])
+	rows, err := db.Conn.Query(stmt, obj["session_uuid"], obj["last_id"], obj["limit"])
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 		p.Author = &author
 
 		result = append(result, models.PostFeed{
-			Post:         p,
+			Post:         &p,
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
 			GroupTitle:   groupTitle,
@@ -105,10 +105,11 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 			{
 				session_uuid : string,
 				last_id : int,
+				limit : int
 			}
 	*/
 
-	query := `SELECT 
+	stmt := `SELECT 
 				p.id,
 				p.author_id,
 				u.nick_name,
@@ -135,7 +136,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 			GROUP BY p.id
 			ORDER BY p.id DESC
 			LIMIT ?;`
-	rows, err := db.Conn.Query(query, obj["session_uuid"], obj["last_id"], obj["limit"])
+	rows, err := db.Conn.Query(stmt, obj["session_uuid"], obj["last_id"], obj["limit"])
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +171,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 		p.Author = &author
 
 		result = append(result, models.PostFeed{
-			Post:         p,
+			Post:         &p,
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
 		})
@@ -184,10 +185,11 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 			{
 				group_id : int,
 				last_id : int,
+				limit : int
 			}
 	*/
 
-	query := `SELECT 
+	stmt := `SELECT 
 				p.id,
 				p.author_id,
 				u.nick_name,
@@ -210,7 +212,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 			GROUP BY p.id
 			ORDER BY p.id DESC
 			LIMIT ?;`
-	rows, err := db.Conn.Query(query, obj["group_id"], obj["last_id"], obj["limit"])
+	rows, err := db.Conn.Query(stmt, obj["group_id"], obj["last_id"], obj["limit"])
 	if err != nil {
 		return nil, err
 	}
@@ -244,7 +246,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 		p.Author = &author
 
 		result = append(result, models.PostFeed{
-			Post:         p,
+			Post:         &p,
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
 		})

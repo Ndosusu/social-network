@@ -1,21 +1,20 @@
-package handlers_post
+package handlers_comment
 
 import (
-	"fmt"
 	"net/http"
 	"social-network/pkg/db/models"
 	post "social-network/pkg/db/models/postco"
 	"social-network/pkg/utils"
 )
 
-func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
+func DeleteCommentHandler(w http.ResponseWriter, r *http.Request) {
 	if !utils.ValidateMethod(w, r, http.MethodDelete) {
 		return
 	}
 
 	data := utils.JSONDecode(w, r)
-	postID, ok := data["id"].(int)
-	if !ok || postID <= 0 {
+	comID, ok := data["id"].(int)
+	if !ok || comID <= 0 {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing post ID", nil)
 		return
 	}
@@ -23,14 +22,13 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	var db models.DB
 	db.OpenConn()
 	pdb := post.New(&db)
-	result, err := pdb.DeletePost(map[string]any{"id": postID})
+	result, err := pdb.DeletePost(map[string]any{"id": comID})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Database connection failed", nil)
 		db.CloseConn()
 		return
 	}
 	db.CloseConn()
-	fmt.Println(result)
 
-	utils.JSONResponse(w, http.StatusOK, "Post deleted successfully", result)
+	utils.JSONResponse(w, http.StatusOK, "Comment deleted successfully", result)
 }

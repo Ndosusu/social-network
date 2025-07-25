@@ -1,7 +1,6 @@
 package handlers_post
 
 import (
-	"math"
 	"net/http"
 	"social-network/pkg/db/models"
 	post "social-network/pkg/db/models/postco"
@@ -15,14 +14,17 @@ func FollowFeedHandler(w http.ResponseWriter, r *http.Request) {
 	data := utils.JSONDecode(w, r)
 
 	sessionUUID, sessionUUIDOk := data["SessionUUID"].(string)
-	lastID, lastIDOk := data["LastID"].(int)
-	// Default to max int64 if LastID is not provided or invalid
-	if !lastIDOk || lastID <= 0 {
-		lastID = math.MaxInt64
-	}
 	if !sessionUUIDOk || sessionUUID == "" {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
 		return
+	}
+	lastID, lastIDOk := data["LastID"].(float64)
+	var lastIDInt int
+	if lastIDOk {
+		lastIDInt = int(lastID)
+	} else {
+		// Default to max int64 if LastID is not provided or invalid
+		lastIDInt = utils.DEFAULT_ID
 	}
 
 	var db models.DB
@@ -30,7 +32,7 @@ func FollowFeedHandler(w http.ResponseWriter, r *http.Request) {
 	pdb := post.New(&db)
 	result, err := pdb.GetFollowFeed(map[string]any{
 		"session_uuid": sessionUUID,
-		"last_id":      lastID,
+		"last_id":      lastIDInt,
 	})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve global feed", nil)
