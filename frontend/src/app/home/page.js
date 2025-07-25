@@ -73,8 +73,24 @@ export default function Home() {
     return (
         <div className="text-white h-full w-full grid items-center text-xl">
             <div className="bg-primaryT h-6/4 w-2/3 neon-xl center grid items-center">
-                <div className="w-full h-screen overflow-scroll flex flex-col items-center p-4 gap-7">
-                    <CheckState />
+                <div className="w-full h-screen overflow-scroll flex flex-col ">
+                    <div className="h-fit w-full flex flex-row justify-around p-3 px-10 gap-7">
+                        <label htmlFor="globalFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
+                            <input id="globalFeed" type="button" onClick={async () => {console.log("global")}} className="hidden" />
+                            <p className="w-full">Global</p>
+                        </label>
+                        <label htmlFor="globalFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
+                            <input id="globalFeed" type="button" onClick={async () => {console.log("global")}} className="hidden" />
+                            <p className="w-full">Followed</p>
+                        </label>
+                        <label htmlFor="globalFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
+                            <input id="globalFeed" type="button" onClick={async () => {console.log("global")}} className="hidden" />
+                            <p className="w-full">Groups</p>
+                        </label>
+                    </div>
+                    <div className="flex flex-col w-full overflow-scroll items-center p-4 gap-7">
+                        <CheckState />
+                    </div>
                 </div>
             </div>
             <div className="fixed neon-xl w-1/10 h-fit max-h-5/6 left-5/6 top-1/12 postAction p-7">
