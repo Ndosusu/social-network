@@ -14,9 +14,13 @@ export default function Home() {
     const [posts, setPosts] = useState(null)
     const [curDetail, setDetail] = useState(null)
     const [curModal, setModal]= useState("")
+    const [feed, setFeed] = useState("global")
     
     useEffect(() => {
-        fetch("http://localhost:8080/feed/global",{
+        setPosts(null)
+        setLoading(true)
+        console.log("fetching "+feed)
+        fetch("http://localhost:8080/feed/"+feed,{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -43,13 +47,15 @@ export default function Home() {
                 throw new Error("No data.")
             }
         })
-    }, [])
+    }, [feed])
 
     const CheckState = () => {
         if (loading) {
+            //replace later with good div instead of simple text
             return <p>loading...</p>
         }
         if (!posts) {
+            //replace later with good div instead of simple text
             return <p>failed to fetch data.</p>
         }
         return posts.map((obj, i) => <CreatePost postFeed={obj} key={i} setDetail={setDetail} setModal={setModal} />)
@@ -82,15 +88,15 @@ export default function Home() {
                 <div className="w-full h-screen overflow-scroll flex flex-col ">
                     <div className="h-fit w-full flex flex-row justify-around p-3 px-10 gap-7">
                         <label htmlFor="globalFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
-                            <input id="globalFeed" type="button" onClick={async () => {console.log("global")}} className="hidden" />
+                            <input id="globalFeed" type="button" onClick={() => {setFeed("global")}} className="hidden" />
                             <p className="w-full">Global</p>
                         </label>
-                        <label htmlFor="globalFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
-                            <input id="globalFeed" type="button" onClick={async () => {console.log("global")}} className="hidden" />
+                        <label htmlFor="followFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
+                            <input id="followFeed" type="button" onClick={() => {setFeed("follow")}} className="hidden" />
                             <p className="w-full">Followed</p>
                         </label>
-                        <label htmlFor="globalFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
-                            <input id="globalFeed" type="button" onClick={async () => {console.log("global")}} className="hidden" />
+                        <label htmlFor="groupFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
+                            <input id="groupFeed" type="button" onClick={() => {setFeed("group")}} className="hidden" />
                             <p className="w-full">Groups</p>
                         </label>
                     </div>

@@ -1,6 +1,7 @@
 package handlers_post
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 	"social-network/pkg/db/models"
@@ -14,8 +15,9 @@ func FollowFeedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	data := utils.JSONDecode(w, r)
 
-	sessionUUID, sessionUUIDOk := data["SessionUUID"].(string)
-	lastID, lastIDOk := data["LastID"].(int)
+	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
+	lastID, lastIDOk := data["last_id"].(int)
+	limit, _ := data["limit"].(int)
 	// Default to max int64 if LastID is not provided or invalid
 	if !lastIDOk || lastID <= 0 {
 		lastID = math.MaxInt64
@@ -31,12 +33,14 @@ func FollowFeedHandler(w http.ResponseWriter, r *http.Request) {
 	result, err := pdb.GetFollowFeed(map[string]any{
 		"session_uuid": sessionUUID,
 		"last_id":      lastID,
+		"limit":        limit,
 	})
 	if err != nil {
-		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve global feed", nil)
+		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve follow feed", nil)
+		fmt.Println(err)
 		return
 	}
 	db.CloseConn()
 
-	utils.JSONResponse(w, http.StatusOK, "Global feed retrieved successfully", result)
+	utils.JSONResponse(w, http.StatusOK, "Follow feed retrieved successfully", result)
 }

@@ -118,7 +118,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 				p.date,
 				p.privacy_mode,
 				COUNT(DISTINCT l.id),
-				COUNT(DISTINCT c.id),
+				COUNT(DISTINCT c.id)
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			JOIN sessions s ON s.uuid = ?
@@ -128,7 +128,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 			LEFT JOIN comments c ON c.post_id = p.id
 			WHERE
 				(
-					OR (f.user_to IS NOT NULL AND p.privacy_mode IN (1,2))
+					(f.user_to IS NOT NULL AND p.privacy_mode IN (1,2))
 					OR (p.privacy_mode = 3 AND pr.follower_id IS NOT NULL)
 				)
 				AND p.id < ?
@@ -196,7 +196,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 				COALESCE(p.image, ''),
 				p.date,
 				COUNT(DISTINCT l.id),
-				COUNT(DISTINCT c.id),
+				COUNT(DISTINCT c.id)
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			LEFT JOIN groups g ON g.id = ? 

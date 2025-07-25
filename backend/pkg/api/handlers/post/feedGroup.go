@@ -14,8 +14,9 @@ func GroupFeedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	data := utils.JSONDecode(w, r)
 
-	groupID, groupIDOk := data["SessionUUID"].(int)
-	lastID, lastIDOk := data["LastID"].(int)
+	groupID, groupIDOk := data["session_uuid"].(int)
+	lastID, lastIDOk := data["last_id"].(int)
+	limit, _ := data["limit"].(int)
 	// Default to max int64 if LastID is not provided or invalid
 	if !lastIDOk || lastID <= 0 {
 		lastID = math.MaxInt64
@@ -31,6 +32,7 @@ func GroupFeedHandler(w http.ResponseWriter, r *http.Request) {
 	result, err := pdb.GetGroupFeed(map[string]any{
 		"group_id": data["GroupID"],
 		"last_id":  lastID,
+		"limit":    limit,
 	})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve group feed", nil)
