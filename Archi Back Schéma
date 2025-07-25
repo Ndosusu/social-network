@@ -1,0 +1,35 @@
+backend/
+├── config/
+│   └── .env ou .yaml
+├── cmd/
+│   ├── cli/
+│   │   └── main.go
+│   └── server/
+│       └── main.go
+├── data/
+│   └── dev.db
+├── pkg/
+│   ├── api/
+│   │   ├── handlers/
+│   │   ├── middleware/
+│   │   └── router.go
+│   ├── db/
+│   │   ├── migrations/
+│   │   │   ├── 00001_init.up.sql
+│   │   │   └── 00001_init.down.sql
+│   │   ├── models/
+│   │   │   └── user.go
+│   │   └── sqlite/
+│   │       └── sqlite.go
+│   ├── utils/
+│   └── websocket/
+│       ├── clientClass.go
+│       └── hubClass.go
+├── scripts/
+│   ├── migrate.sh
+│   └── deploy.sh
+├── .gitignore
+├── go.mod
+├── go.sum
+├── Dockerfile
+└── README.md
