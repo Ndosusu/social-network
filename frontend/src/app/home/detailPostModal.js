@@ -1,19 +1,20 @@
 "use client"
 
 import { useState } from "react"
+import { likePost } from "./page.js"
 
 export default function DetailPostModal(data) {
-    const post = data.post
-    
     return (
         <div className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl overflow-scroll">
-            {post ? <DetailContent post={post} /> : <PostNotFound /> }
+            {data.postFeed ? <DetailContent postFeed={data.postFeed} /> : <PostNotFound /> }
         </div>
     )
 }
 
-function DetailContent({post}) {
+function DetailContent({postFeed}) {
     const [newCom, setNewCom] = useState(false)
+    const [liked, setLiked] = useState(postFeed.Like ? true : false)
+    const post = postFeed.Post
 
     const coms = [ //replace with fetch
         {
@@ -62,10 +63,11 @@ function DetailContent({post}) {
                 <div className="w-full h-fit p-4">
                     <p id="detailMessage">{post.Message}</p>
                 </div>
-                <div className="p-3 flex w-full gap-1 w-1/10 items-center" >
-                    <img src="like.svg" className="h-8" />
-                    <p>{post.nbLike || "0"}</p>
-                </div>
+                <label className="min-w-1/10 flex items-center" onClick={(e) => {e.stopPropagation()}}>
+                    <input type="button" className="hidden" onClick={() => {likePost(postFeed, setLiked)}} />
+                    <img src={liked ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
+                    <p className={liked ? "text-secondary" : null}>{postFeed.LikeCount || "0"}</p>
+                </label>
             </div>
             <input type="button" value={newCom? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl self-start duration-100" onClick={() => {setNewCom(!newCom)}} />
             {

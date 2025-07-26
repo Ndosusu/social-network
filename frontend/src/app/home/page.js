@@ -109,7 +109,7 @@ export default function Home() {
             }
 
             case "detailModal": {
-                return <DetailPostModal post={curDetail} />
+                return <DetailPostModal postFeed={curDetail} />
             }
         }
     }
@@ -163,7 +163,7 @@ export function CreatePost(data) {
 
     return (
         <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={async () => {
-            setDetail(post)
+            setDetail(postFeed)
             setModal("detailModal")
         }}>
             <div className="w-full postHeader bg-primaryT p-2">
@@ -187,8 +187,7 @@ export function CreatePost(data) {
     )
 }
 
-async function likePost(postFeed, fn) {
-    console.log(postFeed)
+export async function likePost(postFeed, fn) {
     fetch("/likes",
         {
             method: "POST",
