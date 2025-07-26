@@ -10,7 +10,7 @@ import (
 
 // Helper functions for post handlers
 
-func validateRequiredFields(data map[string]any, fields []string) string {
+func ValidateRequiredFields(data map[string]any, fields []string) string {
 	for _, field := range fields {
 		if data[field] == nil {
 			return "Missing required field: " + field

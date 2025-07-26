@@ -1,10 +1,9 @@
 package handlers_post
 
 import (
-	"fmt"
 	"net/http"
 	"social-network/pkg/db/models"
-	post "social-network/pkg/db/models/postco"
+	post "social-network/pkg/db/models/post"
 	"social-network/pkg/utils"
 )
 
@@ -14,23 +13,48 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := utils.JSONDecode(w, r)
-	postID, ok := data["id"].(int)
-	if !ok || postID <= 0 {
+	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
+	if !sessionUUIDOk || sessionUUID == "" {
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
+		return
+	}
+
+	postID, postIDOk := data["post_id"].(float64)
+	var postIDInt int
+	if postIDOk {
+		postIDInt = int(postID)
+	} else {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing post ID", nil)
 		return
 	}
 
 	var db models.DB
 	db.OpenConn()
+	defer db.CloseConn()
+
 	pdb := post.New(&db)
-	result, err := pdb.DeletePost(map[string]any{"id": postID})
+	result, err := pdb.IsUserPostAuthor(map[string]any{
+		"post_id":      postIDInt,
+		"session_uuid": sessionUUID,
+	})
 	if err != nil {
-		utils.JSONResponse(w, http.StatusInternalServerError, "Database connection failed", nil)
-		db.CloseConn()
+		utils.JSONResponse(w, http.StatusNotFound, "Post not found or invalid session", nil)
 		return
 	}
-	db.CloseConn()
-	fmt.Println(result)
 
-	utils.JSONResponse(w, http.StatusOK, "Post deleted successfully", nil)
+	canDelete := result.Result.(bool)
+	if !canDelete {
+		utils.JSONResponse(w, http.StatusForbidden, "You are not the author of this post", nil)
+		return
+	}
+
+	result, err = pdb.DeletePost(map[string]any{
+		"post_id": postIDInt,
+	})
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to delet post", nil)
+		return
+	}
+
+	utils.JSONResponse(w, http.StatusOK, "Post deleted successfully", result)
 }

@@ -24,8 +24,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	var db models.DB
 	db.OpenConn()
-	udb := user.New(&db)
+	defer db.CloseConn()
 
+	udb := user.New(&db)
 	result, err := udb.Authenticate(map[string]any{
 		"mail":     mail,
 		"password": password,
@@ -34,7 +35,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Database error: "+err.Error(), nil)
 		return
 	}
-	db.CloseConn()
 
 	if result.Result == nil {
 		utils.JSONResponse(w, http.StatusUnauthorized, "Invalid email or password", nil)

@@ -1,4 +1,4 @@
-package models_group
+package models_event
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"social-network/pkg/utils"
 )
 
-func (db *GroupDB) InsertEvent(obj map[string]any) (*models.Response, error) {
+func (db *EventDB) InsertEvent(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
@@ -31,36 +31,36 @@ func (db *GroupDB) InsertEvent(obj map[string]any) (*models.Response, error) {
 	return db.SelectEventById(map[string]any{"id": newEventId})
 }
 
-func (db *GroupDB) SelectEventById(obj map[string]any) (*models.Response, error) {
+func (db *EventDB) SelectEventById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
-			id : int,
+			event_id : int,
 		}
 	*/
 	stmt := "SELECT id, group_id, title, about, date_schedule, date_creation FROM events WHERE id = ?;"
-	result := db.Conn.QueryRow(stmt, obj["id"])
+	result := db.Conn.QueryRow(stmt, obj["event_id"])
 
-	event := models.Event{}
-	err := result.Scan(&event.Id, &event.GroupId, &event.Title, &event.About, &event.DateSchedule, &event.DateCreation)
+	event := models.Event{
+		Group: &models.Group{Id: utils.NOT_SCANNED},
+	}
+	err := result.Scan(&event.Id, &event.Group.Id, &event.Title, &event.About, &event.DateSchedule, &event.DateCreation)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
 	return &models.Response{Result: event}, nil
 }
-func (db *GroupDB) DeleteEvent(obj map[string]any) (*models.Response, error) {
+func (db *EventDB) DeleteEvent(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
-			id : int,
+			event_id : int,
 		}
 	*/
 	stmt := "DELETE FROM events WHERE id = ?;"
-	_, err := db.Conn.Exec(stmt, obj["id"])
+	_, err := db.Conn.Exec(stmt, obj["event_id"])
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

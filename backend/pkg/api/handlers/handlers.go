@@ -1,23 +1,36 @@
 package handlers
 
 import (
-	handlers_auth "social-network/pkg/api/handlers/auth"
-	handlers_post "social-network/pkg/api/handlers/post"
+	auth "social-network/pkg/api/handlers/auth"
+	comment "social-network/pkg/api/handlers/comment"
+	like "social-network/pkg/api/handlers/like"
+	post "social-network/pkg/api/handlers/post"
 )
 
 var (
 	// Handlers auth
-	RegisterHandler = handlers_auth.RegisterHandler
-	LoginHandler    = handlers_auth.LoginHandler
-	LogoutHandler   = handlers_auth.LogoutHandler
+	RegisterHandler = auth.RegisterHandler
+	LoginHandler    = auth.LoginHandler
+	LogoutHandler   = auth.LogoutHandler
 
 	// Handlers posts
-	CreatePostHandler = handlers_post.CreatePostHandler
-	//UpdatePostHandler = handlers_post.UpdatePostHandler
-	DeletePostHandler = handlers_post.DeletePostHandler
-	ServeImageHandler = handlers_post.ServeImageHandler
+	CreatePostHandler = post.CreatePostHandler
+	//UpdatePostHandler = post.UpdatePostHandler
+	DeletePostHandler = post.DeletePostHandler
+	ServeImageHandler = post.ServeImageHandler
 
-	GlobalFeedHandler = handlers_post.GlobalFeedHandler
-	FollowFeedHandler = handlers_post.FollowFeedHandler
-	GroupFeedHandler  = handlers_post.GroupFeedHandler
+	GlobalFeedHandler = post.GlobalFeedHandler
+	FollowFeedHandler = post.FollowFeedHandler
+	GroupFeedHandler  = post.GroupFeedHandler
+
+	// Handlers comments
+	CreateCommentHandler = comment.CreateCommentHandler
+	//UpdateCommentHandler = comment.UpdateCommentHandler
+	DeleteCommentHandler = comment.DeleteCommentHandler
+
+	CommentsHandler = comment.CommentsHandler
+
+	// Handlers likes
+	CreateLikeHandler = like.CreateLikeHandler
+	DeleteLikeHandler = like.DeleteLikeHandler
 )

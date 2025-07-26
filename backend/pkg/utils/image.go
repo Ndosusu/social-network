@@ -48,8 +48,8 @@ func SaveImageFile(file multipart.File, header *multipart.FileHeader) (string, e
 
 	// Generate unique filename
 	ext := filepath.Ext(header.Filename)
-	filename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-	filePath := filepath.Join(uploadDir, filename)
+	fileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
+	filePath := filepath.Join(uploadDir, fileName)
 
 	// Create the file
 	dst, err := os.Create(filePath)
@@ -63,7 +63,7 @@ func SaveImageFile(file multipart.File, header *multipart.FileHeader) (string, e
 		return "", fmt.Errorf("failed to save file: %v", err)
 	}
 
-	return filePath, nil
+	return fileName, nil
 }
 
 // getImageContentType returns the appropriate content type based on file extension
