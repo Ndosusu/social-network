@@ -31,5 +31,6 @@ var (
 	CommentsHandler = comment.CommentsHandler
 
 	// Handlers likes
-	LikeHandler = like.LikeHandler
+	CreateLikeHandler = like.CreateLikeHandler
+	DeleteLikeHandler = like.DeleteLikeHandler
 )

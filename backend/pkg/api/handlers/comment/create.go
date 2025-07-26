@@ -3,7 +3,7 @@ package handlers_comment
 import (
 	"net/http"
 	"social-network/pkg/db/models"
-	post "social-network/pkg/db/models/postco"
+	comment "social-network/pkg/db/models/comment"
 	user "social-network/pkg/db/models/user"
 	"social-network/pkg/utils"
 )
@@ -26,21 +26,22 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Logic to get Author ID
-	authorUuid := r.FormValue("author_uuid")
-	if authorUuid == "" {
+	sessionUUID := r.FormValue("session_uuid")
+	if sessionUUID == "" {
 		utils.JSONResponse(w, http.StatusBadRequest, "Missing required field: author_uuid", nil)
 		return
 	}
 	var db models.DB
 	db.OpenConn()
+	defer db.CloseConn()
+
 	udb := user.New(&db)
-	result, err := udb.GetSessionByUuid(map[string]any{"uuid": authorUuid})
-	db.CloseConn()
+	result, err := udb.GetSessionByUuid(map[string]any{"session_uuid": sessionUUID})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid author UUID or user not found", nil)
 		return
 	}
-	comData["author_id"] = result.Result.(models.Session).UserId
+	comData["author_id"] = result.Result.(models.Session).User.Id
 
 	// Handle image upload if present
 	file, header, err := r.FormFile("image")
@@ -72,10 +73,8 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	} */
 
-	db.OpenConn()
-	pdb := post.New(&db)
-	result, err = pdb.InsertComment(comData)
-	db.CloseConn()
+	cdb := comment.New(&db)
+	result, err = cdb.InsertComment(comData)
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to create comment", nil)
 		return

@@ -37,7 +37,6 @@ type PostFeed struct {
 	Like         *Like
 	LikeCount    int
 	CommentCount int
-	GroupTitle   string
 }
 
 type Comment struct {

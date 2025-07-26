@@ -3,7 +3,7 @@ package handlers_comment
 import (
 	"net/http"
 	"social-network/pkg/db/models"
-	post "social-network/pkg/db/models/postco"
+	comment "social-network/pkg/db/models/comment"
 	"social-network/pkg/utils"
 )
 
@@ -14,25 +14,41 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := utils.JSONDecode(w, r)
 
-	postID, postIDOk := data["id"].(int)
-	lastID, lastIDOk := data["last_id"].(int)
-	if !postIDOk || postID <= 0 {
+	postID, postIDOk := data["post_id"].(float64)
+	var postIDInt int
+	if postIDOk {
+		postIDInt = int(postID)
+	} else {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing post ID", nil)
 		return
 	}
-	if !lastIDOk || lastID <= 0 {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing comment ID", nil)
-		return
+	lastID, lastIDOk := data["last_id"].(float64)
+	var lastIDInt int
+	if lastIDOk {
+		lastIDInt = int(lastID)
+	} else {
+		// Default to max int if last_id is not provided or invalid
+		lastIDInt = utils.DEFAULT_ID
+	}
+	limit, limitOk := data["limit"].(float64)
+	var limitInt int
+	if limitOk {
+		limitInt = int(limit)
+	} else {
+		// Default to 10 if limit is not provided or invalid
+		limitInt = utils.DEFAULT_LIMIT
 	}
 
 	var db models.DB
 	db.OpenConn()
-	pdb := post.New(&db)
-	result, err := pdb.SelectCommentsByPostId(map[string]any{
-		"post_id": postID,
-		"last_id": lastID,
+	defer db.CloseConn()
+
+	cdb := comment.New(&db)
+	result, err := cdb.SelectCommentsByPostId(map[string]any{
+		"post_id": postIDInt,
+		"last_id": lastIDInt,
+		"limit":   limitInt,
 	})
-	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve comments", nil)
 		return

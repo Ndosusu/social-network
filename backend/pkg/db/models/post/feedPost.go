@@ -94,15 +94,18 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 					Nickname: nickname,
 				},
 				Group: &models.Group{
-					Id: groupId,
+					Id:    groupId,
+					Title: groupTitle,
 				},
-			},
-			Like: &models.Like{
-				Id: likeId,
 			},
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
-			GroupTitle:   groupTitle,
+		}
+
+		if likeId > 0 {
+			pf.Like = &models.Like{
+				Id: likeId,
+			}
 		}
 
 		if postImage != nil && *postImage != "" {
@@ -197,11 +200,15 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 					Nickname: nickname,
 				},
 			},
-			Like: &models.Like{
-				Id: likeId,
-			},
+
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
+		}
+
+		if likeId > 0 {
+			pf.Like = &models.Like{
+				Id: likeId,
+			}
 		}
 
 		if postImage != nil && *postImage != "" {
@@ -288,11 +295,14 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 					Nickname: nickname,
 				},
 			},
-			Like: &models.Like{
-				Id: likeId,
-			},
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
+		}
+
+		if likeId > 0 {
+			pf.Like = &models.Like{
+				Id: likeId,
+			}
 		}
 
 		if postImage != nil && *postImage != "" {

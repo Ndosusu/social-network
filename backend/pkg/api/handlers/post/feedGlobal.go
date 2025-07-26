@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"social-network/pkg/db/models"
-	post "social-network/pkg/db/models/postco"
+	post "social-network/pkg/db/models/post"
 	"social-network/pkg/utils"
 )
 
@@ -39,13 +39,14 @@ func GlobalFeedHandler(w http.ResponseWriter, r *http.Request) {
 
 	var db models.DB
 	db.OpenConn()
+	defer db.CloseConn()
+
 	pdb := post.New(&db)
 	result, err := pdb.GetGlobalFeed(map[string]any{
 		"session_uuid": sessionUUID,
 		"last_id":      lastIDInt,
 		"limit":        limitInt,
 	})
-	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve global feed", nil)
 		return

@@ -6,7 +6,6 @@
 package models_post
 
 import (
-	"errors"
 	"fmt"
 	"social-network/pkg/db/models"
 	"social-network/pkg/utils"
@@ -52,11 +51,11 @@ func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
-			id : int,
+			post_id : int,
 		}
 	*/
 	stmt := "SELECT id, author_id, message, COALESCE(image, ''), date, privacy_mode, COALESCE(group_id, 0) FROM posts WHERE id = ?;"
-	result := db.Conn.QueryRow(stmt, obj["id"])
+	result := db.Conn.QueryRow(stmt, obj["post_id"])
 
 	post := models.Post{
 		Author: &models.User{Id: utils.NOT_SCANNED},
@@ -75,11 +74,11 @@ func (db *PostDB) DeletePost(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
-			id : int,
+			post_id : int,
 		}
 	*/
 	stmt := "DELETE FROM posts WHERE id = ?;"
-	_, err := db.Conn.Exec(stmt, obj["id"])
+	_, err := db.Conn.Exec(stmt, obj["post_id"])
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -88,8 +87,8 @@ func (db *PostDB) DeletePost(obj map[string]any) (*models.Response, error) {
 	return &models.Response{Result: "Ok"}, nil
 }
 
-func (db *PostDB) UpdatePost(obj map[string]any) (*models.Response, error) {
-	/*
+/*func (db *PostDB) UpdatePost(obj map[string]any) (*models.Response, error) {
+
 		expected input (as json object) :
 		{
 			id : int,
@@ -98,7 +97,7 @@ func (db *PostDB) UpdatePost(obj map[string]any) (*models.Response, error) {
 			privacy_mode : int (optional),
 			group_id : int (optional),
 		}
-	*/
+
 
 	// Build dynamic update query
 	setParts := []string{}
@@ -156,3 +155,4 @@ func (db *PostDB) UpdatePost(obj map[string]any) (*models.Response, error) {
 	// Return the updated post
 	return db.SelectPostById(map[string]any{"id": obj["id"]})
 }
+*/

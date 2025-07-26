@@ -54,8 +54,9 @@ func InitRouter() *http.ServeMux {
 	mux.HandleFunc("OPTIONS /feed/detail", m.Cors(handlers.CommentsHandler))
 
 	// Like routes
-	mux.HandleFunc("POST /likes", m.Cors(handlers.LikeHandler))
-	mux.HandleFunc("OPTIONS /likes", m.Cors(handlers.LikeHandler))
+	mux.HandleFunc("POST /likes", m.Cors(handlers.CreateLikeHandler))
+	mux.HandleFunc("DELETE /likes", m.Cors(handlers.DeleteLikeHandler))
+	mux.HandleFunc("OPTIONS /likes", m.Cors(handlers.CreateLikeHandler))
 
 	/* 	// Group routes
 	   	mux.HandleFunc("GET /groups", m.Cors(handlers.GroupHandler))

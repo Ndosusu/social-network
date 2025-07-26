@@ -3,7 +3,7 @@ package handlers_post
 import (
 	"net/http"
 	"social-network/pkg/db/models"
-	post "social-network/pkg/db/models/postco"
+	post "social-network/pkg/db/models/post"
 	rel "social-network/pkg/db/models/relation"
 	user "social-network/pkg/db/models/user"
 	"social-network/pkg/utils"
@@ -27,21 +27,23 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Logic to get Author ID
-	authorUuid := r.FormValue("author_uuid")
-	if authorUuid == "" {
+	sessionUUID := r.FormValue("session_uuid")
+	if sessionUUID == "" {
 		utils.JSONResponse(w, http.StatusBadRequest, "Missing required field: author_uuid", nil)
 		return
 	}
+
 	var db models.DB
 	db.OpenConn()
+	defer db.CloseConn()
+
 	udb := user.New(&db)
-	result, err := udb.GetSessionByUuid(map[string]any{"uuid": authorUuid})
-	db.CloseConn()
+	result, err := udb.GetSessionByUuid(map[string]any{"session_uuid": sessionUUID})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid author UUID or user not found", nil)
 		return
 	}
-	postData["author_id"] = result.Result.(models.Session).UserId
+	postData["author_id"] = result.Result.(models.Session).User.Id
 
 	// Group ID is optional
 	if groupID := r.FormValue("group_id"); groupID != "" {
@@ -78,10 +80,8 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	} */
 
-	db.OpenConn()
 	pdb := post.New(&db)
 	result, err = pdb.InsertPost(postData)
-	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to create post", nil)
 		return
@@ -96,7 +96,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		// Add the author ID to the list, he needs to see his own post
 		followersIDs = append(followersIDs, postData["author_id"].(string))
 
-		db.OpenConn()
 		rdb := rel.New(&db)
 		for _, followerID := range followersIDs {
 			postRels["user_id"] = followerID
@@ -107,7 +106,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		db.CloseConn()
 	}
 
 	utils.JSONResponse(w, http.StatusCreated, "Post created successfully", result)

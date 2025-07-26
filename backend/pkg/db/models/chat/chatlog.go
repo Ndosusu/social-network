@@ -34,11 +34,11 @@ func (db *ChatDB) SelectLogById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
-			id : int,
+			log_id : int,
 		}
 	*/
 	stmt := "SELECT id, chat_id, author_id, log, date FROM chat_log WHERE id = ?;"
-	result := db.Conn.QueryRow(stmt, obj["id"])
+	result := db.Conn.QueryRow(stmt, obj["log_id"])
 
 	log := models.Log{
 		Author: &models.User{Id: utils.NOT_SCANNED},
@@ -56,11 +56,11 @@ func (db *ChatDB) DeleteLog(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
-			id : int,
+			log_id : int,
 		}
 	*/
 	stmt := "DELETE FROM chat_log WHERE id = ?;"
-	_, err := db.Conn.Exec(stmt, obj["id"])
+	_, err := db.Conn.Exec(stmt, obj["log_id"])
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

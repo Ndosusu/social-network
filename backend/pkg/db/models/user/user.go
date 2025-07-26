@@ -55,12 +55,12 @@ func (db *UserDB) SelectUserById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
-			id : int,
+			user_id : int,
 		}
 	*/
 
 	stmt := "SELECT id, email, first_name, last_name, date_birth, avatar, nick_name, about, date_creation, private_mode FROM users WHERE id = ?;"
-	result := db.Conn.QueryRow(stmt, obj["id"])
+	result := db.Conn.QueryRow(stmt, obj["user_id"])
 
 	user := models.User{}
 	err := result.Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName, &user.BirthDate, &user.Avatar, &user.Nickname, &user.About, &user.CreatedDate, &user.PrivateMode)

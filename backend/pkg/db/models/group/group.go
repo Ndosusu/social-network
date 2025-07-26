@@ -31,11 +31,11 @@ func (db *GroupDB) SelectGroupById(obj map[string]any) (*models.Response, error)
 	/*
 		expected input (as json object) :
 		{
-			id : int,
+			group_id : int,
 		}
 	*/
 	stmt := "SELECT id, admin_id, title, about, date_creation FROM groups WHERE id = ?;"
-	result := db.Conn.QueryRow(stmt, obj["id"])
+	result := db.Conn.QueryRow(stmt, obj["group_id"])
 
 	group := models.Group{
 		Admin: &models.User{Id: utils.NOT_SCANNED},
@@ -47,4 +47,20 @@ func (db *GroupDB) SelectGroupById(obj map[string]any) (*models.Response, error)
 	}
 
 	return &models.Response{Result: group}, nil
+}
+
+func (db *GroupDB) DeleteGroup(obj map[string]any) (*models.Response, error) {
+	/*
+		expected input (as json object) :
+		{
+			group_id : int,
+		}
+	*/
+	stmt := "DELETE FROM groups WHERE id = ?;"
+	_, err := db.Conn.Exec(stmt, obj["group_id"])
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return &models.Response{Result: "Ok"}, nil
 }

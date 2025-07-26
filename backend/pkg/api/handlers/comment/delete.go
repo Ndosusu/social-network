@@ -3,7 +3,7 @@ package handlers_comment
 import (
 	"net/http"
 	"social-network/pkg/db/models"
-	post "social-network/pkg/db/models/postco"
+	comment "social-network/pkg/db/models/comment"
 	"social-network/pkg/utils"
 )
 
@@ -13,19 +13,46 @@ func DeleteCommentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := utils.JSONDecode(w, r)
-	comID, ok := data["id"].(int)
-	if !ok || comID <= 0 {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing post ID", nil)
+	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
+	if !sessionUUIDOk || sessionUUID == "" {
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
+		return
+	}
+
+	comID, comIDOk := data["comment_id"].(float64)
+	var comIDInt int
+	if comIDOk {
+		comIDInt = int(comID)
+	} else {
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing comment ID", nil)
 		return
 	}
 
 	var db models.DB
 	db.OpenConn()
-	pdb := post.New(&db)
-	result, err := pdb.DeletePost(map[string]any{"id": comID})
-	db.CloseConn()
+	defer db.CloseConn()
+
+	cdb := comment.New(&db)
+	result, err := cdb.IsUserCommentAuthor(map[string]any{
+		"comment_id":   comIDInt,
+		"session_uuid": sessionUUID,
+	})
 	if err != nil {
-		utils.JSONResponse(w, http.StatusInternalServerError, "Database connection failed", nil)
+		utils.JSONResponse(w, http.StatusNotFound, "Comment not found or invalid session", nil)
+		return
+	}
+
+	canDelete := result.Result.(bool)
+	if !canDelete {
+		utils.JSONResponse(w, http.StatusForbidden, "You are not the author of this comment", nil)
+		return
+	}
+
+	result, err = cdb.DeleteComment(map[string]any{
+		"comment_id": comIDInt,
+	})
+	if err != nil {
+		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to delete comment", nil)
 		return
 	}
 
