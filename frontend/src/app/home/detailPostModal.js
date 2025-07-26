@@ -77,7 +77,7 @@ function DetailContent({postFeed}) {
 }
 
 function deletePost(post) {
-    fetch("/posts", {
+    fetch("http://localhost:8080/posts", {
         method: "DELETE",
         body: {
             session_uuid: localStorage.getItem("logToken"),
@@ -144,7 +144,7 @@ function CreateCom({comFeed}) {
 }
 
 async function likeCom(comFeed, fn) {
-    fetch("/likes", comFeed.Like 
+    fetch("http://localhost:8080/likes", comFeed.Like 
         ? {
             method: "DELETE",
             body: JSON.stringify({

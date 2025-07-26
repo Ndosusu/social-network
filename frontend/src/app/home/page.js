@@ -187,7 +187,7 @@ export function CreatePost(data) {
 }
 
 export async function likePost(postFeed, fn) {
-    fetch("/likes",
+    fetch("http://localhost:8080/likes",
         postFeed.Like 
         ? {
             method: "DELETE",
@@ -212,7 +212,8 @@ export async function likePost(postFeed, fn) {
     .then(data => data.json())
 
     .then(response => {
-        switch(typeof response.data.Result) {
+        console.log(response)
+        switch(typeof response.Data.Result) {
             case "string": {
                 fn(false)
             }
