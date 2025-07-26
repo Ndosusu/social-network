@@ -24,6 +24,7 @@ export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
         .then(data => data.json())
         .then(data => {
             console.log(data.data)
+            modalFn("")
             postsFn([{
                 CommentCount: 0,
                 LikeCount: 0,
@@ -31,8 +32,6 @@ export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
                 Post: data.data.Result,
             }].concat(posts))
         })
-
-        modalFn("")
     }
 
     const changedFile = async (event) => {

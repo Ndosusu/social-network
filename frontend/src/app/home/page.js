@@ -159,6 +159,8 @@ export function CreatePost(data) {
     const setDetail = data.setDetail
     const setModal = data.setModal
 
+    const [liked, setLiked] = useState(postFeed.Like ? true : false)
+
     return (
         <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={async () => {
             setDetail(post)
@@ -171,10 +173,10 @@ export function CreatePost(data) {
                 {post.Message || "no"}
             </div>
             <div className="p-3 flex w-full gap-4">
-                <label className="min-w-1/10 flex items-center">
-                    <input type="button" className="hidden" onClick={() => {likePost()}} />
-                    <img src="/like.svg" className={"h-8 "}></img>
-                    <p>{postFeed.LikeCount || "0"}</p>
+                <label className="min-w-1/10 flex items-center" onClick={(e) => {e.stopPropagation()}}>
+                    <input type="button" className="hidden" onClick={() => {likePost(postFeed, setLiked)}} />
+                    <img src={liked ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
+                    <p className={liked ? "text-secondary" : null}>{postFeed.LikeCount || "0"}</p>
                 </label>
                 <div className="min-w-1/10 flex items-center gap-1">
                     <img src="/comment.svg" className="h-8"></img>
@@ -185,14 +187,15 @@ export function CreatePost(data) {
     )
 }
 
-async function likePost(obj) {
+async function likePost(postFeed, fn) {
+    console.log(postFeed)
     fetch("/likes",
         {
             method: "POST",
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
-                post_id: post.id,
-                like_id: post.like.id
+                post_id: postFeed.Post.Id,
+                like_id: postFeed.Like ? postFeed.Like.Id : null,
             })
         }
     )
@@ -204,6 +207,13 @@ async function likePost(obj) {
     .then(data => data.json())
 
     .then(data => {
-        console.log(data)
+        switch(typeof data.Result) {
+            case "string": {
+                fn(false)
+            }
+            case "object": {
+                fn(true)
+            }
+        }
     })
 }
