@@ -35,11 +35,11 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	db.OpenConn()
 	udb := user.New(&db)
 	result, err := udb.GetSessionByUuid(map[string]any{"uuid": authorUuid})
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid author UUID or user not found", nil)
 		return
 	}
-	db.CloseConn()
 	comData["author_id"] = result.Result.(models.Session).UserId
 
 	// Handle image upload if present
@@ -75,12 +75,11 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	db.OpenConn()
 	pdb := post.New(&db)
 	result, err = pdb.InsertComment(comData)
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to create comment", nil)
-		db.CloseConn()
 		return
 	}
-	db.CloseConn()
 
 	utils.JSONResponse(w, http.StatusCreated, "Comment created successfully", result)
 }

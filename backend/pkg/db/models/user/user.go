@@ -63,32 +63,11 @@ func (db *UserDB) SelectUserById(obj map[string]any) (*models.Response, error) {
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
 	user := models.User{}
-	err := result.Scan(&user.Id, &user.Email, &user.First_name, &user.Last_name, &user.Birth_date, &user.Avatar, &user.Nickname, &user.About, &user.Created_date, &user.Private_mode)
+	err := result.Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName, &user.BirthDate, &user.Avatar, &user.Nickname, &user.About, &user.CreatedDate, &user.PrivateMode)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
-	return &models.Response{Result: user}, nil
-}
-
-func (db *UserDB) SelectUserByUuid(obj map[string]any) (*models.Response, error) {
-	/*
-		expected input (as json object) :
-		{
-			uuid : string,
-		}
-	*/
-
-	stmt := "SELECT id, email, first_name, last_name, date_birth, avatar, nick_name, about, date_creation, private_mode FROM users WHERE uuid = ?;"
-	result := db.Conn.QueryRow(stmt, obj["uuid"])
-
-	user := models.User{}
-	err := result.Scan(&user.Id, &user.Email, &user.First_name, &user.Last_name, &user.Birth_date, &user.Avatar, &user.Nickname, &user.About, &user.Created_date, &user.Private_mode)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
 	return &models.Response{Result: user}, nil
 }
 

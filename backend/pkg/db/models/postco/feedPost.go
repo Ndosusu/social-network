@@ -20,7 +20,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 				p.id,
 				p.author_id,
 				u.nick_name,
-				u.avatar,
+				COALESCE(u.avatar, ''),
 				p.message,
 				COALESCE(p.image, ''),
 				p.date,
@@ -49,7 +49,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 					OR (p.group_id IS NOT NULL AND gmr.group_id IS NOT NULL)
 				)
 				AND p.id < ?
-			GROUP BY p.id
+			GROUP BY p.id, p.author_id, u.nick_name, u.avatar, p.message, p.image, p.date, p.privacy_mode, p.group_id, g.title, ul.id
 			ORDER BY p.id DESC
 			LIMIT ?;`
 	rows, err := db.Conn.Query(stmt, obj["session_uuid"], obj["last_id"], obj["limit"])
@@ -60,47 +60,61 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 
 	var result []models.PostFeed
 	for rows.Next() {
-		var p models.Post
-		var postImage string
-		var author models.User
-		var likeCount, commentCount int
-		var groupTitle string
-		var groupID int
-		var l models.Like
+		var postId, authorId, privacyMode, groupId, likeCount, commentCount, likeId int
+		var nickname, message, date, groupTitle string
+		var postImage, avatar *string
 
 		err := rows.Scan(
-			&p.Id,
-			&p.AuthorId,
-			&author.Nickname,
-			&author.Avatar,
-			&p.Message,
+			&postId,
+			&authorId,
+			&nickname,
+			&avatar,
+			&message,
 			&postImage,
-			&p.Date,
-			&p.PrivacyMode,
-			&groupID,
+			&date,
+			&privacyMode,
+			&groupId,
 			&likeCount,
 			&commentCount,
 			&groupTitle,
-			&l.Id,
+			&likeId,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		if postImage != "" {
-			p.Image = &postImage
-		}
-		p.GroupId = groupID
-		p.Author = &author
-
-		result = append(result, models.PostFeed{
-			Post:         &p,
+		pf := models.PostFeed{
+			Post: &models.Post{
+				Id:          postId,
+				Message:     message,
+				Date:        date,
+				PrivacyMode: privacyMode,
+				Author: &models.User{
+					Id:       authorId,
+					Nickname: nickname,
+				},
+				Group: &models.Group{
+					Id: groupId,
+				},
+			},
+			Like: &models.Like{
+				Id: likeId,
+			},
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
 			GroupTitle:   groupTitle,
-			Like:         &l,
-		})
+		}
+
+		if postImage != nil && *postImage != "" {
+			pf.Post.Image = postImage
+		}
+		if avatar != nil && *avatar != "" {
+			pf.Post.Author.Avatar = avatar
+		}
+
+		result = append(result, pf)
 	}
+
 	return &models.Response{Result: result}, nil
 }
 
@@ -118,7 +132,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 				p.id,
 				p.author_id,
 				u.nick_name,
-				u.avatar,
+				COALESCE(u.avatar, ''),
 				p.message,
 				COALESCE(p.image, ''),
 				p.date,
@@ -140,7 +154,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 					OR (p.privacy_mode = 3 AND pr.follower_id IS NOT NULL)
 				)
 				AND p.id < ?
-			GROUP BY p.id
+			GROUP BY p.id, p.author_id, u.nick_name, u.avatar, p.message, p.image, p.date, p.privacy_mode, ul.id
 			ORDER BY p.id DESC
 			LIMIT ?;`
 	rows, err := db.Conn.Query(stmt, obj["session_uuid"], obj["last_id"], obj["limit"])
@@ -151,40 +165,54 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 
 	var result []models.PostFeed
 	for rows.Next() {
-		var p models.Post
-		var postImage string
-		var author models.User
-		var likeCount, commentCount int
-		var l models.Like
+		var postId, authorId, privacyMode, likeCount, commentCount, likeId int
+		var nickname, message, date string
+		var avatar, postImage *string
 
 		err := rows.Scan(
-			&p.Id,
-			&p.AuthorId,
-			&author.Nickname,
-			&author.Avatar,
-			&p.Message,
+			&postId,
+			&authorId,
+			&nickname,
+			&avatar,
+			&message,
 			&postImage,
-			&p.Date,
-			&p.PrivacyMode,
+			&date,
+			&privacyMode,
 			&likeCount,
 			&commentCount,
-			&l.Id,
+			&likeId,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		if postImage != "" {
-			p.Image = &postImage
-		}
-		p.Author = &author
-
-		result = append(result, models.PostFeed{
-			Post:         &p,
+		pf := models.PostFeed{
+			Post: &models.Post{
+				Id:          postId,
+				Message:     message,
+				Date:        date,
+				PrivacyMode: privacyMode,
+				Author: &models.User{
+					Id:       authorId,
+					Nickname: nickname,
+				},
+			},
+			Like: &models.Like{
+				Id: likeId,
+			},
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
-			Like:         &l,
-		})
+		}
+
+		if postImage != nil && *postImage != "" {
+			pf.Post.Image = postImage
+		}
+		if avatar != nil && *avatar != "" {
+			pf.Post.Author.Avatar = avatar
+		}
+
+		result = append(result, pf)
+
 	}
 	return &models.Response{Result: result}, nil
 }
@@ -193,6 +221,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 			{
+				session_uuid : string,
 				group_id : int,
 				last_id : int,
 				limit : int
@@ -203,7 +232,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 				p.id,
 				p.author_id,
 				u.nick_name,
-				u.avatar,
+				COALESCE(u.avatar, ''),
 				p.message,
 				COALESCE(p.image, ''),
 				p.date,
@@ -212,19 +241,17 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 				COALESCE(ul.id, 0)
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
-			LEFT JOIN groups g ON g.id = ? 
+			LEFT JOIN sessions s ON s.uuid = ?
 			LEFT JOIN likes l ON l.post_id = p.id
-			LEFT JOIN likes ul ON ul.post_id = p.id AND ul.user_id = u.id
+			LEFT JOIN likes ul ON ul.post_id = p.id AND ul.user_id = s.user_id
 			LEFT JOIN comments c ON c.post_id = p.id
-			WHERE
-				(
-					p.group_id IS NOT NULL AND gmr.group_id IS NOT NULL
-				)
+			WHERE	
+				p.group_id = ?
 				AND p.id < ?
-			GROUP BY p.id
+			GROUP BY p.id, p.author_id, u.nick_name, u.avatar, p.message, p.image, p.date, ul.id
 			ORDER BY p.id DESC
 			LIMIT ?;`
-	rows, err := db.Conn.Query(stmt, obj["group_id"], obj["last_id"], obj["limit"])
+	rows, err := db.Conn.Query(stmt, obj["session_uuid"], obj["group_id"], obj["last_id"], obj["limit"])
 	if err != nil {
 		return nil, err
 	}
@@ -232,39 +259,50 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 
 	var result []models.PostFeed
 	for rows.Next() {
-		var p models.Post
-		var postImage string
-		var author models.User
-		var likeCount, commentCount int
-		var l models.Like
+		var postId, authorId, likeCount, commentCount, likeId int
+		var nickname, message, date string
+		var postImage, avatar *string
 
 		err := rows.Scan(
-			&p.Id,
-			&p.AuthorId,
-			&author.Nickname,
-			&author.Avatar,
-			&p.Message,
+			&postId,
+			&authorId,
+			&nickname,
+			&avatar,
+			&message,
 			&postImage,
-			&p.Date,
+			&date,
 			&likeCount,
 			&commentCount,
-			&l.Id,
+			&likeId,
 		)
 		if err != nil {
 			return nil, err
 		}
-
-		if postImage != "" {
-			p.Image = &postImage
-		}
-		p.Author = &author
-
-		result = append(result, models.PostFeed{
-			Post:         &p,
+		pf := models.PostFeed{
+			Post: &models.Post{
+				Id:      postId,
+				Message: message,
+				Date:    date,
+				Author: &models.User{
+					Id:       authorId,
+					Nickname: nickname,
+				},
+			},
+			Like: &models.Like{
+				Id: likeId,
+			},
 			LikeCount:    likeCount,
 			CommentCount: commentCount,
-			Like:         &l,
-		})
+		}
+
+		if postImage != nil && *postImage != "" {
+			pf.Post.Image = postImage
+		}
+		if avatar != nil && *avatar != "" {
+			pf.Post.Author.Avatar = avatar
+		}
+
+		result = append(result, pf)
 	}
 	return &models.Response{Result: result}, nil
 }

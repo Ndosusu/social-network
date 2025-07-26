@@ -36,11 +36,11 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	db.OpenConn()
 	udb := user.New(&db)
 	result, err := udb.GetSessionByUuid(map[string]any{"uuid": authorUuid})
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid author UUID or user not found", nil)
 		return
 	}
-	db.CloseConn()
 	postData["author_id"] = result.Result.(models.Session).UserId
 
 	// Group ID is optional
@@ -81,12 +81,11 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	db.OpenConn()
 	pdb := post.New(&db)
 	result, err = pdb.InsertPost(postData)
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to create post", nil)
-		db.CloseConn()
 		return
 	}
-	db.CloseConn()
 
 	// If privacy mode is whitelist, handle followers
 	if postData["privacy_mode"] == utils.PRIVACY_MODE_WHITELIST {

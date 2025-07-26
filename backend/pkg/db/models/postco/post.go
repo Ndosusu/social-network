@@ -58,8 +58,12 @@ func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
 	stmt := "SELECT id, author_id, message, COALESCE(image, ''), date, privacy_mode, COALESCE(group_id, 0) FROM posts WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	post := models.Post{}
-	err := result.Scan(&post.Id, &post.AuthorId, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.GroupId)
+	post := models.Post{
+		Author: &models.User{Id: utils.NOT_SCANNED},
+		Group:  &models.Group{Id: utils.NOT_SCANNED},
+		Image:  nil,
+	}
+	err := result.Scan(&post.Id, &post.Author.Id, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.Group.Id)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

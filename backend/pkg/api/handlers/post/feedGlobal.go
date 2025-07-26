@@ -45,11 +45,11 @@ func GlobalFeedHandler(w http.ResponseWriter, r *http.Request) {
 		"last_id":      lastIDInt,
 		"limit":        limitInt,
 	})
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve global feed", nil)
 		return
 	}
-	db.CloseConn()
 
 	utils.JSONResponse(w, http.StatusOK, "Global feed retrieved successfully", result)
 }

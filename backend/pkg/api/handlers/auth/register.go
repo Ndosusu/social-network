@@ -74,11 +74,11 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	db.OpenConn()
 	udb := user.New(&db)
 	result, err := udb.InsertUser(userData)
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to create user account", nil)
 		return
 	}
-	db.CloseConn()
 
 	session := result.Result.(models.Session)
 

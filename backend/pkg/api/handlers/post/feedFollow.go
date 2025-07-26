@@ -34,11 +34,11 @@ func FollowFeedHandler(w http.ResponseWriter, r *http.Request) {
 		"session_uuid": sessionUUID,
 		"last_id":      lastIDInt,
 	})
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve global feed", nil)
 		return
 	}
-	db.CloseConn()
 
 	utils.JSONResponse(w, http.StatusOK, "Global feed retrieved successfully", result)
 }

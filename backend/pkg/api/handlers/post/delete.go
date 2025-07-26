@@ -24,12 +24,11 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	db.OpenConn()
 	pdb := post.New(&db)
 	result, err := pdb.DeletePost(map[string]any{"id": postID})
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Database connection failed", nil)
-		db.CloseConn()
 		return
 	}
-	db.CloseConn()
 	fmt.Println(result)
 
 	utils.JSONResponse(w, http.StatusOK, "Post deleted successfully", result)

@@ -33,8 +33,10 @@ func (db *UserDB) GetSessionByUuid(obj map[string]any) (*models.Response, error)
 	stmt := "SELECT id, uuid, user_id, date_creation, COALESCE(date_expiration, '') FROM sessions WHERE uuid = ? AND (date_expiration >= ? OR date_expiration IS NULL);"
 	result := db.Conn.QueryRow(stmt, obj["uuid"], utils.GetCurrentTime())
 
-	session := models.Session{}
-	err := result.Scan(&session.Id, &session.Uuid, &session.UserId, &session.CreatedAt, &session.ExpiresAt)
+	session := models.Session{
+		User: &models.User{Id: utils.NOT_SCANNED},
+	}
+	err := result.Scan(&session.Id, &session.Uuid, &session.User.Id, &session.CreatedAt, &session.ExpiresAt)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

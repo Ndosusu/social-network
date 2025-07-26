@@ -3,6 +3,7 @@ package models_chat
 import (
 	"fmt"
 	"social-network/pkg/db/models"
+	"social-network/pkg/utils"
 )
 
 func (db *ChatDB) InsertChat(obj map[string]any) (*models.Response, error) {
@@ -39,8 +40,12 @@ func (db *ChatDB) SelectChatById(obj map[string]any) (*models.Response, error) {
 	stmt := "SELECT id, user_to, user_from, group_id FROM chats WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	chat := models.Chat{}
-	err := result.Scan(&chat.Id, &chat.ReceiverId, &chat.SenderId, &chat.GroupId)
+	chat := models.Chat{
+		Receiver: &models.User{Id: utils.NOT_SCANNED},
+		Sender:   &models.User{Id: utils.NOT_SCANNED},
+		Group:    &models.Group{Id: utils.NOT_SCANNED},
+	}
+	err := result.Scan(&chat.Id, &chat.Receiver.Id, &chat.Sender.Id, &chat.Group.Id)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -53,6 +58,7 @@ func (db *ChatDB) DeleteChat(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
+
 			id : int,
 		}
 	*/

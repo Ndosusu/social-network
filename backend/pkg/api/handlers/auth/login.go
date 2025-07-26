@@ -30,11 +30,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		"mail":     mail,
 		"password": password,
 	})
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Database error: "+err.Error(), nil)
 		return
 	}
-	db.CloseConn()
 
 	if result.Result == nil {
 		utils.JSONResponse(w, http.StatusUnauthorized, "Invalid email or password", nil)

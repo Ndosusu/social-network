@@ -40,8 +40,11 @@ func (db *ChatDB) SelectLogById(obj map[string]any) (*models.Response, error) {
 	stmt := "SELECT id, chat_id, author_id, log, date FROM chat_log WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	log := models.Log{}
-	err := result.Scan(&log.Id, &log.ChatId, &log.AuthorId, &log.Message, &log.Date)
+	log := models.Log{
+		Author: &models.User{Id: utils.NOT_SCANNED},
+		Chat:   &models.Chat{Id: utils.NOT_SCANNED},
+	}
+	err := result.Scan(&log.Id, &log.Chat.Id, &log.Author.Id, &log.Message, &log.Date)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

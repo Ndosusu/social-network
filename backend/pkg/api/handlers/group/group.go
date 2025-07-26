@@ -1,4 +1,4 @@
-package handlers
+package handlers_group
 
 //PRELOAD LISTE DE GROUPE SUR INDEX
 
@@ -24,17 +24,6 @@ func GroupHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Create new group"))
 		return
 	}
-}
-
-func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	// Logic to create a new group
 }
 
 func RequestJoinGroupHandler(w http.ResponseWriter, r *http.Request) {

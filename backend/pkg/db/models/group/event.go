@@ -41,8 +41,10 @@ func (db *GroupDB) SelectEventById(obj map[string]any) (*models.Response, error)
 	stmt := "SELECT id, group_id, title, about, date_schedule, date_creation FROM events WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	event := models.Event{}
-	err := result.Scan(&event.Id, &event.GroupId, &event.Title, &event.About, &event.DateSchedule, &event.DateCreation)
+	event := models.Event{
+		Group: &models.Group{Id: utils.NOT_SCANNED},
+	}
+	err := result.Scan(&event.Id, &event.Group.Id, &event.Title, &event.About, &event.DateSchedule, &event.DateCreation)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

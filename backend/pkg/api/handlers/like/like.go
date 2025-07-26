@@ -68,12 +68,11 @@ func LikeHandler(w http.ResponseWriter, r *http.Request) {
 			"id": likeIDInt,
 		})
 	}
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to update like status in database", nil)
-		db.CloseConn()
 		return
 	}
-	db.CloseConn()
 
 	utils.JSONResponse(w, http.StatusOK, "Like status changed successfully", result)
 }

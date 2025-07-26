@@ -41,8 +41,12 @@ func (db *PostDB) SelectCommentById(obj map[string]any) (*models.Response, error
 	stmt := "SELECT id, author_id, post_id, message, image, date, group_id FROM comments WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["id"])
 
-	comment := models.Comment{}
-	err := result.Scan(&comment.Id, &comment.AuthorId, &comment.PostId, &comment.Message, &comment.Image, &comment.Date)
+	comment := models.Comment{
+		Author: &models.User{Id: utils.NOT_SCANNED},
+		Post:   &models.Post{Id: utils.NOT_SCANNED},
+		Image:  nil,
+	}
+	err := result.Scan(&comment.Id, &comment.Author.Id, &comment.Post.Id, &comment.Message, &comment.Image, &comment.Date)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -83,7 +87,7 @@ func (db *PostDB) SelectCommentsByPostId(obj map[string]any) (*models.Response, 
 				c.id,
 				c.author_id,
 				u.nick_name,
-				u.avatar, 
+				COALESCE(u.avatar,''), 
 				c.message, 
 				COALESCE(c.image, ''), 
 				c.date, 
@@ -109,36 +113,48 @@ func (db *PostDB) SelectCommentsByPostId(obj map[string]any) (*models.Response, 
 
 	var result []models.CommentFeed
 	for rows.Next() {
-		var c models.Comment
-		var commentImage string
-		var author models.User
-		var likeCount int
-		var l models.Like
-
+		var commentId, authorId, likeCount, likeId int
+		var nickname, message, date string
+		var avatar, image *string
 		err := rows.Scan(
-			&c.Id,
-			&c.AuthorId,
-			&author.Nickname,
-			&author.Avatar,
-			&c.Message,
-			&commentImage,
-			&c.Date,
+			&commentId,
+			&authorId,
+			&nickname,
+			&avatar,
+			&message,
+			&image,
+			&date,
 			&likeCount,
-			&l.Id,
+			&likeId,
 		)
 		if err != nil {
 			return nil, err
 		}
-		if commentImage != "" {
-			c.Image = &commentImage
-		}
-		c.Author = &author
 
-		result = append(result, models.CommentFeed{
-			Comment:   &c,
+		cf := models.CommentFeed{
+			Comment: &models.Comment{
+				Id:      commentId,
+				Message: message,
+				Date:    date,
+				Author: &models.User{
+					Id:       authorId,
+					Nickname: nickname,
+				},
+			},
+			Like: &models.Like{
+				Id: likeId,
+			},
 			LikeCount: likeCount,
-			Like:      &l,
-		})
+		}
+
+		if image != nil && *image != "" {
+			cf.Comment.Image = image
+		}
+		if avatar != nil && *avatar != "" {
+			cf.Comment.Author.Avatar = avatar
+		}
+
+		result = append(result, cf)
 	}
 
 	return &models.Response{Result: result}, nil

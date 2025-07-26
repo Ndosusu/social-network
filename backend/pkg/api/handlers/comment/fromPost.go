@@ -32,12 +32,11 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 		"post_id": postID,
 		"last_id": lastID,
 	})
+	db.CloseConn()
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve comments", nil)
-		db.CloseConn()
 		return
 	}
-	db.CloseConn()
 
 	utils.JSONResponse(w, http.StatusOK, "Comments retrieved successfully", result)
 

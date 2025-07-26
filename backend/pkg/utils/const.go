@@ -10,4 +10,6 @@ const (
 
 	DEFAULT_ID    = math.MaxInt64
 	DEFAULT_LIMIT = 20
+
+	NOT_SCANNED = -1
 )
