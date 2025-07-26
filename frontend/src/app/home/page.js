@@ -171,10 +171,11 @@ export function CreatePost(data) {
                 {post.Message || "no"}
             </div>
             <div className="p-3 flex w-full gap-4">
-                <div className="min-w-1/10 flex items-center">
-                    <img src="/like.svg" className="h-8"></img>
+                <label className="min-w-1/10 flex items-center">
+                    <input type="button" className="hidden" onClick={() => {likePost()}} />
+                    <img src="/like.svg" className={"h-8 "}></img>
                     <p>{postFeed.LikeCount || "0"}</p>
-                </div>
+                </label>
                 <div className="min-w-1/10 flex items-center gap-1">
                     <img src="/comment.svg" className="h-8"></img>
                     <p>{postFeed.CommentCount || "0"}</p>
@@ -182,4 +183,27 @@ export function CreatePost(data) {
             </div>
         </div>
     )
+}
+
+async function likePost(obj) {
+    fetch("/likes",
+        {
+            method: "POST",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                post_id: post.id,
+                like_id: post.like.id
+            })
+        }
+    )
+
+    .catch(error => {
+        throw new Error(error)
+    })
+
+    .then(data => data.json())
+
+    .then(data => {
+        console.log(data)
+    })
 }
