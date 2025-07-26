@@ -43,11 +43,10 @@ export default function Home() {
 
         .then(data => data.json())
 
-        .then(result => {
-            console.log(result)
-            if(result.data) {
+        .then(response => {
+            if(response.data) {
                 setLoading(false)    
-                setPosts(result.data.Result)
+                setPosts(response.data.Result)
             } else {
                 setLoading(false)
                 throw new Error("No data.")
@@ -189,12 +188,19 @@ export function CreatePost(data) {
 
 export async function likePost(postFeed, fn) {
     fetch("/likes",
-        {
+        postFeed.Like 
+        ? {
+            method: "DELETE",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                like_id: postFeed.Like.Id,
+            }),
+        }
+        : {
             method: "POST",
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 post_id: postFeed.Post.Id,
-                like_id: postFeed.Like ? postFeed.Like.Id : null,
             })
         }
     )
@@ -205,8 +211,8 @@ export async function likePost(postFeed, fn) {
 
     .then(data => data.json())
 
-    .then(data => {
-        switch(typeof data.Result) {
+    .then(response => {
+        switch(typeof response.data.Result) {
             case "string": {
                 fn(false)
             }

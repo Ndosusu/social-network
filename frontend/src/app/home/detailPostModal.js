@@ -59,7 +59,12 @@ function DetailContent({postFeed}) {
                     <p className={liked ? "text-secondary" : null}>{postFeed.LikeCount || "0"}</p>
                 </label>
             </div>
-            <input type="button" value={newCom? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl self-start duration-100" onClick={() => {setNewCom(!newCom)}} />
+            <div className="w-full flex flex-row justify-between">
+                <input type="button" value={newCom? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl duration-100" onClick={() => {setNewCom(!newCom)}} />
+                <div className="flex flex-row justify-end w-full">
+                    <input type="button" value="Delete" className="bg-red-500 neon-sm p-3 rounded-xl duration-100" onClick={() => {deletePost(post)}} />
+                </div>
+            </div>
             {
                 newCom 
                 ? <NewComInput />
@@ -69,6 +74,27 @@ function DetailContent({postFeed}) {
             }
         </div>
     )
+}
+
+function deletePost(post) {
+    fetch("/posts", {
+        method: "DELETE",
+        body: {
+            session_uuid: localStorage.getItem("logToken"),
+            post_id: post.Id
+        }
+    })
+    .catch(error => {
+        throw new Error(error)
+    })
+
+    .then(data => data.json())
+
+    .then(data => {
+        if(data.Result != "Ok") {
+            throw new Error("Post deletion failed.")
+        }
+    })
 }
 
 function PostNotFound() {
@@ -118,13 +144,19 @@ function CreateCom({comFeed}) {
 }
 
 async function likeCom(comFeed, fn) {
-    fetch("/likes",
-        {
+    fetch("/likes", comFeed.Like 
+        ? {
+            method: "DELETE",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                like_id: comFeed.Like.Id,
+            })
+        }
+        : {
             method: "POST",
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 comment_id: comFeed.Comment.Id,
-                like_id: comFeed.Like ? comFeed.Like.Id : null,
             })
         }
     )
