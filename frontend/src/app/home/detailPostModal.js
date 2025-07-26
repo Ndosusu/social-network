@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { likePost } from "./page.js"
 
 export default function DetailPostModal(data) {
     return (
@@ -18,39 +17,30 @@ function DetailContent({postFeed}) {
 
     const coms = [ //replace with fetch
         {
-            Author: "wiz",
-            Message: "tkt",
-            nbLike: 3,
+            Comment: {
+                Id: 9,
+                Message: "tkt",
+                Author: {
+                    Id: 4,
+                    Nickname: "wiz"
+                }
+            },
+            Like: null,
+            LikeCount: 0,
         },
         {
-            Author: "ziw",
-            Message: "inquiète toi",
-            nbLike: 4,
-        },
-        {
-            Author: "ziw",
-            Message: "inquiète toi",
-            nbLike: 4,
-        },
-        {
-            Author: "ziw",
-            Message: "inquiète toi",
-            nbLike: 4,
-        },
-        {
-            Author: "ziw",
-            Message: "inquiète toi",
-            nbLike: 4,
-        },
-        {
-            Author: "ziw",
-            Message: "inquiète toi",
-            nbLike: 4,
-        },
-        {
-            Author: "ziw",
-            Message: "inquiète toi",
-            nbLike: 4,
+            Comment: {
+                Id: 10,
+                Message: "inquiète toi",
+                Author: {
+                    Id: 5,
+                    Nickname: "ziw"
+                }
+            },
+            Like: {
+                Id: 11,
+            },
+            LikeCount: 9,
         }
     ]
 
@@ -93,7 +83,7 @@ function CreateComList({comList}) {
     return (
         <div className="w-5/6 h-fit flex flex-col gap-7 p-2 pt-1">
             <p className="font-bold">{comList.length} Comments :</p>
-            {comList.map((obj, i) => <CreateCom com={obj} key={i} />)}
+            {comList.map((obj, i) => <CreateCom comFeed={obj} key={i} />)}
         </div>
     )
 }
@@ -106,21 +96,55 @@ function NoComs() {
     )
 }
 
-function CreateCom({com}) {
+function CreateCom({comFeed}) {
+    const [liked, setLiked] = useState(comFeed.Like ? true : false)
+    const com = comFeed.Comment
+
     return (
          <div className="w-full h-fit rounded-xl neon-sm bg-primaryT">
             <div className="w-full postHeader bg-primaryT p-2">
-                <p id="detailAuthor">{com.Author}</p>
+                <p id="detailAuthor">{com.Author.Nickname}</p>
             </div>
             <div className="w-full h-fit p-4">
                 <p id="detailMessage">{com.Message}</p>
             </div>
-            <div className="p-3 flex w-full gap-1 w-1/10 items-center">
-                <img src="like.svg" className="h-8" />
-                <p>{com.nbLike}</p>
-            </div>
+            <label className="p-3 flex w-full gap-1 w-1/10 items-center" onClick={(e) => {e.stopPropagation()}}>
+                <input type="button" className="hidden" onClick={() => {likeCom(comFeed, setLiked)}} />
+                <img src={liked ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
+                <p className={liked ? "text-secondary" : null}>{comFeed.LikeCount || "0"}</p>
+            </label>
         </div>
     )
+}
+
+async function likeCom(comFeed, fn) {
+    fetch("/likes",
+        {
+            method: "POST",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                comment_id: comFeed.Comment.Id,
+                like_id: comFeed.Like ? comFeed.Like.Id : null,
+            })
+        }
+    )
+
+    .catch(error => {
+        throw new Error(error)
+    })
+
+    .then(data => data.json())
+
+    .then(data => {
+        switch(typeof data.Result) {
+            case "string": {
+                fn(false)
+            }
+            case "object": {
+                fn(true)
+            }
+        }
+    })
 }
 
 function NewComInput() {
