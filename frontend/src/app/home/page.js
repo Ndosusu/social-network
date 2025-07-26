@@ -15,11 +15,16 @@ export default function Home() {
     const [curDetail, setDetail] = useState(null)
     const [curModal, setModal]= useState("")
     const [feed, setFeed] = useState("global")
+    const [groupList, setGroupList] = useState(null)
+    const [groupId, setGroup] = useState(null)
     
     useEffect(() => {
+        if(feed == "group" && !groupId) {
+            return
+        }
+        
         setPosts(null)
         setLoading(true)
-        console.log("fetching "+feed)
         fetch("http://localhost:8080/feed/"+feed,{
             method: 'POST',
             headers: {
@@ -28,6 +33,7 @@ export default function Home() {
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 limit: 15,
+                group_id: feed == "group" ? groupId : null,
             })
         })
         .catch(error => {
@@ -47,12 +53,38 @@ export default function Home() {
                 throw new Error("No data.")
             }
         })
-    }, [feed])
+    }, [feed, groupId])
+
+    useEffect(() => {
+        //fetch group list
+        const temp = [
+            {
+                id: 1,
+                name: "thug shaker central",
+            },
+            {
+                id: 2,
+                name: "wizards' den",
+            },
+            {
+                id: 3,
+                name: "kawaii desu neeeeee",
+            },
+            {
+                id: 4,
+                name: "Itadakimasuuuuuuuuu",
+            }
+        ]
+        setGroupList(temp)
+    }, [])
 
     const CheckState = () => {
         if (loading) {
             //replace later with good div instead of simple text
             return <p>loading...</p>
+        }
+        if (!groupId && feed == "group") {
+            return groupList.map((obj, i) => <p key={i} onClick={() => {setGroup(obj.id)}}>{obj.name}</p>)
         }
         if (!posts) {
             //replace later with good div instead of simple text
@@ -73,7 +105,7 @@ export default function Home() {
     const CheckModalState = () => {
         switch(curModal) {
             case "newPostModal": {
-                return <NewPostModal />
+                return <NewPostModal posts={posts} postsFn={setPosts} modalFn={setModal} groupList={groupList} />
             }
 
             case "detailModal": {
@@ -96,7 +128,7 @@ export default function Home() {
                             <p className="w-full">Followed</p>
                         </label>
                         <label htmlFor="groupFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
-                            <input id="groupFeed" type="button" onClick={() => {setFeed("group")}} className="hidden" />
+                            <input id="groupFeed" type="button" onClick={() => {setGroup(null); setFeed("group")}} className="hidden" />
                             <p className="w-full">Groups</p>
                         </label>
                     </div>

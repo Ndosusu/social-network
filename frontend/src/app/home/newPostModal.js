@@ -4,7 +4,7 @@ import { useState } from "react"
 import PrivateUserList from "./userList"
 import PrivateGroupList from "./groupList"
 
-export default function NewPostModal() {
+export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
     const [privacyState, setPrivacy] = useState(1)
 
     const newPostResolve = async (event) => {
@@ -22,7 +22,17 @@ export default function NewPostModal() {
             throw new Error(error)
         })
         .then(data => data.json())
-        .then(data => console.log(data))
+        .then(data => {
+            console.log(data.data)
+            postsFn([{
+                CommentCount: 0,
+                LikeCount: 0,
+                GroupTitle: "",
+                Post: data.data.Result,
+            }].concat(posts))
+        })
+
+        modalFn("")
     }
 
     const changedFile = async (event) => {
@@ -66,7 +76,7 @@ export default function NewPostModal() {
                     <input type="submit" className="neon-sm text-2xl rounded-xl px-10 py-5 bg-secondary duration-100 hover:cursor-pointer hover:scale-110" value="Post"></input>
                 </form>
             </div>
-            <CheckPrivacyState privacy={privacyState} />
+            <CheckPrivacyState privacy={privacyState} groupList={groupList} />
         </div>
     )
 }
@@ -89,14 +99,14 @@ function CreateOption({text, val, fn}) {
     )
 }
 
-function CheckPrivacyState({privacy}) {
+function CheckPrivacyState({privacy, groupList}) {
     switch (privacy) {
         case 3: {
             return <PrivateUserList />
         }
 
         case 4: {
-            return <PrivateGroupList />
+            return <PrivateGroupList groupList={groupList} />
         }
     }
 }

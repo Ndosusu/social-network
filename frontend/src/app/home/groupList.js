@@ -2,29 +2,11 @@
 
 import {useState} from "react"
 
-export default function PrivateGroupList() {
-    const [groupList, setGroupList] = useState([])
-
-    //fetch groups
-    const groups = [
-        {
-            id: "1",
-            name: "thug shaker central",
-        },
-        {
-            id: "2",
-            name: "wizards' den",
-        },
-        {
-            id: "3",
-            name: "kawaii desu neeeeee",
-        }
-    ]
-
+export default function PrivateGroupList({groupList}) {
     return (
         <div className="w-1/5 h-9/10 neon-xl rounded-xl flex flex-col pointer-events-auto p-2">
             <div className="h-full w-full rounded-xl flex flex-col gap-1 overflow-scroll">
-                {groups.map((obj, i) => <CreateGroupRadio group={obj} key={i} />)}
+                {groupList.map((obj, i) => <CreateGroupRadio group={obj} key={i} />)}
             </div>
         </div>
     )
