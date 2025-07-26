@@ -29,7 +29,11 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 				COUNT(DISTINCT l.id),
 				COUNT(DISTINCT c.id),
 				COALESCE(g.title, ''),
-				COALESCE(ul.id, 0)
+				COALESCE(ul.id, 0),
+				CASE
+					WHEN p.author_id = s.user_id THEN 1
+					ELSE 0
+				END AS is_client
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			JOIN sessions s ON s.uuid = ?
@@ -63,6 +67,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 		var postId, authorId, privacyMode, groupId, likeCount, commentCount, likeId int
 		var nickname, message, date, groupTitle string
 		var postImage, avatar *string
+		var isClient bool
 
 		err := rows.Scan(
 			&postId,
@@ -78,6 +83,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 			&commentCount,
 			&groupTitle,
 			&likeId,
+			&isClient,
 		)
 		if err != nil {
 			return nil, err
@@ -92,6 +98,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 				Author: &models.User{
 					Id:       authorId,
 					Nickname: nickname,
+					IsClient: isClient,
 				},
 				Group: &models.Group{
 					Id:    groupId,
@@ -142,7 +149,11 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 				p.privacy_mode,
 				COUNT(DISTINCT l.id),
 				COUNT(DISTINCT c.id),
-				COALESCE(ul.id, 0)
+				COALESCE(ul.id, 0),
+				CASE
+					WHEN p.author_id = s.user_id THEN 1
+					ELSE 0
+				END AS is_client
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			JOIN sessions s ON s.uuid = ?
@@ -171,6 +182,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 		var postId, authorId, privacyMode, likeCount, commentCount, likeId int
 		var nickname, message, date string
 		var avatar, postImage *string
+		var isClient bool
 
 		err := rows.Scan(
 			&postId,
@@ -184,6 +196,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 			&likeCount,
 			&commentCount,
 			&likeId,
+			&isClient,
 		)
 		if err != nil {
 			return nil, err
@@ -198,6 +211,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 				Author: &models.User{
 					Id:       authorId,
 					Nickname: nickname,
+					IsClient: isClient,
 				},
 			},
 
@@ -245,7 +259,11 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 				p.date,
 				COUNT(DISTINCT l.id),
 				COUNT(DISTINCT c.id),
-				COALESCE(ul.id, 0)
+				COALESCE(ul.id, 0),
+				CASE
+					WHEN p.author_id = s.user_id THEN 1
+					ELSE 0
+				END AS is_client
 			FROM posts p
 			JOIN users u ON p.author_id = u.id
 			LEFT JOIN sessions s ON s.uuid = ?
@@ -269,6 +287,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 		var postId, authorId, likeCount, commentCount, likeId int
 		var nickname, message, date string
 		var postImage, avatar *string
+		var isClient bool
 
 		err := rows.Scan(
 			&postId,
@@ -281,6 +300,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 			&likeCount,
 			&commentCount,
 			&likeId,
+			&isClient,
 		)
 		if err != nil {
 			return nil, err
@@ -293,6 +313,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 				Author: &models.User{
 					Id:       authorId,
 					Nickname: nickname,
+					IsClient: isClient,
 				},
 			},
 			LikeCount:    likeCount,

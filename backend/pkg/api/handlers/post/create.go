@@ -40,7 +40,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	udb := user.New(&db)
 	result, err := udb.GetSessionByUuid(map[string]any{"session_uuid": sessionUUID})
 	if err != nil {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid author UUID or user not found", nil)
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid session UUID or user not found", nil)
 		return
 	}
 	postData["author_id"] = result.Result.(models.Session).User.Id
@@ -98,7 +98,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 		rdb := rel.New(&db)
 		for _, followerID := range followersIDs {
-			postRels["user_id"] = followerID
+			postRels["follower_id"] = followerID
 			_, err = rdb.InsertPrivacyPostRel(postRels)
 			if err != nil {
 				utils.JSONResponse(w, http.StatusInternalServerError, "Failed to create post privacy relation: "+err.Error(), nil)

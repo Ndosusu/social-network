@@ -13,6 +13,11 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := utils.JSONDecode(w, r)
+	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
+	if !sessionUUIDOk || sessionUUID == "" {
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
+		return
+	}
 
 	postID, postIDOk := data["post_id"].(float64)
 	var postIDInt int
@@ -45,9 +50,10 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 
 	cdb := comment.New(&db)
 	result, err := cdb.SelectCommentsByPostId(map[string]any{
-		"post_id": postIDInt,
-		"last_id": lastIDInt,
-		"limit":   limitInt,
+		"session_uuid": sessionUUID,
+		"post_id":      postIDInt,
+		"last_id":      lastIDInt,
+		"limit":        limitInt,
 	})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve comments", nil)

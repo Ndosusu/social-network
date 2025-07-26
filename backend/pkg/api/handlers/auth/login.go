@@ -32,7 +32,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		"password": password,
 	})
 	if err != nil {
-		utils.JSONResponse(w, http.StatusInternalServerError, "Database error: "+err.Error(), nil)
+		utils.JSONResponse(w, http.StatusInternalServerError, "Invalid email or password", nil)
 		return
 	}
 

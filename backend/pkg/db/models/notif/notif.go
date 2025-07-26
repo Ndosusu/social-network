@@ -29,7 +29,7 @@ func (db *NotifDB) InsertNotif(obj map[string]any) (*models.Response, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	return db.SelectNotifById(map[string]any{"id": newNotifId})
+	return db.SelectNotifById(map[string]any{"notif_id": newNotifId})
 }
 
 // GROUP OR EVENT NEED TO MODIFY LIKE I DID FOR LIKE

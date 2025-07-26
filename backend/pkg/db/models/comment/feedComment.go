@@ -25,7 +25,11 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 				COALESCE(c.image, ''), 
 				c.date, 
 				COUNT(DISTINCT l.id),
-				COALESCE(ul.id, 0)
+				COALESCE(ul.id, 0),
+				CASE
+					WHEN c.author_id = s.user_id THEN 1
+					ELSE 0
+				END AS is_client
 			FROM comments c
 			JOIN users u ON c.author_id = u.id
 			JOIN sessions s ON s.uuid = ?
@@ -49,6 +53,8 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 		var commentId, authorId, likeCount, likeId int
 		var nickname, message, date string
 		var avatar, image *string
+		var isClient bool
+
 		err := rows.Scan(
 			&commentId,
 			&authorId,
@@ -59,6 +65,7 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 			&date,
 			&likeCount,
 			&likeId,
+			&isClient,
 		)
 		if err != nil {
 			return nil, err
@@ -72,6 +79,7 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 				Author: &models.User{
 					Id:       authorId,
 					Nickname: nickname,
+					IsClient: isClient,
 				},
 			},
 			LikeCount: likeCount,

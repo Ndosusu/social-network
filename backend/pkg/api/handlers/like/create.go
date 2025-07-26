@@ -20,7 +20,6 @@ func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
 		return
 	}
-
 	postID, postIDOk := data["post_id"].(float64)
 	var postIDInt int
 	if postIDOk {
@@ -47,7 +46,9 @@ func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.CloseConn()
 
 	udb := user.New(&db)
-	sessionResult, err := udb.GetSessionByUuid(map[string]any{"uuid": sessionUUID})
+	sessionResult, err := udb.GetSessionByUuid(map[string]any{
+		"sesson_uuid": sessionUUID,
+	})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusUnauthorized, "Invalid session", nil)
 		return

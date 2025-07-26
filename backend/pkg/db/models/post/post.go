@@ -44,7 +44,7 @@ func (db *PostDB) InsertPost(obj map[string]any) (*models.Response, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	return db.SelectPostById(map[string]any{"id": newPostId})
+	return db.SelectPostById(map[string]any{"post_id": newPostId})
 }
 
 func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
