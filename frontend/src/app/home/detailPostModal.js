@@ -48,7 +48,7 @@ function DetailContent({postFeed}) {
         <div className="w-5/6 h-full flex flex-col items-center p-7 gap-5 center">
             <div className="w-full min-h-40 rounded-xl neon-sm bg-primaryT">
                 <div className="w-full postHeader bg-primaryT p-2">
-                    <p id="detailAuthor">{post.Author.Nickname || "Author not found"}</p>
+                    <p id="detailAuthor">{post.Author.Nickname || post.Author.FirstName + " " + post.Author.LastName || "Author not found"}</p>
                 </div>
                 <div className="w-full h-fit p-4">
                     <p id="detailMessage">{post.Message || "Content not found"}</p>

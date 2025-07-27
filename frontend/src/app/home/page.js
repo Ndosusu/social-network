@@ -155,7 +155,6 @@ export default function Home() {
 export function CreatePost(data) {
     const postFeed = data.postFeed
     const post = postFeed.Post
-    console.log(postFeed)
     const setDetail = data.setDetail
     const setModal = data.setModal
 
@@ -167,7 +166,7 @@ export function CreatePost(data) {
             setModal("detailModal")
         }}>
             <div className="w-full postHeader bg-primaryT p-2">
-                {post.Author.Nickname || "Author not found"}
+                {post.Author.Nickname || post.Author.FirstName + " " + post.Author.LastName || "Author not found"}
             </div>
             <div className="w-full h-fit p-4">
                 {post.Message || "Content not found"}
@@ -214,7 +213,7 @@ export async function likePost(postFeed, fn) {
 
     .then(response => {
         console.log(response)
-        switch(typeof response.Data.Result) {
+        switch(typeof response.data.Result) {
             case "string": {
                 fn(false)
             }

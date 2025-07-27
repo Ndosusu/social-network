@@ -23,7 +23,6 @@ export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
         })
         .then(data => data.json())
         .then(response => {
-            console.log(response)
             modalFn("")
             postsFn([{
                 CommentCount: 0,
