@@ -153,12 +153,10 @@ export default function Home() {
 }
 
 export function CreatePost(data) {
-    const postFeed = data.postFeed
+    const [postFeed, setPostFeed] = useState(data.postFeed)
     const post = postFeed.Post
     const setDetail = data.setDetail
     const setModal = data.setModal
-
-    const [liked, setLiked] = useState(postFeed.Like ? true : false)
 
     return (
         <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={async () => {
@@ -173,9 +171,9 @@ export function CreatePost(data) {
             </div>
             <div className="p-3 flex w-full gap-4">
                 <label className="min-w-1/10 flex items-center" onClick={(e) => {e.stopPropagation()}}>
-                    <input type="button" className="hidden" onClick={() => {likePost(postFeed, setLiked)}} />
-                    <img src={liked ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
-                    <p className={liked ? "text-secondary" : null}>{postFeed.LikeCount || "0"}</p>
+                    <input type="button" className="hidden" onClick={() => {likePost(postFeed, setPostFeed)}} />
+                    <img src={postFeed.Like ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
+                    <p className={postFeed.Like ? "text-secondary" : null}>{postFeed.LikeCount || "0"}</p>
                 </label>
                 <div className="min-w-1/10 flex items-center gap-1">
                     <img src="/comment.svg" className="h-8"></img>
@@ -187,6 +185,7 @@ export function CreatePost(data) {
 }
 
 export async function likePost(postFeed, fn) {
+    const cloneFeed = structuredClone(postFeed)
     fetch("http://localhost:8080/likes",
         postFeed.Like 
         ? {
@@ -194,7 +193,7 @@ export async function likePost(postFeed, fn) {
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 like_id: postFeed.Like.Id,
-            }),
+            })
         }
         : {
             method: "POST",
@@ -212,13 +211,18 @@ export async function likePost(postFeed, fn) {
     .then(data => data.json())
 
     .then(response => {
-        console.log(response)
         switch(typeof response.data.Result) {
             case "string": {
-                fn(false)
+                cloneFeed.Like = null
+                --cloneFeed.LikeCount
+                fn(cloneFeed)
+                break
             }
             case "object": {
-                fn(true)
+                cloneFeed.Like = response.data.Result
+                ++cloneFeed.LikeCount
+                fn(cloneFeed)
+                break
             }
         }
     })
