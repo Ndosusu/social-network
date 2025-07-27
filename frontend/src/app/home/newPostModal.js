@@ -11,7 +11,7 @@ export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
         event.preventDefault()
 
         const formData = new FormData(event.currentTarget)
-        formData.append("author_uuid", localStorage.getItem("logToken"))
+        formData.append("session_uuid", localStorage.getItem("logToken"))
 
         fetch("http://localhost:8080/posts", {
             method: "POST",
@@ -22,14 +22,14 @@ export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
             throw new Error(error)
         })
         .then(data => data.json())
-        .then(data => {
-            console.log(data.data)
+        .then(response => {
+            console.log(response)
             modalFn("")
             postsFn([{
                 CommentCount: 0,
                 LikeCount: 0,
                 GroupTitle: "",
-                Post: data.data.Result,
+                Post: response.data.Result,
             }].concat(posts))
         })
     }
