@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { likePost } from "./page"
 
 export default function DetailPostModal(data) {
     return (
@@ -10,9 +11,9 @@ export default function DetailPostModal(data) {
     )
 }
 
-function DetailContent({postFeed}) {
+function DetailContent(data) {
     const [newCom, setNewCom] = useState(false)
-    const [liked, setLiked] = useState(postFeed.Like ? true : false)
+    const [postFeed, setPostFeed] = useState(data.postFeed)
     const post = postFeed.Post
 
     const coms = [ //replace with fetch
@@ -53,10 +54,10 @@ function DetailContent({postFeed}) {
                 <div className="w-full h-fit p-4">
                     <p id="detailMessage">{post.Message || "Content not found"}</p>
                 </div>
-                <label className="min-w-1/10 flex items-center" onClick={(e) => {e.stopPropagation()}}>
-                    <input type="button" className="hidden" onClick={() => {likePost(postFeed, setLiked)}} />
-                    <img src={liked ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
-                    <p className={liked ? "text-secondary" : null}>{postFeed.LikeCount || "0"}</p>
+                <label className="min-w-1/10 flex items-center select-none" onClick={(e) => {e.stopPropagation()}}>
+                    <input type="button" className="hidden" onClick={() => {likePost(postFeed, setPostFeed)}} />
+                    <img src={postFeed.Like ? "/likeActive.svg" : "/like.svg"} className="h-8"></img>
+                    <p className={postFeed.Like ? "text-secondary" : null}>{postFeed.LikeCount || "0"}</p>
                 </label>
             </div>
             <div className="w-full flex flex-row justify-between">
