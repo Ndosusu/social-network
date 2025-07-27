@@ -54,18 +54,54 @@ func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
 			post_id : int,
 		}
 	*/
-	stmt := "SELECT id, author_id, message, COALESCE(image, ''), date, privacy_mode, COALESCE(group_id, 0) FROM posts WHERE id = ?;"
+	stmt := `SELECT 
+                p.id,
+				p.author_id,
+				p.message,
+				COALESCE(p.image, ''),
+				p.date,
+				p.privacy_mode, 
+				COALESCE(p.group_id, 0),
+                COALESCE(u.avatar, ''),
+				u.nick_name,
+				COALESCE(g.title, '')
+	            FROM posts p
+            JOIN users u ON p.author_id = u.id
+            LEFT JOIN groups g ON p.group_id = g.id
+            WHERE p.id = ?;`
 	result := db.Conn.QueryRow(stmt, obj["post_id"])
 
-	post := models.Post{
-		Author: &models.User{Id: utils.NOT_SCANNED},
-		Group:  &models.Group{Id: utils.NOT_SCANNED},
-		Image:  nil,
-	}
-	err := result.Scan(&post.Id, &post.Author.Id, &post.Message, &post.Image, &post.Date, &post.PrivacyMode, &post.Group.Id)
+	var postId, authorId, privacyMode, groupId int
+	var message, date, nickname, groupTitle, avatar, postImage string
+
+	err := result.Scan(&postId, &authorId, &message, &postImage, &date, &privacyMode, &groupId, &avatar, &nickname, &groupTitle)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
+	}
+
+	post := models.Post{
+		Id:          postId,
+		Message:     message,
+		Date:        date,
+		PrivacyMode: privacyMode,
+		Author: &models.User{
+			Id:       authorId,
+			Nickname: nickname,
+		},
+	}
+
+	if postImage != "" {
+		post.Image = &postImage
+	}
+	if avatar != "" {
+		post.Author.Avatar = &avatar
+	}
+	if groupId > 0 {
+		post.Group = &models.Group{
+			Id:    groupId,
+			Title: groupTitle,
+		}
 	}
 
 	return &models.Response{Result: post}, nil

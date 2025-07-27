@@ -47,7 +47,7 @@ func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 
 	udb := user.New(&db)
 	sessionResult, err := udb.GetSessionByUuid(map[string]any{
-		"sesson_uuid": sessionUUID,
+		"session_uuid": sessionUUID,
 	})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusUnauthorized, "Invalid session", nil)
