@@ -11,7 +11,7 @@ export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
         event.preventDefault()
 
         const formData = new FormData(event.currentTarget)
-        formData.append("author_uuid", localStorage.getItem("logToken"))
+        formData.append("session_uuid", localStorage.getItem("logToken"))
 
         fetch("http://localhost:8080/posts", {
             method: "POST",
