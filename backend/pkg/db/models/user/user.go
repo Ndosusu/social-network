@@ -92,10 +92,9 @@ func (db *UserDB) Authenticate(obj map[string]any) (*models.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	response, err := db.InsertSession(int(id))
 	if err != nil {
-		fmt.Println("Failed to create session for new user")
+		fmt.Println("Failed to create session for the user")
 		return nil, err
 	}
 

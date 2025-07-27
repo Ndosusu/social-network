@@ -24,7 +24,7 @@ func (db *GroupDB) InsertGroup(obj map[string]any) (*models.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	return db.SelectGroupById(map[string]any{"id": newGroupId})
+	return db.SelectGroupById(map[string]any{"group_id": newGroupId})
 }
 
 func (db *GroupDB) SelectGroupById(obj map[string]any) (*models.Response, error) {

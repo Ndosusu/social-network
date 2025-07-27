@@ -16,8 +16,8 @@ func (db *CommentDB) InsertComment(obj map[string]any) (*models.Response, error)
 			image : string,
 		}
 	*/
-	stmt := "INSERT INTO comments (author_id, post_id, message, image, group_id, date) VALUES (?, ?, ?, ?, ?, ?);"
-	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["post_id"], obj["message"], obj["image"], obj["group_id"], utils.GetCurrentTime())
+	stmt := "INSERT INTO comments (author_id, post_id, message, image, date) VALUES (?, ?, ?, ?, ?);"
+	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["post_id"], obj["message"], obj["image"], utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -28,7 +28,7 @@ func (db *CommentDB) InsertComment(obj map[string]any) (*models.Response, error)
 		fmt.Println(err)
 		return nil, err
 	}
-	return db.SelectCommentById(map[string]any{"id": newCommentId})
+	return db.SelectCommentById(map[string]any{"comment_id": newCommentId})
 }
 
 func (db *CommentDB) SelectCommentById(obj map[string]any) (*models.Response, error) {

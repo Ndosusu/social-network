@@ -28,7 +28,7 @@ func (db *EventDB) InsertEvent(obj map[string]any) (*models.Response, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	return db.SelectEventById(map[string]any{"id": newEventId})
+	return db.SelectEventById(map[string]any{"event_id": newEventId})
 }
 
 func (db *EventDB) SelectEventById(obj map[string]any) (*models.Response, error) {

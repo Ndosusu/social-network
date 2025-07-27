@@ -49,9 +49,10 @@ func GroupFeedHandler(w http.ResponseWriter, r *http.Request) {
 
 	pdb := post.New(&db)
 	result, err := pdb.GetGroupFeed(map[string]any{
-		"group_id": groupIDInt,
-		"last_id":  lastIDInt,
-		"limit":    limitInt,
+		"session_uuid": sessionUUID,
+		"group_id":     groupIDInt,
+		"last_id":      lastIDInt,
+		"limit":        limitInt,
 	})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve group feed", nil)

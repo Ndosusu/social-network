@@ -49,7 +49,9 @@ func DeleteLikeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := ldb.DeleteLike(map[string]any{"like_id": likeIDInt})
+	result, err := ldb.DeleteLike(map[string]any{
+		"like_id": likeIDInt,
+	})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Error deleting like", nil)
 		return

@@ -1,6 +1,7 @@
 package models_like
 
 import (
+	"database/sql"
 	"fmt"
 	"social-network/pkg/db/models"
 )
@@ -14,18 +15,32 @@ func (db *LikeDB) InsertLike(obj map[string]any) (*models.Response, error) {
 			comment_id : int,
 		}
 	*/
-	stmt := "INSERT INTO likes (user_id, post_id, comment_id) VALUES (?, ?, ?);"
-	result, err := db.Conn.Exec(stmt, obj["user_id"], obj["post_id"], obj["comment_id"])
+	postID, hasPost := obj["post_id"].(int)
+	commentID, hasComment := obj["comment_id"].(int)
+	userID := obj["user_id"].(int)
+
+	var stmt string
+	var result sql.Result
+	var err error
+
+	if hasPost && postID > 0 {
+		stmt = "INSERT INTO likes (user_id, post_id) VALUES (?, ?);"
+		result, err = db.Conn.Exec(stmt, userID, postID)
+	} else if hasComment && commentID > 0 {
+		stmt = "INSERT INTO likes (user_id, comment_id) VALUES (?, ?);"
+		result, err = db.Conn.Exec(stmt, userID, commentID)
+	}
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
+
 	newLikeId, err := result.LastInsertId()
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
-	return db.SelectLikeById(map[string]any{"id": newLikeId})
+	return db.SelectLikeById(map[string]any{"like_id": newLikeId})
 }
 
 func (db *LikeDB) SelectLikeById(obj map[string]any) (*models.Response, error) {
