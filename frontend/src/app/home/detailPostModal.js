@@ -48,10 +48,10 @@ function DetailContent({postFeed}) {
         <div className="w-5/6 h-full flex flex-col items-center p-7 gap-5 center">
             <div className="w-full min-h-40 rounded-xl neon-sm bg-primaryT">
                 <div className="w-full postHeader bg-primaryT p-2">
-                    <p id="detailAuthor">{post.AuthorId}</p>
+                    <p id="detailAuthor">{post.Author.Nickname || "Author not found"}</p>
                 </div>
                 <div className="w-full h-fit p-4">
-                    <p id="detailMessage">{post.Message}</p>
+                    <p id="detailMessage">{post.Message || "Content not found"}</p>
                 </div>
                 <label className="min-w-1/10 flex items-center" onClick={(e) => {e.stopPropagation()}}>
                     <input type="button" className="hidden" onClick={() => {likePost(postFeed, setLiked)}} />

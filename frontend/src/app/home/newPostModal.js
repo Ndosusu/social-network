@@ -22,14 +22,14 @@ export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
             throw new Error(error)
         })
         .then(data => data.json())
-        .then(data => {
-            console.log(data.data)
+        .then(response => {
+            console.log(response)
             modalFn("")
             postsFn([{
                 CommentCount: 0,
                 LikeCount: 0,
                 GroupTitle: "",
-                Post: data.data.Result,
+                Post: response.data.Result,
             }].concat(posts))
         })
     }

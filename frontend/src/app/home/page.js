@@ -155,6 +155,7 @@ export default function Home() {
 export function CreatePost(data) {
     const postFeed = data.postFeed
     const post = postFeed.Post
+    console.log(postFeed)
     const setDetail = data.setDetail
     const setModal = data.setModal
 
@@ -166,10 +167,10 @@ export function CreatePost(data) {
             setModal("detailModal")
         }}>
             <div className="w-full postHeader bg-primaryT p-2">
-                {post.AuthorId || "no"}
+                {post.Author.Nickname || "Author not found"}
             </div>
             <div className="w-full h-fit p-4">
-                {post.Message || "no"}
+                {post.Message || "Content not found"}
             </div>
             <div className="p-3 flex w-full gap-4">
                 <label className="min-w-1/10 flex items-center" onClick={(e) => {e.stopPropagation()}}>
