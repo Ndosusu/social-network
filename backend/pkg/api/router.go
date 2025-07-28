@@ -16,8 +16,10 @@ func InitRouter() *http.ServeMux {
 	mux.HandleFunc("POST /auth/register", m.Cors(handlers.RegisterHandler))
 	mux.HandleFunc("POST /auth/login", m.Cors(handlers.LoginHandler))
 	mux.HandleFunc("POST /auth/logout", m.Cors(handlers.LogoutHandler))
+
 	mux.HandleFunc("OPTIONS /auth/register", m.Cors(handlers.RegisterHandler))
 	mux.HandleFunc("OPTIONS /auth/login", m.Cors(handlers.LoginHandler))
+	mux.HandleFunc("OPTIONS /auth/logout", m.Cors(handlers.LogoutHandler))
 
 	// User routes
 	/* mux.HandleFunc("GET /user/profile", m.Cors(handlers.UserProfileHandler))
@@ -58,23 +60,24 @@ func InitRouter() *http.ServeMux {
 	mux.HandleFunc("DELETE /likes", m.Cors(handlers.DeleteLikeHandler))
 	mux.HandleFunc("OPTIONS /likes", m.Cors(handlers.CreateLikeHandler))
 
-	/* 	// Group routes
-	   	mux.HandleFunc("GET /groups", m.Cors(handlers.GroupHandler))
-	   	mux.HandleFunc("POST /groups", m.Cors(handlers.GroupHandler))
-	   	mux.HandleFunc("POST /groups/create", m.Cors(handlers.CreateGroupHandler))
-	   	mux.HandleFunc("POST /groups/join", m.Cors(handlers.RequestJoinGroupHandler))
-	   	mux.HandleFunc("POST /groups/invite", m.Cors(handlers.InviteToGroupHandler))
-	   	mux.HandleFunc("OPTIONS /groups", m.Cors(handlers.GroupHandler))
+	// Group routes
+	mux.HandleFunc("POST /groups", m.Cors(handlers.CreateGroupHandler))
+	mux.HandleFunc("DELETE /groups", m.Cors(handlers.DeleteGroupHandler))
 
-	   	// Chat routes - avec CORS ajouté
-	   	mux.HandleFunc("GET /chat", m.Cors(handlers.ChatHandler))
-	   	mux.HandleFunc("POST /chat", m.Cors(handlers.ChatHandler))
-	   	mux.HandleFunc("OPTIONS /chat", m.Cors(handlers.ChatHandler))
+	mux.HandleFunc("POST /groups/list", m.Cors(handlers.ListGroupsHandler))
 
-	   	// Notification routes
-	   	mux.HandleFunc("GET /notifications", m.Cors(handlers.NotificationHandler))
-	   	mux.HandleFunc("POST /notifications", m.Cors(handlers.NotificationHandler))
-	   	mux.HandleFunc("OPTIONS /notifications", m.Cors(handlers.NotificationHandler))
+	mux.HandleFunc("OPTIONS /groups", m.Cors(handlers.CreateGroupHandler))
+	mux.HandleFunc("OPTIONS /groups/list", m.Cors(handlers.ListGroupsHandler))
+	/*
+		// Chat routes - avec CORS ajouté
+		mux.HandleFunc("GET /chat", m.Cors(handlers.ChatHandler))
+		mux.HandleFunc("POST /chat", m.Cors(handlers.ChatHandler))
+		mux.HandleFunc("OPTIONS /chat", m.Cors(handlers.ChatHandler))
+
+		// Notification routes
+		mux.HandleFunc("GET /notifications", m.Cors(handlers.NotificationHandler))
+		mux.HandleFunc("POST /notifications", m.Cors(handlers.NotificationHandler))
+		mux.HandleFunc("OPTIONS /notifications", m.Cors(handlers.NotificationHandler))
 	*/
 	// Route par défaut
 	mux.HandleFunc("GET /{$}", m.Cors(func(w http.ResponseWriter, r *http.Request) {
