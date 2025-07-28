@@ -4,7 +4,7 @@ import { useState } from "react"
 import PrivateUserList from "./userList"
 import PrivateGroupList from "./groupList"
 
-export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
+export default function NewPostModal({posts, postsFn, modalFn}) {
     const [privacyState, setPrivacy] = useState(1)
 
     const newPostResolve = async (event) => {
@@ -69,19 +69,19 @@ export default function NewPostModal({posts, postsFn, modalFn, groupList}) {
                                 <img id="preview" className="preview w-full h-full rounded-xl hidden"></img>
                             </div>
                         </label>
-                        <CreateOptionList opts={["Public", "Followers only", "Private", "Group"]} fn={setPrivacy} />
+                        <CreateOptionList opts={["Public", "Followers only", "Private"]} fn={setPrivacy} />
                     </div>
                     <input type="submit" className="neon-sm text-2xl rounded-xl px-10 py-5 bg-secondary duration-100 hover:cursor-pointer hover:scale-110" value="Post"></input>
                 </form>
             </div>
-            <CheckPrivacyState privacy={privacyState} groupList={groupList} />
+            <CheckPrivacyState privacy={privacyState} />
         </div>
     )
 }
 
 function CreateOptionList({opts, fn}) {
     return (
-        <div className="w-full h-fit flex justify-between gap-5 text-center">
+        <div className="w-full h-fit flex justify-center gap-10 text-center">
             {opts.map((obj, i) => <CreateOption text={obj} val={i+1} key={i} fn={fn} />)} 
         </div>
     )
@@ -97,14 +97,7 @@ function CreateOption({text, val, fn}) {
     )
 }
 
-function CheckPrivacyState({privacy, groupList}) {
-    switch (privacy) {
-        case 3: {
-            return <PrivateUserList />
-        }
-
-        case 4: {
-            return <PrivateGroupList groupList={groupList} />
-        }
-    }
+function CheckPrivacyState({privacy}) {
+    if (privacy == 3)
+        return <PrivateUserList />
 }
