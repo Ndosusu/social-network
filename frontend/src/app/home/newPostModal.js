@@ -23,12 +23,13 @@ export default function NewPostModal({posts, postsFn, modalFn}) {
         .then(data => data.json())
         .then(response => {
             modalFn("")
-            postsFn([{
+            const obj = {
                 CommentCount: 0,
                 LikeCount: 0,
                 GroupTitle: "",
                 Post: response.data.Result,
-            }].concat(posts))
+            }
+            postsFn(posts ? [obj].concat(posts) : [obj])
         })
     }
 

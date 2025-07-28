@@ -11,7 +11,7 @@ export default function Home() {
     CheckLogToken(router)
     
     const [loading, setLoading] = useState(true)
-    const [posts, setPosts] = useState(null)
+    const [posts, setPosts] = useState([])
     const [curDetail, setDetail] = useState(null)
     const [curModal, setModal]= useState("")
     const [feed, setFeed] = useState("global")
@@ -57,6 +57,7 @@ export default function Home() {
             //replace later with good div instead of simple text
             return <p>No posts found.</p>
         }
+        console.log(posts)
         return posts.map((obj, i) => <CreatePost postFeed={obj} key={i} setDetail={setDetail} setModal={setModal} />)
     }
 
@@ -80,7 +81,6 @@ export default function Home() {
             }
         }
     }
-
     return (
         <div className="text-white h-full w-full grid items-center text-xl">
             <div className="bg-primaryT h-6/4 w-2/3 neon-xl center grid items-center">
