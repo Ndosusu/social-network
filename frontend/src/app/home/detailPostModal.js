@@ -61,9 +61,9 @@ function DetailContent(data) {
                 </label>
             </div>
             <div className="w-full flex flex-row justify-between">
-                <input type="button" value={newCom? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl duration-100" onClick={() => {setNewCom(!newCom)}} />
+                <input type="button" value={newCom? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {setNewCom(!newCom)}} />
                 <div className="flex flex-row justify-end w-full">
-                    <input type="button" value="Delete" className="bg-red-500 neon-sm p-3 rounded-xl duration-100" onClick={() => {deletePost(post)}} />
+                    <input type="button" value="Delete" className="bg-red-500 neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {deletePost(post)}} />
                 </div>
             </div>
             {
@@ -220,7 +220,7 @@ function NewComInput() {
                     </div>
                 </label>
             </div>
-            <input type="submit" value="Send" className="bg-secondary neon-sm rounded-xl px-5 py-3 w-fit self-end" />
+            <input type="submit" value="Send" className="bg-secondary neon-sm rounded-xl px-5 py-3 w-fit self-end duration-100 hover:scale-110" />
         </form>
     )
 }

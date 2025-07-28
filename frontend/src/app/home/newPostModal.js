@@ -90,7 +90,7 @@ function CreateOptionList({opts, fn}) {
 
 function CreateOption({text, val, fn}) {
     return (
-        <label htmlFor={"radio"+val} className="neon-sm rounded-xl p-2 w-2/10">
+        <label htmlFor={"radio"+val} className="neon-sm rounded-xl p-2 w-2/10 duration-100 hover:scale-110">
             <input type="radio" name="privacy_mode" id={"radio"+val} value={val} defaultChecked={val == 1 ? true : false} onClick={() => {fn(val)}} className="hidden" />
             <p>{text}</p>
         </label>

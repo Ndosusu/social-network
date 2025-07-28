@@ -56,25 +56,39 @@ export default function Home() {
 
     useEffect(() => {
         //fetch group list
-        const temp = [
-            {
-                id: 1,
-                name: "thug shaker central",
-            },
-            {
-                id: 2,
-                name: "wizards' den",
-            },
-            {
-                id: 3,
-                name: "kawaii desu neeeeee",
-            },
-            {
-                id: 4,
-                name: "Itadakimasuuuuuuuuu",
-            }
-        ]
-        setGroupList(temp)
+        fetch("/groups/list", {
+            method: "POST",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+            }),
+        })
+        .catch(error => {
+            throw new Error(error)
+        })
+
+        .then(data => data.json())
+        .then(response => {
+            setGroupList(response.data.Result)
+        })
+        // const temp = [
+        //     {
+        //         id: 1,
+        //         name: "thug shaker central",
+        //     },
+        //     {
+        //         id: 2,
+        //         name: "wizards' den",
+        //     },
+        //     {
+        //         id: 3,
+        //         name: "kawaii desu neeeeee",
+        //     },
+        //     {
+        //         id: 4,
+        //         name: "Itadakimasuuuuuuuuu",
+        //     }
+        // ]
+        // setGroupList(temp)
     }, [])
 
     const CheckState = () => {
@@ -91,7 +105,7 @@ export default function Home() {
         }
         if (!posts) {
             //replace later with good div instead of simple text
-            return <p>failed to fetch data.</p>
+            return <p>No posts found.</p>
         }
         return posts.map((obj, i) => <CreatePost postFeed={obj} key={i} setDetail={setDetail} setModal={setModal} />)
     }
@@ -177,7 +191,7 @@ export function CreatePost(data) {
                 {post.Message || "Content not found"}
             </div>
             <div className="p-3 flex w-full gap-4">
-                <label className="min-w-1/10 flex items-center" onClick={(e) => {e.stopPropagation()}}>
+                <label className="min-w-1/10 flex items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
                     <input type="button" className="hidden" onClick={() => {likePost(postFeed, setPostFeed)}} />
                     <img src={postFeed.Like ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
                     <p className={postFeed.Like ? "text-secondary" : null}>{postFeed.LikeCount || "0"}</p>
