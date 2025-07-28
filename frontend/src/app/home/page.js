@@ -76,7 +76,7 @@ export default function Home() {
             }
 
             case "detailModal": {
-                return <DetailPostModal postFeed={curDetail} />
+                return <DetailPostModal postFeed={curDetail} postsFn={setPosts} modalFn={setModal} postsList={posts} />
             }
         }
     }

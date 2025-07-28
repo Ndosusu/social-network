@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import PrivateUserList from "./userList"
-import PrivateGroupList from "./groupList"
 
 export default function NewPostModal({posts, postsFn, modalFn}) {
     const [privacyState, setPrivacy] = useState(1)
@@ -98,6 +97,7 @@ function CreateOption({text, val, fn}) {
 }
 
 function CheckPrivacyState({privacy}) {
-    if (privacy == 3)
+    //check if privacy is equal to 3, 3 is the value given if the user chose to make the post on a whitelist
+    if (privacy == 3) 
         return <PrivateUserList />
 }

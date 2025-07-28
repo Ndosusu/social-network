@@ -6,7 +6,7 @@ import { likePost } from "./page"
 export default function DetailPostModal(data) {
     return (
         <div className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl overflow-scroll">
-            {data.postFeed ? <DetailContent postFeed={data.postFeed} /> : <PostNotFound /> }
+            {data.postFeed ? <DetailContent postFeed={data.postFeed} postsFn={data.postsFn} modalFn={data.modalFn} postsList={data.postsList} /> : <PostNotFound /> }
         </div>
     )
 }
@@ -63,7 +63,7 @@ function DetailContent(data) {
             <div className="w-full flex flex-row justify-between">
                 <input type="button" value={newCom? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {setNewCom(!newCom)}} />
                 <div className="flex flex-row justify-end w-full">
-                    <input type="button" value="Delete" className="bg-red-500 neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {deletePost(post)}} />
+                    <input type="button" value="Delete" className="bg-red-500 neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={async () => {deletePost(postFeed, data.modalFn, data.postsFn, data.postsList)}} />
                 </div>
             </div>
             {
@@ -77,13 +77,13 @@ function DetailContent(data) {
     )
 }
 
-function deletePost(post) {
+function deletePost(postFeed, modalFn, postsFn, postsList) {
     fetch("http://localhost:8080/posts", {
         method: "DELETE",
-        body: {
+        body: JSON.stringify({
             session_uuid: localStorage.getItem("logToken"),
-            post_id: post.Id
-        }
+            post_id: postFeed.Post.Id,
+        })
     })
     .catch(error => {
         throw new Error(error)
@@ -91,9 +91,19 @@ function deletePost(post) {
 
     .then(data => data.json())
 
-    .then(data => {
-        if(data.Result != "Ok") {
+    .then(response => {
+        if(response.data.Result != "Ok") {
             throw new Error("Post deletion failed.")
+        } else {
+            let index
+            postsList.forEach((obj, i) => {
+                if(obj.Post.Id == postFeed.Post.Id) {
+                    index = i
+                }
+            })
+            postsList.splice(index, 1)
+            postsFn(postsList)
+            modalFn("")
         }
     })
 }
