@@ -1,14 +1,14 @@
-package handlers_auth
+package handlers_group
 
 import (
 	"net/http"
 	"social-network/pkg/db/models"
-	user "social-network/pkg/db/models/user"
+	group "social-network/pkg/db/models/group"
 	"social-network/pkg/utils"
 )
 
-func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	if !utils.ValidateMethod(w, r, http.MethodPost) {
+func ListGroupsHandler(w http.ResponseWriter, r *http.Request) {
+	if !utils.ValidateMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -18,19 +18,18 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
 		return
 	}
-
 	var db models.DB
 	db.OpenConn()
 	defer db.CloseConn()
 
-	sdb := user.New(&db)
-	result, err := sdb.CloseSession(map[string]any{
+	gdb := group.New(&db)
+	result, err := gdb.GetUserGroupList(map[string]any{
 		"session_uuid": sessionUUID,
 	})
 	if err != nil {
-		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to close session", nil)
+		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve groups", nil)
 		return
 	}
+	utils.JSONResponse(w, http.StatusOK, "Groups retrieved successfully", result)
 
-	utils.JSONResponse(w, http.StatusOK, "Logout successful", result)
 }

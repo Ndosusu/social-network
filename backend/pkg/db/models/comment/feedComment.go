@@ -51,8 +51,7 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 	var result []models.CommentFeed
 	for rows.Next() {
 		var commentId, authorId, likeCount, likeId int
-		var nickname, message, date string
-		var avatar, image *string
+		var nickname, message, date, avatar, image string
 		var isClient bool
 
 		err := rows.Scan(
@@ -91,11 +90,11 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 			}
 		}
 
-		if image != nil && *image != "" {
-			cf.Comment.Image = image
+		if image != "" {
+			cf.Comment.Image = &image
 		}
-		if avatar != nil && *avatar != "" {
-			cf.Comment.Author.Avatar = avatar
+		if avatar != "" {
+			cf.Comment.Author.Avatar = &avatar
 		}
 
 		result = append(result, cf)

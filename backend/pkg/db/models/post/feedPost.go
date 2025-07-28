@@ -47,7 +47,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 			WHERE
 				(
 					p.author_id = s.user_id
-					OR (p.privacy_mode = 0 AND u.private_mode = 0)
+					OR (p.privacy_mode = 1 AND u.private_mode = 0)
 					OR (f.user_to IS NOT NULL AND p.privacy_mode IN (1,2))
 					OR (p.privacy_mode = 3 AND pr.follower_id IS NOT NULL)
 					OR (p.group_id IS NOT NULL AND gmr.group_id IS NOT NULL)
@@ -65,8 +65,7 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 	var result []models.PostFeed
 	for rows.Next() {
 		var postId, authorId, privacyMode, groupId, likeCount, commentCount, likeId int
-		var nickname, message, date, groupTitle string
-		var postImage, avatar *string
+		var nickname, message, date, groupTitle, postImage, avatar string
 		var isClient bool
 
 		err := rows.Scan(
@@ -115,11 +114,11 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 			}
 		}
 
-		if postImage != nil && *postImage != "" {
-			pf.Post.Image = postImage
+		if postImage != "" {
+			pf.Post.Image = &postImage
 		}
-		if avatar != nil && *avatar != "" {
-			pf.Post.Author.Avatar = avatar
+		if avatar != "" {
+			pf.Post.Author.Avatar = &avatar
 		}
 
 		result = append(result, pf)
@@ -180,8 +179,7 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 	var result []models.PostFeed
 	for rows.Next() {
 		var postId, authorId, privacyMode, likeCount, commentCount, likeId int
-		var nickname, message, date string
-		var avatar, postImage *string
+		var nickname, message, date, avatar, postImage string
 		var isClient bool
 
 		err := rows.Scan(
@@ -225,11 +223,11 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 			}
 		}
 
-		if postImage != nil && *postImage != "" {
-			pf.Post.Image = postImage
+		if postImage != "" {
+			pf.Post.Image = &postImage
 		}
-		if avatar != nil && *avatar != "" {
-			pf.Post.Author.Avatar = avatar
+		if avatar != "" {
+			pf.Post.Author.Avatar = &avatar
 		}
 
 		result = append(result, pf)
@@ -285,8 +283,7 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 	var result []models.PostFeed
 	for rows.Next() {
 		var postId, authorId, likeCount, commentCount, likeId int
-		var nickname, message, date string
-		var postImage, avatar *string
+		var nickname, message, date, postImage, avatar string
 		var isClient bool
 
 		err := rows.Scan(
@@ -326,11 +323,11 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 			}
 		}
 
-		if postImage != nil && *postImage != "" {
-			pf.Post.Image = postImage
+		if postImage != "" {
+			pf.Post.Image = &postImage
 		}
-		if avatar != nil && *avatar != "" {
-			pf.Post.Author.Avatar = avatar
+		if avatar != "" {
+			pf.Post.Author.Avatar = &avatar
 		}
 
 		result = append(result, pf)

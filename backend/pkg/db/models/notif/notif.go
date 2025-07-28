@@ -32,7 +32,7 @@ func (db *NotifDB) InsertNotif(obj map[string]any) (*models.Response, error) {
 	return db.SelectNotifById(map[string]any{"notif_id": newNotifId})
 }
 
-// GROUP OR EVENT NEED TO MODIFY LIKE I DID FOR LIKE
+// GROUP OR EVENT NEED TO MODIFY LIKE I DID FOR LIKE + NEED DATA OF USERS
 func (db *NotifDB) SelectNotifById(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
