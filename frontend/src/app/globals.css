@@ -82,3 +82,7 @@ label:has(input[type=radio]:checked), label:has(input[type=checkbox]:checked) {
 label:has(input[type=radio]:checked:hover), label:has(input[type=checkbox]:checked:hover) {
   background-color: var(--secondaryL);
 }
+
+.fade {
+  background-image: linear-gradient(var(--primary) 0%, rgba(0, 0, 0, 0) 5%, rgba(0, 0, 0, 0) 95%, var(--primary) 100%);
+}

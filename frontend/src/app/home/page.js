@@ -83,7 +83,11 @@ export default function Home() {
             return <p>loading...</p>
         }
         if (!groupId && feed == "group") {
-            return groupList.map((obj, i) => <p key={i} onClick={() => {setGroup(obj.id)}}>{obj.name}</p>)
+            return groupList.map((obj, i) => (
+                <div className="p-3 w-5/6 text-center hover:bg-hovered rounded-xl" onClick={() => {setGroup(obj.id)}} key={i}>
+                    <p>{obj.name}</p>
+                </div>
+            ))
         }
         if (!posts) {
             //replace later with good div instead of simple text
@@ -116,23 +120,26 @@ export default function Home() {
     return (
         <div className="text-white h-full w-full grid items-center text-xl">
             <div className="bg-primaryT h-6/4 w-2/3 neon-xl center grid items-center">
-                <div className="w-full h-screen overflow-scroll flex flex-col ">
+                <div className="w-full h-screen overflow-hidden flex flex-col gap-2">
                     <div className="h-fit w-full flex flex-row justify-around p-3 px-10 gap-7">
                         <label htmlFor="globalFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
-                            <input id="globalFeed" type="button" onClick={() => {setFeed("global")}} className="hidden" />
+                            <input id="globalFeed" name="feedRadio" type="radio" defaultChecked onClick={() => {setFeed("global")}} className="hidden" />
                             <p className="w-full">Global</p>
                         </label>
                         <label htmlFor="followFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
-                            <input id="followFeed" type="button" onClick={() => {setFeed("follow")}} className="hidden" />
+                            <input id="followFeed" name="feedRadio" type="radio" onClick={() => {setFeed("follow")}} className="hidden" />
                             <p className="w-full">Followed</p>
                         </label>
                         <label htmlFor="groupFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
-                            <input id="groupFeed" type="button" onClick={() => {setGroup(null); setFeed("group")}} className="hidden" />
+                            <input id="groupFeed" name="feedRadio" type="radio" onClick={() => {setGroup(null); setFeed("group")}} className="hidden" />
                             <p className="w-full">Groups</p>
                         </label>
                     </div>
-                    <div className="flex flex-col w-full overflow-scroll items-center p-4 gap-7">
-                        <CheckState />
+                    <div className="flex flex-col w-full flex-grow overflow-hidden items-center gap-7 relative">
+                        <div className="absolute h-full w-9/10 pointer-events-none rounded-t-xl fade" />
+                        <div className="h-full p-4 py-8 w-full flex flex-col items-center overflow-scroll gap-7">
+                            <CheckState />
+                        </div>
                     </div>
                 </div>
             </div>
