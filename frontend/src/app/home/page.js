@@ -132,8 +132,7 @@ export function CreatePost(data) {
             setModal("detailModal")
         }}>
             <div className="w-full postHeader bg-primaryT p-2 flex flex-row gap-4 items-center">
-                {/* <img src={post.Author.Avatar ? "http://localhost:8080/data/images"+post.Author.Avatar : "defaultAvatar.svg"} className="h-10 rounded-xl" /> */}
-                <img src="http://localhost:8080/data/images/temp.png" className="h-10 rounded-xl" />
+                <img src={post.Author.Avatar ? DEFAULT_SERVER_PATH + "data/images" + post.Author.Avatar : "defaultAvatar.svg"} className="h-10 rounded-xl" />
                 {post.Author.Nickname || post.Author.FirstName + " " + post.Author.LastName || "Author not found"}
             </div>
             <div className="w-full h-fit p-4">
