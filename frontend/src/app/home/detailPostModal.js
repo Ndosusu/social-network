@@ -123,8 +123,8 @@ function NoComs() {
     )
 }
 
-function CreateCom({comFeed}) {
-    const [liked, setLiked] = useState(comFeed.Like ? true : false)
+function CreateCom(data) {
+    const [comFeed, setComFeed] = useState(data.comFeed)
     const com = comFeed.Comment
 
     return (
@@ -136,15 +136,16 @@ function CreateCom({comFeed}) {
                 <p id="detailMessage">{com.Message}</p>
             </div>
             <label className="p-3 flex w-full gap-1 w-1/10 items-center" onClick={(e) => {e.stopPropagation()}}>
-                <input type="button" className="hidden" onClick={() => {likeCom(comFeed, setLiked)}} />
-                <img src={liked ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
-                <p className={liked ? "text-secondary" : null}>{comFeed.LikeCount || "0"}</p>
+                <input type="button" className="hidden" onClick={() => {likeCom(comFeed, setComFeed)}} />
+                <img src={comFeed.Like ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
+                <p className={comFeed.Like ? "text-secondary" : null}>{comFeed.LikeCount || "0"}</p>
             </label>
         </div>
     )
 }
 
 async function likeCom(comFeed, fn) {
+    const cloneFeed = structuredClone(comFeed)
     fetch("http://localhost:8080/likes", comFeed.Like 
         ? {
             method: "DELETE",
@@ -168,13 +169,19 @@ async function likeCom(comFeed, fn) {
 
     .then(data => data.json())
 
-    .then(data => {
-        switch(typeof data.Result) {
+    .then(response => {
+        switch(typeof response.data.Result) {
             case "string": {
-                fn(false)
+                cloneFeed.Like = null
+                --cloneFeed.LikeCount
+                fn(cloneFeed)
+                break
             }
             case "object": {
-                fn(true)
+                cloneFeed.Like = response.data.Result
+                ++cloneFeed.LikeCount
+                fn(cloneFeed)
+                break
             }
         }
     })
