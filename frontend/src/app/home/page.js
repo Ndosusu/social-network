@@ -158,7 +158,7 @@ export function CreatePost(data) {
                 {post.Author.Nickname || post.Author.FirstName + " " + post.Author.LastName || "Author not found"}
             </div>
             <div className="w-full h-fit p-4">
-                {post.Message || "Content not found"}
+                <p className="break-all">{post.Message || "Content not found"}</p>
             </div>
             <div className="p-3 flex w-full gap-4">
                 <label className="min-w-1/10 flex items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>

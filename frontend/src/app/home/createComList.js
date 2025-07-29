@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { DEFAULT_SERVER_PATH } from "../page"
 
-export default function CreateComList({comList}) {
+export default function CreateComList({comList, postFeed}) {
     return (
         <div className="w-5/6 h-fit flex flex-col gap-7 p-2 pt-1">
-            <p className="font-bold">{comList.length} Comments :</p>
+            <p className="font-bold">{postFeed.CommentCount} Comments :</p>
             {comList.map((obj, i) => <CreateCom comFeed={obj} key={i} />)}
         </div>
     )
@@ -25,9 +25,10 @@ function CreateCom(data) {
     const com = comFeed.Comment
 
     return (
-         <div className="w-full h-fit rounded-xl neon-sm bg-primaryT">
-            <div className="w-full postHeader bg-primaryT p-2">
-                <p id="detailAuthor">{com.Author.Nickname}</p>
+         <div className="w-full h-fit rounded-xl neon-sm bg-primaryT box-border">
+            <div className="w-full postHeader bg-primaryT p-2 flex flex-row items-center gap-4">
+                <img src={com.Author.Avatar ? DEFAULT_SERVER_PATH + "data/images" + com.Author.Avatar : "defaultAvatar.svg"} className="h-10 rounded-xl" />
+                <p id="detailAuthor">{com.Author.Nickname || com.Author.FirstName + " " + com.Author.LastName || "Author not found"}</p>
             </div>
             <div className="w-full h-fit p-4">
                 <p id="detailMessage">{com.Message}</p>

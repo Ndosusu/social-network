@@ -32,13 +32,14 @@ export default function DetailPostModal(data) {
 
     const DetailContent = () => {
         return (
-        <div className="w-5/6 h-full flex flex-col items-center p-7 gap-5 center">
-            <div className="w-full min-h-40 rounded-xl neon-sm bg-primaryT">
-                <div className="w-full postHeader bg-primaryT p-2">
+        <div className="w-5/6 h-fit flex flex-col items-center p-7 gap-5 center box-content">
+            <div className="w-full h-fit rounded-xl neon-sm bg-primaryT flex flex-col">
+                <div className="w-full postHeader bg-primaryT p-2 flex flex-row items-center gap-4">
+                    <img src={post.Author.Avatar ? DEFAULT_SERVER_PATH + "data/images" + post.Author.Avatar : "defaultAvatar.svg"} className="h-10 rounded-xl" />
                     <p id="detailAuthor">{post.Author.Nickname || post.Author.FirstName + " " + post.Author.LastName || "Author not found"}</p>
                 </div>
                 <div className="w-full h-fit p-4">
-                    <p id="detailMessage">{post.Message || "Content not found"}</p>
+                    <p className="break-all">{post.Message || "Content not found"}</p>
                 </div>
                 <label className="w-fit flex items-center select-none p-3 gap-1 duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
                     <input type="button" className="hidden" onClick={() => {likePost(postFeed, setPostFeed)}} />
@@ -56,7 +57,7 @@ export default function DetailPostModal(data) {
                 newCom 
                 ? <NewComInput postFeed={postFeed} comFeedList={coms} comFn={setComs} stateFn={setNewCom} />
                 : (coms && coms.length > 0 
-                    ? <CreateComList comList={coms} />
+                    ? <CreateComList comList={coms} postFeed={postFeed} />
                     : <NoComs />)
             }
         </div>
@@ -64,6 +65,10 @@ export default function DetailPostModal(data) {
     }
 
     const getNextComs= async () => {
+        if(!coms) {
+            return
+        }
+        
         fetch(DEFAULT_SERVER_PATH + "feed/detail", {
             method: "POST",
             body: JSON.stringify({
@@ -86,7 +91,7 @@ export default function DetailPostModal(data) {
     return (
         <div className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl overflow-scroll" onScroll={(e) => {
             //Check if user scrolled to the bottom, 1 is needed as a safety because scrollHeight and clientHeight are rounded numbers but not scrollTop
-            if(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop <= 1) 
+            if(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop <= 1 && !newCom) 
                 getNextComs()
         }}>
             {data.postFeed ? <DetailContent /> : <PostNotFound /> }
