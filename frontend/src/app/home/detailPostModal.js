@@ -58,7 +58,7 @@ function DetailContent(data) {
             </div>
             {
                 newCom 
-                ? <NewComInput postFeed={postFeed} />
+                ? <NewComInput postFeed={postFeed} comFeedList={coms} comFn={setComs} stateFn={setNewCom} />
                 : (coms && coms.length > 0 
                     ? <CreateComList comList={coms} />
                     : <NoComs />)
@@ -187,7 +187,7 @@ async function likeCom(comFeed, fn) {
     })
 }
 
-function NewComInput({postFeed}) {
+function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
     const changedFile = async (event) => {
         const preview = document.querySelector("#previewCom")
         const fileName = document.querySelector("#fileNameCom")
@@ -226,7 +226,13 @@ function NewComInput({postFeed}) {
 
         .then(data => data.json())
         .then(response => {
-            console.log(response)
+            const obj = {
+                Like: null,
+                LikeCount: null,
+                Comment: response.data.Result,
+            }
+            comFn([obj].concat(comFeedList))
+            stateFn(false)
         })
     }
 
