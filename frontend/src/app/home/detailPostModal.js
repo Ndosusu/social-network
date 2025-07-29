@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { likePost } from "./page"
-import { CreateComList, NoComs, NewComInput } from "./createComList"
+import CreateComList, { NoComs, NewComInput } from "./createComList"
+import { DEFAULT_SERVER_PATH } from "../page"
 
 export default function DetailPostModal(data) {
     return (
@@ -19,7 +20,7 @@ function DetailContent(data) {
     const post = postFeed.Post
 
     useEffect(() => {
-        fetch("http://localhost:8080/feed/detail", {
+        fetch(DEFAULT_SERVER_PATH + "feed/detail", {
             method: "POST",
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
@@ -69,7 +70,7 @@ function DetailContent(data) {
 }
 
 function deletePost(postFeed, modalFn, postsFn, postsList) {
-    fetch("http://localhost:8080/posts", {
+    fetch(DEFAULT_SERVER_PATH + "posts", {
         method: "DELETE",
         body: JSON.stringify({
             session_uuid: localStorage.getItem("logToken"),

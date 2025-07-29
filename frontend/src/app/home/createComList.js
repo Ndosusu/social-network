@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { DEFAULT_SERVER_PATH } from "../page"
 
 export default function CreateComList({comList}) {
     return (
@@ -42,7 +43,7 @@ function CreateCom(data) {
 
 async function likeCom(comFeed, fn) {
     const cloneFeed = structuredClone(comFeed)
-    fetch("http://localhost:8080/likes", comFeed.Like 
+    fetch(DEFAULT_SERVER_PATH + "likes", comFeed.Like 
         ? {
             method: "DELETE",
             body: JSON.stringify({
@@ -112,7 +113,7 @@ export function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
         formData.append("session_uuid", localStorage.getItem("logToken"))
         formData.append("post_id", postFeed.Post.Id)
 
-        fetch("http://localhost:8080/comments", {
+        fetch(DEFAULT_SERVER_PATH + "comments", {
             method: "POST",
             body: formData,
         })

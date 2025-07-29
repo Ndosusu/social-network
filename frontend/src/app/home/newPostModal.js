@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import PrivateUserList from "./userList"
+import { DEFAULT_SERVER_PATH } from "../page"
 
 export default function NewPostModal({posts, postsFn, modalFn}) {
     const [privacyState, setPrivacy] = useState(1)
@@ -12,7 +13,7 @@ export default function NewPostModal({posts, postsFn, modalFn}) {
         const formData = new FormData(event.currentTarget)
         formData.append("session_uuid", localStorage.getItem("logToken"))
 
-        fetch("http://localhost:8080/posts", {
+        fetch(DEFAULT_SERVER_PATH + "posts", {
             method: "POST",
             body: formData,
         })

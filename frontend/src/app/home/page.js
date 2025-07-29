@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import ActionMenu from "../actionMenu"
 import NewPostModal from "./newPostModal"
 import DetailPostModal from "./detailPostModal"
+import { DEFAULT_SERVER_PATH } from "../page"
 
 export default function Home() {
     const router = useRouter()
@@ -19,7 +20,7 @@ export default function Home() {
     useEffect(() => {
         setPosts(null)
         setLoading(true)
-        fetch("http://localhost:8080/feed/"+feed,{
+        fetch(DEFAULT_SERVER_PATH + "feed/"+feed,{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -130,7 +131,9 @@ export function CreatePost(data) {
             setDetail(postFeed)
             setModal("detailModal")
         }}>
-            <div className="w-full postHeader bg-primaryT p-2">
+            <div className="w-full postHeader bg-primaryT p-2 flex flex-row gap-4 items-center">
+                {/* <img src={post.Author.Avatar ? "http://localhost:8080/data/images"+post.Author.Avatar : "defaultAvatar.svg"} className="h-10 rounded-xl" /> */}
+                <img src="http://localhost:8080/data/images/temp.png" className="h-10 rounded-xl" />
                 {post.Author.Nickname || post.Author.FirstName + " " + post.Author.LastName || "Author not found"}
             </div>
             <div className="w-full h-fit p-4">
@@ -153,7 +156,7 @@ export function CreatePost(data) {
 
 export async function likePost(postFeed, fn) {
     const cloneFeed = structuredClone(postFeed)
-    fetch("http://localhost:8080/likes",
+    fetch(DEFAULT_SERVER_PATH + "likes",
         postFeed.Like 
         ? {
             method: "DELETE",

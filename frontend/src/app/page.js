@@ -2,6 +2,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+export const DEFAULT_SERVER_PATH = "http://localhost:8080/"
+
 export default function Home() {
   const [loginForm, setLogin] = useState(true)
   const router = useRouter()
@@ -17,7 +19,7 @@ export default function Home() {
     })
 
     try {
-      let result = await fetch("http://localhost:8080/auth/login", {
+      let result = await fetch(DEFAULT_SERVER_PATH + "auth/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +48,7 @@ export default function Home() {
     const formData = new FormData(event.currentTarget)
     
     try {
-      let result = await fetch("http://localhost:8080/auth/register", {
+      let result = await fetch(DEFAULT_SERVER_PATH + "auth/register", {
         method: 'POST',
         body: formData //body au lieu de data
       })
