@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { likePost } from "./page"
 
 export default function DetailPostModal(data) {
@@ -13,37 +13,27 @@ export default function DetailPostModal(data) {
 
 function DetailContent(data) {
     const [newCom, setNewCom] = useState(false)
+    const [coms, setComs] = useState(null)
     const [postFeed, setPostFeed] = useState(data.postFeed)
     const post = postFeed.Post
 
-    const coms = [ //replace with fetch
-        {
-            Comment: {
-                Id: 9,
-                Message: "tkt",
-                Author: {
-                    Id: 4,
-                    Nickname: "wiz"
-                }
-            },
-            Like: null,
-            LikeCount: 0,
-        },
-        {
-            Comment: {
-                Id: 10,
-                Message: "inquiète toi",
-                Author: {
-                    Id: 5,
-                    Nickname: "ziw"
-                }
-            },
-            Like: {
-                Id: 11,
-            },
-            LikeCount: 9,
-        }
-    ]
+    useEffect(() => {
+        fetch("http://localhost:8080/feed/detail", {
+            method: "POST",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                post_id: post.Id,
+            })
+        })
+        .catch(error => {
+            throw new Error(error)
+        })
+
+        .then(data => data.json())
+        .then(response => {
+            setComs(response.data.Result)
+        })
+    }, [])
 
     return (
         <div className="w-5/6 h-full flex flex-col items-center p-7 gap-5 center">
@@ -68,8 +58,8 @@ function DetailContent(data) {
             </div>
             {
                 newCom 
-                ? <NewComInput />
-                : (coms.length > 0 
+                ? <NewComInput postFeed={postFeed} />
+                : (coms && coms.length > 0 
                     ? <CreateComList comList={coms} />
                     : <NoComs />)
             }
@@ -190,7 +180,7 @@ async function likeCom(comFeed, fn) {
     })
 }
 
-function NewComInput() {
+function NewComInput({postFeed}) {
     const changedFile = async (event) => {
         const preview = document.querySelector("#previewCom")
         const fileName = document.querySelector("#fileNameCom")
@@ -212,13 +202,30 @@ function NewComInput() {
         }
     }
 
-    const handleForm = async (event) => {
+    const newComResolve = async (event) => {
         event.preventDefault()
+
+        const formData = new FormData(event.currentTarget)
+        formData.append("session_uuid", localStorage.getItem("logToken"))
+        formData.append("post_id", postFeed.Post.Id)
+
+        fetch("http://localhost:8080/comments", {
+            method: "POST",
+            body: formData,
+        })
+        .catch(error => {
+            throw new Error(error)
+        })
+
+        .then(data => data.json())
+        .then(response => {
+            console.log(response)
+        })
     }
 
     return (
-        <form className="w-full h-full flex flex-col gap-5" onSubmit={handleForm}>
-            <textarea name="Message" className="w-full resize-none neon-sm rounded-xl bg-primaryT h-25 overflow-scroll p-3 flex-grow" placeholder="Write your comment here" maxLength={1024} required />
+        <form className="w-full h-full flex flex-col gap-5" encType="multipart/form-data" onSubmit={newComResolve}>
+            <textarea name="message" className="w-full resize-none neon-sm rounded-xl bg-primaryT h-25 overflow-scroll p-3 flex-grow" placeholder="Write your comment here" maxLength={1024} required />
             <div className="col-span-2 grid align-center h-fit">
                 <label htmlFor="file" className="bg-primaryT h-fit neon-sm rounded-xl w-full p-2 flex flex-row justify-between" >
                     <div>

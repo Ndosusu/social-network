@@ -38,7 +38,7 @@ func (db *CommentDB) SelectCommentById(obj map[string]any) (*models.Response, er
 			comment_id : int,
 		}
 	*/
-	stmt := "SELECT id, author_id, post_id, message, image, date, group_id FROM comments WHERE id = ?;"
+	stmt := "SELECT id, author_id, post_id, message, image, date FROM comments WHERE id = ?;"
 	result := db.Conn.QueryRow(stmt, obj["comment_id"])
 
 	comment := models.Comment{

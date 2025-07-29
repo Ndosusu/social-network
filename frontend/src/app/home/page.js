@@ -57,7 +57,7 @@ export default function Home() {
             //replace later with good div instead of simple text
             return <p>No posts found.</p>
         }
-        console.log(posts)
+
         return posts.map((obj, i) => <CreatePost postFeed={obj} key={i} setDetail={setDetail} setModal={setModal} />)
     }
 
