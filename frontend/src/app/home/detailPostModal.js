@@ -6,14 +6,6 @@ import CreateComList, { NoComs, NewComInput } from "./createComList"
 import { DEFAULT_SERVER_PATH } from "../page"
 
 export default function DetailPostModal(data) {
-    return (
-        <div className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl overflow-scroll">
-            {data.postFeed ? <DetailContent postFeed={data.postFeed} postsFn={data.postsFn} modalFn={data.modalFn} postsList={data.postsList} /> : <PostNotFound /> }
-        </div>
-    )
-}
-
-function DetailContent(data) {
     const [newCom, setNewCom] = useState(false)
     const [coms, setComs] = useState(null)
     const [postFeed, setPostFeed] = useState(data.postFeed)
@@ -25,6 +17,7 @@ function DetailContent(data) {
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 post_id: post.Id,
+                limit: 15,
             })
         })
         .catch(error => {
@@ -37,7 +30,8 @@ function DetailContent(data) {
         })
     }, [])
 
-    return (
+    const DetailContent = () => {
+        return (
         <div className="w-5/6 h-full flex flex-col items-center p-7 gap-5 center">
             <div className="w-full min-h-40 rounded-xl neon-sm bg-primaryT">
                 <div className="w-full postHeader bg-primaryT p-2">
@@ -65,6 +59,37 @@ function DetailContent(data) {
                     ? <CreateComList comList={coms} />
                     : <NoComs />)
             }
+        </div>
+        )
+    }
+
+    const getNextComs= async () => {
+        fetch(DEFAULT_SERVER_PATH + "feed/detail", {
+            method: "POST",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                post_id: post.Id,
+                limit: 15,
+                last_id: coms[coms.length - 1].Comment.Id,
+            })
+        })
+        .catch(error => {
+            throw new Error(error)
+        })
+        .then(data => data.json())
+        .then(response => {
+            if(response.data.Result)
+                setComs(coms.concat(response.data.Result))
+        })
+    }
+
+    return (
+        <div className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-10 inset-1/2 -translate-1/2 rounded-xl overflow-scroll" onScroll={(e) => {
+            //Check if user scrolled to the bottom, 1 is needed as a safety because scrollHeight and clientHeight are rounded numbers but not scrollTop
+            if(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop <= 1) 
+                getNextComs()
+        }}>
+            {data.postFeed ? <DetailContent /> : <PostNotFound /> }
         </div>
     )
 }

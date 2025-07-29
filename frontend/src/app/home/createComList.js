@@ -128,7 +128,11 @@ export function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
                 LikeCount: null,
                 Comment: response.data.Result,
             }
-            comFn([obj].concat(comFeedList))
+            if(comFeedList){
+                comFn([obj].concat(comFeedList))
+            } else {
+                comFn([obj])
+            }            
             stateFn(false)
         })
     }

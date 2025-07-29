@@ -20,7 +20,7 @@ export default function Home() {
     useEffect(() => {
         setPosts(null)
         setLoading(true)
-        fetch(DEFAULT_SERVER_PATH + "feed/"+feed,{
+        fetch(DEFAULT_SERVER_PATH + "feed/" + feed,{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -28,7 +28,6 @@ export default function Home() {
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 limit: 15,
-                group_id: feed == "group" ? groupId : null,
             })
         })
         .catch(error => {
@@ -48,6 +47,25 @@ export default function Home() {
             }
         })
     }, [feed])
+
+    const getNextPosts = async () => {
+        fetch(DEFAULT_SERVER_PATH + "feed/" + feed, {
+            method:"POST",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                limit: 15,
+                last_id: posts[posts.length - 1].Post.Id,
+            }),
+        })
+        .catch(error => {
+            throw new Error(error)
+        })
+        .then(data => data.json())
+        .then(response => {
+            if(response.data.Result)
+                setPosts(posts.concat(response.data.Result))
+        })
+    }
 
     const CheckState = () => {
         if (loading) {
@@ -98,7 +116,11 @@ export default function Home() {
                     </div>
                     <div className="flex flex-col w-full flex-grow overflow-hidden items-center gap-7 relative">
                         <div className="absolute h-full w-9/10 pointer-events-none rounded-t-xl fade" />
-                        <div className="h-full p-4 py-8 w-full flex flex-col items-center overflow-scroll gap-7">
+                        <div className="h-full p-4 py-8 w-full flex flex-col items-center overflow-scroll gap-7" onScroll={(e) => {
+                            //Check if user scrolled to the bottom, 1 is needed as a safety because scrollHeight and clientHeight are rounded numbers but not scrollTop
+                            if(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop <= 1) 
+                                getNextPosts()
+                        }}>
                             <CheckState />
                         </div>
                     </div>
