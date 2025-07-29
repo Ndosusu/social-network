@@ -31,7 +31,7 @@ function CreateCom(data) {
                 <p id="detailAuthor">{com.Author.Nickname || com.Author.FirstName + " " + com.Author.LastName || "Author not found"}</p>
             </div>
             <div className="w-full h-fit p-4">
-                <p id="detailMessage">{com.Message}</p>
+                <p className="break-all">{com.Message}</p>
             </div>
             <label className="p-3 flex gap-1 w-fit items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
                 <input type="button" className="hidden" onClick={() => {likeCom(comFeed, setComFeed)}} />
