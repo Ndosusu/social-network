@@ -83,7 +83,7 @@ async function likeCom(comFeed, fn) {
     })
 }
 
-function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
+export function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
     const changedFile = async (event) => {
         const preview = document.querySelector("#previewCom")
         const fileName = document.querySelector("#fileNameCom")

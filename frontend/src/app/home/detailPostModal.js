@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { likePost } from "./page"
-import CreateComList, { NoComs } from "./createComList"
+import { CreateComList, NoComs, NewComInput } from "./createComList"
 
 export default function DetailPostModal(data) {
     return (
