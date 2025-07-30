@@ -3,8 +3,13 @@
 import { useState } from "react"
 import PrivateUserList from "./userList"
 import { DEFAULT_SERVER_PATH } from "../page"
+import { useHomeContext } from "./contextProvider"
 
-export default function NewPostModal({posts, postsFn, modalFn}) {
+export default function NewPostModal() {
+    const {
+        feedPosts,
+        modal,
+    } = useHomeContext()
     const [privacyState, setPrivacy] = useState(1)
 
     const newPostResolve = async (event) => {
@@ -23,7 +28,7 @@ export default function NewPostModal({posts, postsFn, modalFn}) {
         })
         .then(data => data.json())
         .then(response => {
-            modalFn("")
+            modal.set("")
             const obj = {
                 CommentCount: 0,
                 LikeCount: 0,
@@ -31,7 +36,7 @@ export default function NewPostModal({posts, postsFn, modalFn}) {
                 Post: response.data.Result,
             }
             // infosFn(newInfoMessage("Post created successfully"))
-            postsFn(posts ? [obj].concat(posts) : [obj])
+            feedPosts.set(feedPosts.val ? [obj].concat(feedPosts.val) : [obj])
         })
     }
 
@@ -57,7 +62,7 @@ export default function NewPostModal({posts, postsFn, modalFn}) {
     }
 
     return (
-        <div className="modal absolute w-full h-full z-10 inset-1/2 -translate-1/2 flex items-center justify-center pointer-events-none gap-7">
+        <div className="modal absolute w-full h-full z-12 inset-1/2 -translate-1/2 flex items-center justify-center pointer-events-none gap-7">
             <div className="neon-xl bg-primaryT h-9/10 w-3/5 rounded-xl pointer-events-auto">
                 <form id="newPostForm" encType="multipart/form-data" className="w-full h-full flex flex-col justify-between items-center p-7 gap-7" onSubmit={newPostResolve}>
                     <div className="w-full h-3/4 flex flex-col items-center gap-7 flex-grow">

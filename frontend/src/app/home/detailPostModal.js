@@ -60,7 +60,7 @@ export default function DetailPostModal() {
                     commentInput
                     ? <NewComInput commentList={{val: commentList, set: setComList}} commentInput={{val: commentInput,set: setComInput}} />
                     : (commentList && commentList.length > 0 
-                        ? <CreateComList commentList={{val: commentList, set:setComList}} />
+                        ? <CreateComList commentList={{val: commentList, set: setComList}} />
                         : <NoComs />)
                 }
             </div>
