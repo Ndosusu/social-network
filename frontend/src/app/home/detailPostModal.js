@@ -55,7 +55,7 @@ export default function DetailPostModal(data) {
             </div>
             {
                 newCom 
-                ? <NewComInput postFeed={postFeed} comFeedList={coms} comFn={setComs} stateFn={setNewCom} />
+                ? <NewComInput postFeed={postFeed} comFeedList={coms} comFn={setComs} stateFn={setNewCom} infosFn={data.infosFn} />
                 : (coms && coms.length > 0 
                     ? <CreateComList comList={coms} postFeed={postFeed} />
                     : <NoComs />)

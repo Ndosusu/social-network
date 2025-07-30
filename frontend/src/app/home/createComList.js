@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { DEFAULT_SERVER_PATH } from "../page"
+import { newInfoMessage } from "../infoMessage"
 
 export default function CreateComList({comList, postFeed}) {
     return (
@@ -85,7 +86,7 @@ async function likeCom(comFeed, fn) {
     })
 }
 
-export function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
+export function NewComInput({postFeed, comFeedList, comFn, stateFn, infosFn}) {
     const changedFile = async (event) => {
         const preview = document.querySelector("#previewCom")
         const fileName = document.querySelector("#fileNameCom")
@@ -129,11 +130,12 @@ export function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
                 LikeCount: null,
                 Comment: response.data.Result,
             }
+            infosFn(newInfoMessage("Comment created successfully"))
             if(comFeedList){
                 comFn([obj].concat(comFeedList))
             } else {
                 comFn([obj])
-            }            
+            }           
             stateFn(false)
         })
     }

@@ -6,7 +6,7 @@ import ActionMenu from "../actionMenu"
 import NewPostModal from "./newPostModal"
 import DetailPostModal from "./detailPostModal"
 import { DEFAULT_SERVER_PATH } from "../page"
-import { CreateAllInfoMessages, InfoMessages, newInfoMessage } from "../infoMessage"
+import { CreateAllInfoMessages } from "../infoMessage"
 
 export default function Home() {
     const router = useRouter()
@@ -17,6 +17,7 @@ export default function Home() {
     const [curDetail, setDetail] = useState(null)
     const [curModal, setModal]= useState("")
     const [feed, setFeed] = useState("global")
+    const [infoMessages, setInfo] = useState([])
     
     useEffect(() => {
         setPosts(null)
@@ -93,11 +94,11 @@ export default function Home() {
     const CheckModalState = () => {
         switch(curModal) {
             case "newPostModal": {
-                return <NewPostModal posts={posts} postsFn={setPosts} modalFn={setModal} />
+                return <NewPostModal posts={posts} postsFn={setPosts} modalFn={setModal} infosFn={setInfo} />
             }
 
             case "detailModal": {
-                return <DetailPostModal postFeed={curDetail} postsFn={setPosts} modalFn={setModal} postsList={posts} />
+                return <DetailPostModal postFeed={curDetail} postsFn={setPosts} modalFn={setModal} infosFn={setInfo} postsList={posts} />
             }
         }
     }
@@ -135,7 +136,7 @@ export default function Home() {
                     <p className="text-sm text-center">New post</p>
                 </div>
             </div>
-            <CreateAllInfoMessages allInfoMessages={InfoMessages} />
+            <CreateAllInfoMessages allInfoMessages={infoMessages} />
             <ActionMenu />
             {
                 curModal != "" 

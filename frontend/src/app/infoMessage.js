@@ -1,31 +1,35 @@
 "use client"
 
-export let InfoMessages = []
-
-export function newInfoMessage(message, ...classes) {
+export function newInfoMessage(tabInfo , message, ...classes) {
     const obj = {
         message: message,
         classes: classes,
     }
+    console.log(tabInfo)
 
-    InfoMessages.push(obj)
+    tabInfo ? tabInfo.push(obj) : tabInfo = [obj]
+    
+    return tabInfo
 }
 
-export function CreateAllInfoMessages({allInfoMessages}) {
-    if(!allInfoMessages) {
+export function CreateAllInfoMessages({tabInfo}) {
+    if(!tabInfo) {
         return
     }
 
     return (
         <div className="absolute top-0 inset-x-1/2 -translate-x-1/2 w-1/4 flex flex-col gap-5 z-90 p-3">
-            {allInfoMessages.map((obj, i) => <CreateInfoMessage info={obj} key={i} /> )}
+            {tabInfo.map((obj, i) => <CreateInfoMessage info={obj} tabInfo={tabInfo} key={i} /> )}
         </div>
     )
 }
 
-function CreateInfoMessage({info}) {
+function CreateInfoMessage({info, tabInfo}) {
     return (
-        <div className={"infoMessage rounded-xl neon-sm w-full text-center p-8 " + (info.classes.length > 0 ? info.classes.join(" ") : "bg-primaryT")} onAnimationEnd={(e) => e.target.remove()}>
+        <div className={"infoMessage rounded-xl neon-sm w-full text-center p-8 " + (info.classes.length > 0 ? info.classes.join(" ") : "bg-primaryT")} onAnimationEnd={(e) => {
+            e.target.remove()
+            tabInfo.shift()
+        }}>
             <p>{info.message}</p>
         </div>
     )
