@@ -5,7 +5,7 @@ import PrivateUserList from "./userList"
 import { DEFAULT_SERVER_PATH } from "../page"
 import { newInfoMessage } from "../infoMessage"
 
-export default function NewPostModal({posts, postsFn, modalFn, infosFn}) {
+export default function NewPostModal({posts, postsFn, modalFn}) {
     const [privacyState, setPrivacy] = useState(1)
 
     const newPostResolve = async (event) => {
@@ -31,7 +31,7 @@ export default function NewPostModal({posts, postsFn, modalFn, infosFn}) {
                 GroupTitle: "",
                 Post: response.data.Result,
             }
-            infosFn(newInfoMessage("Post created successfully"))
+            // infosFn(newInfoMessage("Post created successfully"))
             postsFn(posts ? [obj].concat(posts) : [obj])
         })
     }

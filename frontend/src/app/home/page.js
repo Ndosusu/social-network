@@ -94,11 +94,11 @@ export default function Home() {
     const CheckModalState = () => {
         switch(curModal) {
             case "newPostModal": {
-                return <NewPostModal posts={posts} postsFn={setPosts} modalFn={setModal} infosFn={setInfo} />
+                return <NewPostModal posts={posts} postsFn={setPosts} modalFn={setModal} />
             }
 
             case "detailModal": {
-                return <DetailPostModal postFeed={curDetail} postsFn={setPosts} modalFn={setModal} infosFn={setInfo} postsList={posts} />
+                return <DetailPostModal postFeed={curDetail} postsFn={setPosts} modalFn={setModal} postsList={posts} />
             }
         }
     }

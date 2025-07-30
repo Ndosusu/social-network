@@ -86,7 +86,7 @@ async function likeCom(comFeed, fn) {
     })
 }
 
-export function NewComInput({postFeed, comFeedList, comFn, stateFn, infosFn}) {
+export function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
     const changedFile = async (event) => {
         const preview = document.querySelector("#previewCom")
         const fileName = document.querySelector("#fileNameCom")
@@ -130,7 +130,7 @@ export function NewComInput({postFeed, comFeedList, comFn, stateFn, infosFn}) {
                 LikeCount: null,
                 Comment: response.data.Result,
             }
-            infosFn(newInfoMessage("Comment created successfully"))
+            // infosFn(newInfoMessage("Comment created successfully"))
             if(comFeedList){
                 comFn([obj].concat(comFeedList))
             } else {

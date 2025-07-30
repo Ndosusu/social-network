@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation"
 import ActionMenu from "../actionMenu"
 import { CheckLogToken } from "../checkToken"
-import { CreateAllInfoMessages, InfoMessages } from "../infoMessage"
 
 export default function SearchPage() {
     const router = useRouter()
@@ -26,7 +25,6 @@ export default function SearchPage() {
             <div className="neon-xl bg-primaryT w-full h-full rounded-xl text-2xl flex flex-col gap-4 p-6">
                 {result.map((obj, i) => <CreateSearchResult user={obj} key={i} />)}
             </div>
-            <CreateAllInfoMessages allInfoMessages={InfoMessages} />
             <ActionMenu />
         </div>
     )
