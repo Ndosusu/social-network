@@ -7,17 +7,19 @@ import NewPostModal from "./newPostModal"
 import DetailPostModal from "./detailPostModal"
 import { DEFAULT_SERVER_PATH } from "../page"
 import { CreateAllInfoMessages } from "../infoMessage"
+import { HomeProvider, useHomeContext } from "./contextProvider"
 
-export default function Home() {
+export default function HomeContextWrapper() {
+    return (
+        <HomeProvider>
+            <Home />
+        </HomeProvider>
+    )
+}
+
+export function Home() {
     const router = useRouter()
     CheckLogToken(router)
-    
-    const [loading, setLoading] = useState(true)
-    const [posts, setPosts] = useState([])
-    const [curDetail, setDetail] = useState(null)
-    const [curModal, setModal]= useState("")
-    const [feed, setFeed] = useState("global")
-    const [infoMessages, setInfo] = useState([])
     
     useEffect(() => {
         setPosts(null)
