@@ -2,8 +2,10 @@
 
 import { createContext, useContext, useState } from "react"
 
+//create context hook
 const HomeContext = createContext()
 
+//small function to make state creation faster
 export const parseState = (tabState) => {
     return {
         val: tabState[0],
@@ -11,6 +13,7 @@ export const parseState = (tabState) => {
     }
 }
 
+//context provider component, gives access to the context to all child component as well as giving the context it's value
 export function HomeProvider({children}) {
 
     const States = {
@@ -29,6 +32,12 @@ export function HomeProvider({children}) {
         //gives the name of the modal to show
         modal: parseState(useState("")),
 
+        // //determines whether to show to new comment form or the comment list
+        // commentInput: parseState(useState(false)),
+
+        // //represents the comments list
+        // commentList: parseState(useState(null)),
+
         //represent the list of info messages (WIP)
         infoMessages: parseState(useState([])),
     }
@@ -40,6 +49,7 @@ export function HomeProvider({children}) {
     )
 }
 
+//get the context
 export function useHomeContext() {
     return useContext(HomeContext)
 }

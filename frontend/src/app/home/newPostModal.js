@@ -5,19 +5,25 @@ import PrivateUserList from "./userList"
 import { DEFAULT_SERVER_PATH } from "../page"
 import { useHomeContext } from "./contextProvider"
 
+//component for the post creation modal
 export default function NewPostModal() {
     const {
         feedPosts,
         modal,
     } = useHomeContext()
+
+    //additional necessary state, DO NOT PUT IN CONTEXT, SEE detailPostModal.js FOR MORE DETAILS
     const [privacyState, setPrivacy] = useState(1)
 
-    const newPostResolve = async (event) => {
+    //called when new post form is submitted
+    const newPostResolve = (event) => {
         event.preventDefault()
 
+        //collect data from the form and add necessary data not given by the form
         const formData = new FormData(event.currentTarget)
         formData.append("session_uuid", localStorage.getItem("logToken"))
 
+        //api call to create the post
         fetch(DEFAULT_SERVER_PATH + "posts", {
             method: "POST",
             body: formData,
@@ -26,7 +32,11 @@ export default function NewPostModal() {
             console.log(error)
             throw new Error(error)
         })
+
+        //make data readable as json object
         .then(data => data.json())
+
+        //create an empty PostFeed object and add it to the post list
         .then(response => {
             modal.set("")
             const obj = {
@@ -40,6 +50,7 @@ export default function NewPostModal() {
         })
     }
 
+    //called when the user chooses a file to update the preview
     const changedFile = async (event) => {
         const preview = document.querySelector("#preview")
         const fileName = document.querySelector("#fileName")
@@ -86,6 +97,7 @@ export default function NewPostModal() {
     )
 }
 
+//component to create dynamically the options for the privacy setting
 function CreateOptionList({opts, fn}) {
     return (
         <div className="w-full h-fit flex justify-center gap-10 text-center">
@@ -95,6 +107,7 @@ function CreateOptionList({opts, fn}) {
     //val +1 to account for the fact that the list begins at index 0 whereas the starting index in the db is 1
 }
 
+//component to create a single option
 function CreateOption({text, val, fn}) {
     return (
         <label htmlFor={"radio"+val} className="neon-sm rounded-xl p-2 w-2/10 duration-100 hover:scale-110">
@@ -104,6 +117,7 @@ function CreateOption({text, val, fn}) {
     )
 }
 
+//component to check if the user list needs to be shown or not
 function CheckPrivacyState({privacy}) {
     //check if privacy is equal to 3, 3 is the value given if the user chose to make the post on a whitelist
     if (privacy == 3) 

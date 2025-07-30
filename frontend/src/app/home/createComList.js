@@ -5,6 +5,7 @@ import { DEFAULT_SERVER_PATH } from "../page"
 import { newInfoMessage } from "../infoMessage"
 import { useHomeContext } from "./contextProvider"
 
+//component that creates the comments feed dynamically
 export function CreateComList({commentList}) {
     const {
         curPost,
@@ -18,6 +19,7 @@ export function CreateComList({commentList}) {
     )
 }
 
+//returns a div to tell the user that there is no comment, CALLED ONLY IF NO COMMENTS
 export function NoComs() {
     return (
         <div className="w-5/6 flex flex-col items-center gap-7 p-5">
@@ -26,6 +28,7 @@ export function NoComs() {
     )
 }
 
+//create a div for a comment with the appropriate data
 function CreateCom(data) {
     const [comFeed, setComFeed] = useState(data.comFeed)
     const com = comFeed.Comment
@@ -48,8 +51,12 @@ function CreateCom(data) {
     )
 }
 
-async function likeCom(comFeed, fn) {
+//function to call when user likes a comment
+function likeCom(comFeed, fn) {
+    //clone the original structure  in order not to modify the original (important to make the set state function work)
     const cloneFeed = structuredClone(comFeed)
+
+    //api call, ternary operator to switch between deleting the like or add it
     fetch(DEFAULT_SERVER_PATH + "likes", comFeed.Like 
         ? {
             method: "DELETE",
@@ -66,13 +73,14 @@ async function likeCom(comFeed, fn) {
             })
         }
     )
-
     .catch(error => {
         throw new Error(error)
     })
 
+    //make data readable as json object
     .then(data => data.json())
 
+    //if action was delete, Result is "ok" as string, else Result is the new like as an object. act accordingly
     .then(response => {
         switch(typeof response.data.Result) {
             case "string": {
@@ -91,11 +99,13 @@ async function likeCom(comFeed, fn) {
     })
 }
 
+//Component called when user wants to create a new comment
 export function NewComInput({commentList, commentInput}) {
     const {
         curPost,
     } = useHomeContext()
 
+    //called when the user chooses a file to update the preview
     const changedFile = async (event) => {
         const preview = document.querySelector("#previewCom")
         const fileName = document.querySelector("#fileNameCom")
@@ -117,13 +127,16 @@ export function NewComInput({commentList, commentInput}) {
         }
     }
 
-    const newComResolve = async (event) => {
+    //called when the new comment form is submitted
+    const newComResolve = (event) => {
         event.preventDefault()
 
+        //create the object to send to the back and adding necessary data not given by the form
         const formData = new FormData(event.currentTarget)
         formData.append("session_uuid", localStorage.getItem("logToken"))
         formData.append("post_id", curPost.val.Post.Id)
 
+        //api request to add the comment
         fetch(DEFAULT_SERVER_PATH + "comments", {
             method: "POST",
             body: formData,
@@ -132,7 +145,10 @@ export function NewComInput({commentList, commentInput}) {
             throw new Error(error)
         })
 
+        //make data readable as json object
         .then(data => data.json())
+
+        //if everything went well, Result is the new comment object. create an empty CommentFeed object and add it to the list
         .then(response => {
             const obj = {
                 Like: null,

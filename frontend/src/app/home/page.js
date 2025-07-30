@@ -9,6 +9,7 @@ import { DEFAULT_SERVER_PATH } from "../page"
 import { CreateAllInfoMessages } from "../infoMessage"
 import { HomeProvider, useHomeContext } from "./contextProvider"
 
+//needed to give the context to the whole Home page
 export default function HomeContextWrapper() {
     return (
         <HomeProvider>
@@ -17,7 +18,9 @@ export default function HomeContextWrapper() {
     )
 }
 
+//main page component
 export function Home() {
+    //create router to redirect and check if user allowed to access website
     const router = useRouter()
     CheckLogToken(router)
 
@@ -28,9 +31,11 @@ export function Home() {
         modal,
     } = useHomeContext()
     
+    //reset post feed and refetch it
     useEffect(() => {
         feedPosts.set(null)
         feedLoading.set(true)
+        //api call to get the correct post feed
         fetch(DEFAULT_SERVER_PATH + "feed/" + currentFeed.val,{
             method: 'POST',
             headers: {
@@ -46,8 +51,10 @@ export function Home() {
             throw new Error(error)
         })
 
+        //make data readable as json object
         .then(data => data.json())
 
+        //if posts returned, set post list
         .then(response => {
             if(response.data) {
                 feedLoading.set(false)    
@@ -59,7 +66,9 @@ export function Home() {
         })
     }, [currentFeed.val])
 
-    const getNextPosts = async () => {
+    //called when reaching the end of the post list to get the next ones
+    const getNextPosts = () => {
+        //api call to get the post from the correct feed and give the id of the last post
         fetch(DEFAULT_SERVER_PATH + "feed/" + currentFeed.val, {
             method:"POST",
             body: JSON.stringify({
@@ -71,13 +80,18 @@ export function Home() {
         .catch(error => {
             throw new Error(error)
         })
+
+        //make data readable as json object
         .then(data => data.json())
+
+        //add to post list
         .then(response => {
             if(response.data.Result)
                 feedPosts.set(feedPosts.val.concat(response.data.Result))
         })
     }
 
+    //check the state of the feed and show the according div
     const CheckState = () => {
         if (feedLoading.val) {
             //replace later with good div instead of simple text
@@ -90,15 +104,17 @@ export function Home() {
         return feedPosts.val.map((obj, i) => <CreatePost postFeed={obj} key={i}/>)
     }
 
+    //component to handle modals
     const CreateModal = () => {
         return (
             <div id="modalDiv" className="w-screen h-screen absolute z-10">
-                <div className="w-full h-full bg-black opacity-80 absolute z-11" onClick={async () => {modal.set("")}}/>
+                <div className="w-full h-full bg-black opacity-80 absolute z-11" onClick={() => {modal.set("")}}/>
                 <CheckModalState />
             </div>
         )
     }
 
+    //check which modal to show
     const CheckModalState = () => {
         switch(modal.val) {
             case "newPostModal": {
@@ -155,6 +171,7 @@ export function Home() {
     )
 }
 
+//component to create a single post with the correct data
 export function CreatePost(data) {
     const {
         curPost,
@@ -164,7 +181,7 @@ export function CreatePost(data) {
     const post = postFeed.Post
     
     return (
-        <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={async () => {
+        <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={() => {
             curPost.set(postFeed)
             modal.set("detailModal")
         }}>
@@ -195,8 +212,12 @@ export function CreatePost(data) {
     )
 }
 
+//called when user likes a post
 export async function likePost(postFeed, fn) {
+    //make a clone so that the update state function works later
     const cloneFeed = structuredClone(postFeed)
+
+    //api call with a ternary to either delete the like or add it
     fetch(DEFAULT_SERVER_PATH + "likes",
         postFeed.Like 
         ? {
@@ -219,8 +240,10 @@ export async function likePost(postFeed, fn) {
         throw new Error(error)
     })
 
+    //make data readable as json object
     .then(data => data.json())
 
+    //api returns "Ok" as a string if delete or the like as an object, act accordingly
     .then(response => {
         switch(typeof response.data.Result) {
             case "string": {
