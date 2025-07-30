@@ -4,13 +4,14 @@ import { createContext, useContext, useState } from "react"
 
 const HomeContext = createContext()
 
-export function HomeProvider({children}) {
-    const parseState = (tabState) => {
-        return {
-            val: tabState[0],
-            set: tabState[1]
-        }
+export const parseState = (tabState) => {
+    return {
+        val: tabState[0],
+        set: tabState[1]
     }
+}
+
+export function HomeProvider({children}) {
 
     const States = {
         //sets feed loading state
@@ -28,8 +29,14 @@ export function HomeProvider({children}) {
         //gives the name of the modal to show
         modal: parseState(useState("")),
 
+        //determines whether to show to new comment form or the comment list
+        commentInput: parseState(useState(false)),
+
+        //represents the comments list
+        commentList: parseState(useState(null)),
+
         //represent the list of info messages (WIP)
-        infoMessages: parseState(useState([]))
+        infoMessages: parseState(useState([])),
     }
 
     return (

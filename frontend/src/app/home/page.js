@@ -92,8 +92,8 @@ export function Home() {
 
     const CreateModal = () => {
         return (
-            <div id="modalDiv" className="w-screen h-screen absolute ">
-                <div className="w-full h-full bg-black opacity-80 absolute z-5" onClick={async () => {modal.set("")}}/>
+            <div id="modalDiv" className="w-screen h-screen absolute z-10">
+                <div className="w-full h-full bg-black opacity-80 absolute z-11" onClick={async () => {modal.set("")}}/>
                 <CheckModalState />
             </div>
         )
@@ -118,11 +118,11 @@ export function Home() {
                 <div className="w-full h-screen overflow-hidden flex flex-col">
                     <div className="h-fit w-full flex flex-row justify-around p-3 px-10 gap-7 bg-primary">
                         <label htmlFor="globalFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
-                            <input id="globalFeed" name="feedRadio" type="radio" defaultChecked onClick={() => {setFeed("global")}} className="hidden" />
+                            <input id="globalFeed" name="feedRadio" type="radio" defaultChecked onClick={() => {currentFeed.set("global")}} className="hidden" />
                             <p className="w-full">Global</p>
                         </label>
                         <label htmlFor="followFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
-                            <input id="followFeed" name="feedRadio" type="radio" onClick={() => {setFeed("follow")}} className="hidden" />
+                            <input id="followFeed" name="feedRadio" type="radio" onClick={() => {currentFeed.set("follow")}} className="hidden" />
                             <p className="w-full">Followed</p>
                         </label>
                     </div>
@@ -162,7 +162,7 @@ export function CreatePost(data) {
     } = useHomeContext()
     const [postFeed, setPostFeed] = useState(data.postFeed)
     const post = postFeed.Post
-
+    
     return (
         <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={async () => {
             curPost.set(postFeed)

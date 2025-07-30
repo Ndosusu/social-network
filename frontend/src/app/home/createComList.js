@@ -3,12 +3,17 @@
 import { useState } from "react"
 import { DEFAULT_SERVER_PATH } from "../page"
 import { newInfoMessage } from "../infoMessage"
+import { useHomeContext } from "./contextProvider"
 
-export default function CreateComList({comList, postFeed}) {
+export function CreateComList({commentList}) {
+    const {
+        curPost,
+    } = useHomeContext()
+
     return (
         <div className="w-5/6 h-fit flex flex-col gap-7 p-2 pt-1">
-            <p className="font-bold">{postFeed.CommentCount} Comments :</p>
-            {comList.map((obj, i) => <CreateCom comFeed={obj} key={i} />)}
+            <p className="font-bold">{curPost.val.CommentCount} Comments :</p>
+            {commentList.val.map((obj, i) => <CreateCom comFeed={obj} key={i} />)}
         </div>
     )
 }
@@ -86,7 +91,11 @@ async function likeCom(comFeed, fn) {
     })
 }
 
-export function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
+export function NewComInput({commentList, commentInput}) {
+    const {
+        curPost,
+    } = useHomeContext()
+
     const changedFile = async (event) => {
         const preview = document.querySelector("#previewCom")
         const fileName = document.querySelector("#fileNameCom")
@@ -113,7 +122,7 @@ export function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
 
         const formData = new FormData(event.currentTarget)
         formData.append("session_uuid", localStorage.getItem("logToken"))
-        formData.append("post_id", postFeed.Post.Id)
+        formData.append("post_id", curPost.val.Post.Id)
 
         fetch(DEFAULT_SERVER_PATH + "comments", {
             method: "POST",
@@ -131,12 +140,12 @@ export function NewComInput({postFeed, comFeedList, comFn, stateFn}) {
                 Comment: response.data.Result,
             }
             // infosFn(newInfoMessage("Comment created successfully"))
-            if(comFeedList){
-                comFn([obj].concat(comFeedList))
+            if(commentList.val){
+                commentList.set([obj].concat(commentList.val))
             } else {
-                comFn([obj])
+                commentList.set([obj])
             }           
-            stateFn(false)
+            commentInput.set(false)
         })
     }
 
