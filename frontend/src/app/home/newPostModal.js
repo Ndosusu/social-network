@@ -3,6 +3,7 @@
 import { useState } from "react"
 import PrivateUserList from "./userList"
 import { DEFAULT_SERVER_PATH } from "../page"
+import { newInfoMessage } from "../infoMessage"
 
 export default function NewPostModal({posts, postsFn, modalFn}) {
     const [privacyState, setPrivacy] = useState(1)
@@ -30,6 +31,7 @@ export default function NewPostModal({posts, postsFn, modalFn}) {
                 GroupTitle: "",
                 Post: response.data.Result,
             }
+            newInfoMessage("Post created successfully")
             postsFn(posts ? [obj].concat(posts) : [obj])
         })
     }

@@ -1,5 +1,4 @@
 "use client"
-import { useEffect, useState } from "react";
 import Beams from "./beams";
 import "./globals.css";
 

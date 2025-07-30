@@ -1,11 +1,12 @@
 "use client"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { CheckLogToken } from "../checkToken"
 import { useEffect, useState } from "react"
 import ActionMenu from "../actionMenu"
 import NewPostModal from "./newPostModal"
 import DetailPostModal from "./detailPostModal"
 import { DEFAULT_SERVER_PATH } from "../page"
+import { CreateAllInfoMessages, InfoMessages, newInfoMessage } from "../infoMessage"
 
 export default function Home() {
     const router = useRouter()
@@ -100,6 +101,7 @@ export default function Home() {
             }
         }
     }
+    
     return (
         <div className="text-white h-full w-full grid items-center text-xl">
             <div className="bg-primaryT h-6/4 w-2/3 center grid items-center relative">
@@ -133,6 +135,7 @@ export default function Home() {
                     <p className="text-sm text-center">New post</p>
                 </div>
             </div>
+            <CreateAllInfoMessages allInfoMessages={InfoMessages} />
             <ActionMenu />
             {
                 curModal != "" 
