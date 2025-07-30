@@ -102,9 +102,10 @@ export default function Home() {
     }
     return (
         <div className="text-white h-full w-full grid items-center text-xl">
-            <div className="bg-primaryT h-6/4 w-2/3 neon-xl center grid items-center">
-                <div className="w-full h-screen overflow-hidden flex flex-col gap-2">
-                    <div className="h-fit w-full flex flex-row justify-around p-3 px-10 gap-7">
+            <div className="bg-primaryT h-6/4 w-2/3 center grid items-center relative">
+                <div className="w-full h-full neon-xl absolute z-6 pointer-events-none" />
+                <div className="w-full h-screen overflow-hidden flex flex-col">
+                    <div className="h-fit w-full flex flex-row justify-around p-3 px-10 gap-7 bg-primary">
                         <label htmlFor="globalFeed" className="neon-sm p-2 w-full h-fit flex flex-row rounded-xl text-center duration-100 hover:scale-110">
                             <input id="globalFeed" name="feedRadio" type="radio" defaultChecked onClick={() => {setFeed("global")}} className="hidden" />
                             <p className="w-full">Global</p>
@@ -115,7 +116,7 @@ export default function Home() {
                         </label>
                     </div>
                     <div className="flex flex-col w-full flex-grow overflow-hidden items-center gap-7 relative">
-                        <div className="absolute h-full w-9/10 pointer-events-none rounded-t-xl fade" />
+                        <div className="absolute h-full w-full pointer-events-none fade z-5" />
                         <div className="h-full p-4 py-8 w-full flex flex-col items-center overflow-scroll gap-7" onScroll={(e) => {
                             //Check if user scrolled to the bottom, 1 is needed as a safety because scrollHeight and clientHeight are rounded numbers but not scrollTop
                             if(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop <= 1) 
@@ -126,7 +127,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-            <div className="fixed neon-xl w-1/10 h-fit max-h-5/6 left-5/6 top-1/12 postAction p-7">
+            <div className="fixed neon-xl w-1/10 h-fit max-h-5/6 left-5/6 top-1/12 postAction p-7 z-7">
                 <div className="neon-sm p-5 rounded-xl flex flex-col items-center" onClick={() => {setModal("newPostModal")}}>
                     <img src="/new.svg" className="h-max"></img>
                     <p className="text-sm text-center">New post</p>
@@ -157,8 +158,13 @@ export function CreatePost(data) {
                 <img src={post.Author.Avatar ? DEFAULT_SERVER_PATH + "data/images" + post.Author.Avatar : "defaultAvatar.svg"} className="h-10 rounded-xl" />
                 {post.Author.Nickname || post.Author.FirstName + " " + post.Author.LastName || "Author not found"}
             </div>
-            <div className="w-full h-fit p-4">
+            <div className="w-full h-fit p-4 flex flex-row justify-between gap-3">
                 <p className="break-all">{post.Message || "Content not found"}</p>
+                {
+                    post.Image
+                    ? <img src={ DEFAULT_SERVER_PATH + "data/images/" + post.Image} className="h-25 max-w-1/3" />
+                    : null
+                }
             </div>
             <div className="p-3 flex w-full gap-4">
                 <label className="min-w-1/10 flex items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
