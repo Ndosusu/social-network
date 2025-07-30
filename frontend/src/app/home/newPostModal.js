@@ -3,7 +3,6 @@
 import { useState } from "react"
 import PrivateUserList from "./userList"
 import { DEFAULT_SERVER_PATH } from "../page"
-import { newInfoMessage } from "../infoMessage"
 
 export default function NewPostModal({posts, postsFn, modalFn}) {
     const [privacyState, setPrivacy] = useState(1)
