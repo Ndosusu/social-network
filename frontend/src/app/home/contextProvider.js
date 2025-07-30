@@ -22,7 +22,7 @@ export function HomeProvider({children}) {
         //represent the current's feed post list
         feedPosts: parseState(useState([])),
 
-        //represent the post to the details of
+        //represent the post to show the details of
         curPost: parseState(useState(null)),
 
         //gives the name of the modal to show

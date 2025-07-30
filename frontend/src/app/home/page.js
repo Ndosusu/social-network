@@ -20,11 +20,18 @@ export default function HomeContextWrapper() {
 export function Home() {
     const router = useRouter()
     CheckLogToken(router)
+
+    const {
+        feedLoading,
+        currentFeed,
+        feedPosts,
+        modal,
+    } = useHomeContext()
     
     useEffect(() => {
-        setPosts(null)
-        setLoading(true)
-        fetch(DEFAULT_SERVER_PATH + "feed/" + feed,{
+        feedPosts.set(null)
+        feedLoading.set(true)
+        fetch(DEFAULT_SERVER_PATH + "feed/" + currentFeed.val,{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -43,22 +50,22 @@ export function Home() {
 
         .then(response => {
             if(response.data) {
-                setLoading(false)    
-                setPosts(response.data.Result)
+                feedLoading.set(false)    
+                feedPosts.set(response.data.Result)
             } else {
                 setLoading(false)
                 throw new Error("No data.")
             }
         })
-    }, [feed])
+    }, [currentFeed.val])
 
     const getNextPosts = async () => {
-        fetch(DEFAULT_SERVER_PATH + "feed/" + feed, {
+        fetch(DEFAULT_SERVER_PATH + "feed/" + currentFeed.val, {
             method:"POST",
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 limit: 15,
-                last_id: posts[posts.length - 1].Post.Id,
+                last_id: feedPosts.val[feedPosts.val.length - 1].Post.Id,
             }),
         })
         .catch(error => {
@@ -67,44 +74,43 @@ export function Home() {
         .then(data => data.json())
         .then(response => {
             if(response.data.Result)
-                setPosts(posts.concat(response.data.Result))
+                feedPosts.set(feedPosts.val.concat(response.data.Result))
         })
     }
 
     const CheckState = () => {
-        if (loading) {
+        if (feedLoading.val) {
             //replace later with good div instead of simple text
             return <p>loading...</p>
         }
-        if (!posts) {
+        if (!feedPosts.val) {
             //replace later with good div instead of simple text
             return <p>No posts found.</p>
         }
-
-        return posts.map((obj, i) => <CreatePost postFeed={obj} key={i} setDetail={setDetail} setModal={setModal} />)
+        return feedPosts.val.map((obj, i) => <CreatePost postFeed={obj} key={i}/>)
     }
 
     const CreateModal = () => {
         return (
             <div id="modalDiv" className="w-screen h-screen absolute ">
-                <div className="w-full h-full bg-black opacity-80 absolute z-5" onClick={async () => {setModal("")}}/>
+                <div className="w-full h-full bg-black opacity-80 absolute z-5" onClick={async () => {modal.set("")}}/>
                 <CheckModalState />
             </div>
         )
     }
 
     const CheckModalState = () => {
-        switch(curModal) {
+        switch(modal.val) {
             case "newPostModal": {
-                return <NewPostModal posts={posts} postsFn={setPosts} modalFn={setModal} />
+                return <NewPostModal />
             }
 
             case "detailModal": {
-                return <DetailPostModal postFeed={curDetail} postsFn={setPosts} modalFn={setModal} postsList={posts} />
+                return <DetailPostModal />
             }
         }
     }
-    
+
     return (
         <div className="text-white h-full w-full grid items-center text-xl">
             <div className="bg-primaryT h-6/4 w-2/3 center grid items-center relative">
@@ -133,15 +139,15 @@ export function Home() {
                 </div>
             </div>
             <div className="fixed neon-xl w-1/10 h-fit max-h-5/6 left-5/6 top-1/12 postAction p-7 z-7">
-                <div className="neon-sm p-5 rounded-xl flex flex-col items-center" onClick={() => {setModal("newPostModal")}}>
+                <div className="neon-sm p-5 rounded-xl flex flex-col items-center" onClick={() => {modal.set("newPostModal")}}>
                     <img src="/new.svg" className="h-max"></img>
                     <p className="text-sm text-center">New post</p>
                 </div>
             </div>
-            <CreateAllInfoMessages allInfoMessages={infoMessages} />
+            {/* <CreateAllInfoMessages allInfoMessages={infoMessages} /> */}
             <ActionMenu />
             {
-                curModal != "" 
+                modal.val != "" 
                 ? <CreateModal /> 
                 : null
             }
@@ -150,15 +156,17 @@ export function Home() {
 }
 
 export function CreatePost(data) {
+    const {
+        curPost,
+        modal,
+    } = useHomeContext()
     const [postFeed, setPostFeed] = useState(data.postFeed)
     const post = postFeed.Post
-    const setDetail = data.setDetail
-    const setModal = data.setModal
 
     return (
         <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={async () => {
-            setDetail(postFeed)
-            setModal("detailModal")
+            curPost.set(postFeed)
+            modal.set("detailModal")
         }}>
             <div className="w-full postHeader bg-primaryT p-2 flex flex-row gap-4 items-center">
                 <img src={post.Author.Avatar ? DEFAULT_SERVER_PATH + "data/images" + post.Author.Avatar : "defaultAvatar.svg"} className="h-10 rounded-xl" />
