@@ -41,10 +41,28 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		"About":     r.FormValue("About"),
 	}
 
-	// Handle avatar file
-	avatarPath := "default-avatar.png"
-	if _, fileHeader, err := r.FormFile("Avatar"); err == nil {
-		avatarPath = fileHeader.Filename
+	// Handle image upload if present
+	file, header, err := r.FormFile("Avatar")
+	if err == nil {
+		defer file.Close()
+
+		// Validate image file
+		if err := utils.ValidateImageFile(file, header); err != nil {
+			utils.JSONResponse(w, http.StatusBadRequest, err.Error(), nil)
+			return
+		}
+
+		// Save the image
+		imagePath, err := utils.SaveImageFile(file, header)
+		if err != nil {
+			utils.JSONResponse(w, http.StatusInternalServerError, "Failed to save image: "+err.Error(), nil)
+			return
+		}
+
+		registrationData["Avatar"] = imagePath
+	} else if err != http.ErrMissingFile {
+		utils.JSONResponse(w, http.StatusBadRequest, "Error processing image file", nil)
+		return
 	}
 
 	// Basic validation
@@ -65,8 +83,8 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		"last_name":  registrationData["LastName"],
 		"password":   registrationData["Password"],
 		"date_birth": FormatDate(registrationData["Day"].(string), registrationData["Month"].(string), registrationData["Year"].(string)),
+		"avatar":     registrationData["Avatar"],
 		"nickname":   registrationData["Nickname"],
-		"avatar":     avatarPath,
 		"about":      registrationData["About"],
 	}
 

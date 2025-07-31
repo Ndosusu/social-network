@@ -62,13 +62,13 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Save the image
-		imagePath, err := utils.SaveImageFile(file, header)
+		imageName, err := utils.SaveImageFile(file, header)
 		if err != nil {
 			utils.JSONResponse(w, http.StatusInternalServerError, "Failed to save image: "+err.Error(), nil)
 			return
 		}
 
-		postData["image"] = imagePath
+		postData["image"] = imageName
 	} else if err != http.ErrMissingFile {
 		utils.JSONResponse(w, http.StatusBadRequest, "Error processing image file", nil)
 		return

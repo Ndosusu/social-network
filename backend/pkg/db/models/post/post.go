@@ -44,7 +44,10 @@ func (db *PostDB) InsertPost(obj map[string]any) (*models.Response, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	return db.SelectPostById(map[string]any{"post_id": newPostId})
+	return db.SelectPostById(map[string]any{
+		"post_id":   newPostId,
+		"author_id": obj["author_id"],
+	})
 }
 
 func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
@@ -52,6 +55,7 @@ func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
 		expected input (as json object) :
 		{
 			post_id : int,
+			author_id : int,
 		}
 	*/
 	stmt := `SELECT 
@@ -63,18 +67,25 @@ func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
 				p.privacy_mode, 
 				COALESCE(p.group_id, 0),
                 COALESCE(u.avatar, ''),
-				u.nick_name,
-				COALESCE(g.title, '')
-	            FROM posts p
+				COALESCE(u.nick_name, ''),
+				u.first_name,
+				u.last_name,
+				COALESCE(g.title, ''),
+				CASE
+					WHEN p.author_id = ? THEN 1
+					ELSE 0
+				END as is_client
+	        FROM posts p
             JOIN users u ON p.author_id = u.id
             LEFT JOIN groups g ON p.group_id = g.id
             WHERE p.id = ?;`
-	result := db.Conn.QueryRow(stmt, obj["post_id"])
+	result := db.Conn.QueryRow(stmt, obj["author_id"], obj["post_id"])
 
 	var postId, authorId, privacyMode, groupId int
-	var message, date, nickname, groupTitle, avatar, postImage string
+	var message, date, nickname, groupTitle, avatar, postImage, firstName, lastName string
+	var isClient bool
 
-	err := result.Scan(&postId, &authorId, &message, &postImage, &date, &privacyMode, &groupId, &avatar, &nickname, &groupTitle)
+	err := result.Scan(&postId, &authorId, &message, &postImage, &date, &privacyMode, &groupId, &avatar, &nickname, &firstName, &lastName, &groupTitle, &isClient)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -86,9 +97,14 @@ func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
 		Date:        date,
 		PrivacyMode: privacyMode,
 		Author: &models.User{
-			Id:       authorId,
-			Nickname: nickname,
+			Id:        authorId,
+			FirstName: firstName,
+			LastName:  lastName,
+			IsClient:  isClient,
 		},
+	}
+	if nickname != "" {
+		post.Author.Nickname = nickname
 	}
 
 	if postImage != "" {
@@ -106,6 +122,7 @@ func (db *PostDB) SelectPostById(obj map[string]any) (*models.Response, error) {
 
 	return &models.Response{Result: post}, nil
 }
+
 func (db *PostDB) DeletePost(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :

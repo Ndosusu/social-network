@@ -11,13 +11,13 @@ func (db *CommentDB) InsertComment(obj map[string]any) (*models.Response, error)
 		expected input (as json object) :
 		{
 			author_id : int,
-			post_id : int,
+			comment_id : int,
 			message : string,
 			image : string,
 		}
 	*/
-	stmt := "INSERT INTO comments (author_id, post_id, message, image, date) VALUES (?, ?, ?, ?, ?);"
-	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["post_id"], obj["message"], obj["image"], utils.GetCurrentTime())
+	stmt := "INSERT INTO comments (author_id, comment_id, message, image, date) VALUES (?, ?, ?, ?, ?);"
+	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["comment_id"], obj["message"], obj["image"], utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -28,7 +28,10 @@ func (db *CommentDB) InsertComment(obj map[string]any) (*models.Response, error)
 		fmt.Println(err)
 		return nil, err
 	}
-	return db.SelectCommentById(map[string]any{"comment_id": newCommentId})
+	return db.SelectCommentById(map[string]any{
+		"comment_id": newCommentId,
+		"author_id":  obj["author_id"],
+	})
 }
 
 func (db *CommentDB) SelectCommentById(obj map[string]any) (*models.Response, error) {
@@ -36,23 +39,62 @@ func (db *CommentDB) SelectCommentById(obj map[string]any) (*models.Response, er
 		expected input (as json object) :
 		{
 			comment_id : int,
+			author_id : int,
 		}
 	*/
-	stmt := "SELECT id, author_id, post_id, message, image, date, group_id FROM comments WHERE id = ?;"
-	result := db.Conn.QueryRow(stmt, obj["comment_id"])
+	stmt := `SELECT
+				c.id, 
+				c.author_id, 
+				c.message, 
+				COALESCE(c.image, ''), 
+				c.date,
+				COALESCE(u.avatar, ''),
+				COALESCE(u.nick_name, ''),
+				u.first_name,
+				u.last_name,
+				CASE
+					WHEN c.author_id = ? THEN 1
+					ELSE 0
+				END AS is_client
+			FROM comments c 
+			JOIN users u ON c.author_id = u.id
+			WHERE c.id = ?;`
+	result := db.Conn.QueryRow(stmt, obj["author_id"], obj["comment_id"])
 
-	comment := models.Comment{
-		Author: &models.User{Id: utils.NOT_SCANNED},
-		Post:   &models.Post{Id: utils.NOT_SCANNED},
-		Image:  nil,
-	}
-	err := result.Scan(&comment.Id, &comment.Author.Id, &comment.Post.Id, &comment.Message, &comment.Image, &comment.Date)
+	var commentId, authorId int
+	var message, date, nickname, avatar, commentImage, firstName, lastName string
+	var isClient bool
+
+	err := result.Scan(&commentId, &authorId, &message, &commentImage, &date, &avatar, &nickname, &firstName, &lastName, &isClient)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
+	comment := models.Comment{
+		Id:      commentId,
+		Message: message,
+		Date:    date,
+		Author: &models.User{
+			Id:        authorId,
+			FirstName: firstName,
+			LastName:  lastName,
+			IsClient:  isClient,
+		},
+	}
+	if nickname != "" {
+		comment.Author.Nickname = nickname
+	}
+
+	if commentImage != "" {
+		comment.Image = &commentImage
+	}
+	if avatar != "" {
+		comment.Author.Avatar = &avatar
+	}
+
 	return &models.Response{Result: comment}, nil
+
 }
 
 func (db *CommentDB) DeleteComment(obj map[string]any) (*models.Response, error) {
