@@ -1,10 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { likePost } from "./page"
 import { CreateComList, NoComs, NewComInput } from "./createComList"
 import { DEFAULT_SERVER_PATH } from "../page"
-import { parseState, useHomeContext } from "./contextProvider"
+import { useHomeContext } from "./contextProvider"
 
 export default function DetailPostModal() {
     const {
@@ -76,7 +75,6 @@ export default function DetailPostModal() {
         //update comment list with new comments
         .then(response => {
             if(response.data.Result) {
-                // setComList(commentList.concat(response.data.Result))
                 commentList.set(commentList.val.concat(response.data.Result))
             }
         })

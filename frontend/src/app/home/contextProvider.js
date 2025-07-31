@@ -38,14 +38,11 @@ export function HomeProvider({children}) {
 
         //represents the comments list
         commentList: parseState(useState(null)),
-
-        //represent the list of info messages (WIP)
-        infoMessages: parseState(useState([])),
     }
 
     //reset post feed and refetch it
     useEffect(() => {
-        console.log("Fetching posts...")
+        console.log("Fetching posts for feed " + States.currentFeed.val + "...")
         States.feedPosts.set(null)
         States.feedLoading.set(true)
         //api call to get the correct post feed

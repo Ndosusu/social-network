@@ -4,12 +4,14 @@ import { useState } from "react"
 import PrivateUserList from "./userList"
 import { DEFAULT_SERVER_PATH } from "../page"
 import { useHomeContext } from "./contextProvider"
+import { newInfoMessage } from "../infoMessage"
 
 //component for the post creation modal
 export default function NewPostModal() {
     const {
         feedPosts,
         modal,
+        infoMessages,
     } = useHomeContext()
 
     //additional necessary state
@@ -45,7 +47,7 @@ export default function NewPostModal() {
                 GroupTitle: "",
                 Post: response.data.Result,
             }
-            // infosFn(newInfoMessage("Post created successfully"))
+            newInfoMessage("Post created successfuly #" + obj.Post.Id)
             feedPosts.set(feedPosts.val ? [obj].concat(feedPosts.val) : [obj])
         })
     }
