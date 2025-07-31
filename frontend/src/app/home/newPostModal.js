@@ -11,7 +11,6 @@ export default function NewPostModal() {
     const {
         feedPosts,
         modal,
-        infoMessages,
     } = useHomeContext()
 
     //additional necessary state

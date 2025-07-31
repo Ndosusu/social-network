@@ -31,7 +31,6 @@ export function Home() {
         currentFeed,
         feedPosts,
         modal,
-        infoMessages,
     } = useHomeContext()
 
     //called when reaching the end of the post list to get the next ones
@@ -132,7 +131,7 @@ export function Home() {
                     <p className="text-sm text-center">New post</p>
                 </div>
             </div>
-            <CreateAllInfoMessages infoState={infoMessages} />
+            <CreateAllInfoMessages />
             <ActionMenu />
             {
                 modal.val != "" 
