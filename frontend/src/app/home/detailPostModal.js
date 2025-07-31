@@ -54,6 +54,9 @@ export default function DetailPostModal() {
         if(!commentList.val) {
             return
         }
+
+        const lastId = commentList.val[commentList.val.length - 1].Comment.Id
+        console.log("Fetching comments after #" + lastId + "...")
         
         //api call to get the next comments, it works by giving the id of the last comment you have, gives the next comments that are older than the given one
         fetch(DEFAULT_SERVER_PATH + "feed/detail", {
@@ -62,7 +65,7 @@ export default function DetailPostModal() {
                 session_uuid: localStorage.getItem("logToken"),
                 post_id: post.Id,
                 limit: 15,
-                last_id: commentList.val[commentList.val.length - 1].Comment.Id,
+                last_id: lastId,
             })
         })
         .catch(error => {
@@ -82,8 +85,10 @@ export default function DetailPostModal() {
 
     return (
         <div className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-12 inset-1/2 -translate-1/2 rounded-xl overflow-scroll" onScroll={(e) => {
+            console.log("scroll")
+            console.log(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop)
             //Check if user scrolled to the bottom, 1 is needed as a safety because scrollHeight and clientHeight are rounded numbers but not scrollTop
-            if(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop <= 1 && !commentInput) 
+            if(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop <= 1 && !commentInput.val) 
                 getNextComs()
         }}>
             {curPost.val ? <DetailContent /> : <PostNotFound /> }
