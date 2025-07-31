@@ -19,7 +19,9 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 	stmt := `SELECT 
 				p.id,
 				p.author_id,
-				u.nick_name,
+				COALESCE(u.nick_name, ''),
+				u.first_name,
+				u.last_name,
 				COALESCE(u.avatar, ''),
 				p.message,
 				COALESCE(p.image, ''),
@@ -65,13 +67,15 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 	var result []models.PostFeed
 	for rows.Next() {
 		var postId, authorId, privacyMode, groupId, likeCount, commentCount, likeId int
-		var nickname, message, date, groupTitle, postImage, avatar string
+		var nickname, message, date, groupTitle, postImage, avatar, lastName, firstName string
 		var isClient bool
 
 		err := rows.Scan(
 			&postId,
 			&authorId,
 			&nickname,
+			&firstName,
+			&lastName,
 			&avatar,
 			&message,
 			&postImage,
@@ -95,9 +99,10 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 				Date:        date,
 				PrivacyMode: privacyMode,
 				Author: &models.User{
-					Id:       authorId,
-					Nickname: nickname,
-					IsClient: isClient,
+					Id:        authorId,
+					FirstName: firstName,
+					LastName:  lastName,
+					IsClient:  isClient,
 				},
 				Group: &models.Group{
 					Id:    groupId,
@@ -112,6 +117,10 @@ func (db *PostDB) GetGlobalFeed(obj map[string]any) (*models.Response, error) {
 			pf.Like = &models.Like{
 				Id: likeId,
 			}
+		}
+
+		if nickname != "" {
+			pf.Post.Author.Nickname = nickname
 		}
 
 		if postImage != "" {
@@ -140,7 +149,9 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 	stmt := `SELECT 
 				p.id,
 				p.author_id,
-				u.nick_name,
+				COALESCE(u.nick_name, ''),
+				u.first_name,
+				u.last_name,
 				COALESCE(u.avatar, ''),
 				p.message,
 				COALESCE(p.image, ''),
@@ -179,13 +190,15 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 	var result []models.PostFeed
 	for rows.Next() {
 		var postId, authorId, privacyMode, likeCount, commentCount, likeId int
-		var nickname, message, date, avatar, postImage string
+		var nickname, message, date, avatar, postImage, lastName, firstName string
 		var isClient bool
 
 		err := rows.Scan(
 			&postId,
 			&authorId,
 			&nickname,
+			&firstName,
+			&lastName,
 			&avatar,
 			&message,
 			&postImage,
@@ -207,9 +220,10 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 				Date:        date,
 				PrivacyMode: privacyMode,
 				Author: &models.User{
-					Id:       authorId,
-					Nickname: nickname,
-					IsClient: isClient,
+					Id:        authorId,
+					FirstName: firstName,
+					LastName:  lastName,
+					IsClient:  isClient,
 				},
 			},
 
@@ -221,6 +235,9 @@ func (db *PostDB) GetFollowFeed(obj map[string]any) (*models.Response, error) {
 			pf.Like = &models.Like{
 				Id: likeId,
 			}
+		}
+		if nickname != "" {
+			pf.Post.Author.Nickname = nickname
 		}
 
 		if postImage != "" {
@@ -250,7 +267,9 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 	stmt := `SELECT 
 				p.id,
 				p.author_id,
-				u.nick_name,
+				COALESCE(u.nick_name, ''),
+				u.first_name,
+				u.last_name,
 				COALESCE(u.avatar, ''),
 				p.message,
 				COALESCE(p.image, ''),
@@ -283,13 +302,15 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 	var result []models.PostFeed
 	for rows.Next() {
 		var postId, authorId, likeCount, commentCount, likeId int
-		var nickname, message, date, postImage, avatar string
+		var nickname, message, date, postImage, avatar, firstName, lastName string
 		var isClient bool
 
 		err := rows.Scan(
 			&postId,
 			&authorId,
 			&nickname,
+			&firstName,
+			&lastName,
 			&avatar,
 			&message,
 			&postImage,
@@ -308,9 +329,10 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 				Message: message,
 				Date:    date,
 				Author: &models.User{
-					Id:       authorId,
-					Nickname: nickname,
-					IsClient: isClient,
+					Id:        authorId,
+					FirstName: firstName,
+					LastName:  lastName,
+					IsClient:  isClient,
 				},
 			},
 			LikeCount:    likeCount,
@@ -321,6 +343,9 @@ func (db *PostDB) GetGroupFeed(obj map[string]any) (*models.Response, error) {
 			pf.Like = &models.Like{
 				Id: likeId,
 			}
+		}
+		if nickname != "" {
+			pf.Post.Author.Nickname = nickname
 		}
 
 		if postImage != "" {

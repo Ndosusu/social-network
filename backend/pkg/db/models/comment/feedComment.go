@@ -19,8 +19,10 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 	stmt := `SELECT
 				c.id,
 				c.author_id,
-				u.nick_name,
-				COALESCE(u.avatar,''), 
+				COALESCE(u.nick_name, ''),
+				u.first_name,
+				u.last_name,
+				COALESCE(u.avatar, ''), 
 				c.message, 
 				COALESCE(c.image, ''), 
 				c.date, 
@@ -51,13 +53,15 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 	var result []models.CommentFeed
 	for rows.Next() {
 		var commentId, authorId, likeCount, likeId int
-		var nickname, message, date, avatar, image string
+		var nickname, message, date, avatar, image, firstName, lastName string
 		var isClient bool
 
 		err := rows.Scan(
 			&commentId,
 			&authorId,
 			&nickname,
+			&firstName,
+			&lastName,
 			&avatar,
 			&message,
 			&image,
@@ -76,9 +80,10 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 				Message: message,
 				Date:    date,
 				Author: &models.User{
-					Id:       authorId,
-					Nickname: nickname,
-					IsClient: isClient,
+					Id:        authorId,
+					FirstName: firstName,
+					LastName:  lastName,
+					IsClient:  isClient,
 				},
 			},
 			LikeCount: likeCount,
@@ -88,6 +93,9 @@ func (db *CommentDB) SelectCommentsByPostId(obj map[string]any) (*models.Respons
 			cf.Like = &models.Like{
 				Id: likeId,
 			}
+		}
+		if nickname != "" {
+			cf.Comment.Author.Nickname = nickname
 		}
 
 		if image != "" {
