@@ -9,41 +9,11 @@ import { parseState, useHomeContext } from "./contextProvider"
 export default function DetailPostModal() {
     const {
         curPost,
+        commentInput,
+        commentList,
     } = useHomeContext()
 
-    //create necessary additionnal states. DO NOT PUT IN THE CONTEXT OR IT WILL CREATE AN INFINITE LOOP
-    const [commentList, setComList] = useState(null)
-    const [commentInput, setComInput] = useState(false)
     const post = curPost.val.Post
-
-    //if in context, it creates an infinite loop because the fetch is in a children component, when updating the state, it will rerender the main
-    //component which will re-fetch, which will re-update etc... (or at least I believe this is what is happening)
-
-    //maybe try having all fetches in main component ?
-
-
-    //api call to get all comments of the given post
-    useEffect(() => {
-        fetch(DEFAULT_SERVER_PATH + "feed/detail", {
-            method: "POST",
-            body: JSON.stringify({
-                session_uuid: localStorage.getItem("logToken"),
-                post_id: post.Id,
-                limit: 15,
-            })
-        })
-        .catch(error => {
-            throw new Error(error)
-        })
-
-        //make data readable as json object
-        .then(data => data.json())
-
-        //update comment list
-        .then(response => {
-            setComList(response.data.Result)
-        })
-    }, [])
 
     //called after checking if the post exist to show it
     const DetailContent = () => {
@@ -64,16 +34,16 @@ export default function DetailPostModal() {
                     </label>
                 </div>
                 <div className="w-full flex flex-row justify-between">
-                    <input type="button" value={commentInput? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {setComInput(!commentInput)}} />
+                    <input type="button" value={commentInput.val? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {commentInput.set(!commentInput.val)}} />
                     <div className="flex flex-row justify-end w-full">
                         <input type="button" value="Delete" className="bg-red-500 neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {deletePost()}} />
                     </div>
                 </div>
                 {
-                    commentInput
-                    ? <NewComInput commentList={{val: commentList, set: setComList}} commentInput={{val: commentInput,set: setComInput}} />
-                    : (commentList && commentList.length > 0 
-                        ? <CreateComList commentList={{val: commentList, set: setComList}} />
+                    commentInput.val
+                    ? <NewComInput />
+                    : (commentList.val && commentList.val.length > 0 
+                        ? <CreateComList />
                         : <NoComs />)
                 }
             </div>
@@ -82,7 +52,7 @@ export default function DetailPostModal() {
 
     //function called when reaching the end of the comment list to get the next ones
     const getNextComs = () => {
-        if(!commentList) {
+        if(!commentList.val) {
             return
         }
         
@@ -93,7 +63,7 @@ export default function DetailPostModal() {
                 session_uuid: localStorage.getItem("logToken"),
                 post_id: post.Id,
                 limit: 15,
-                last_id: commentList[commentList.length - 1].Comment.Id,
+                last_id: commentList.val[commentList.val.length - 1].Comment.Id,
             })
         })
         .catch(error => {
@@ -105,8 +75,10 @@ export default function DetailPostModal() {
 
         //update comment list with new comments
         .then(response => {
-            if(response.data.Result)
-                setComList(commentList.concat(response.data.Result))
+            if(response.data.Result) {
+                // setComList(commentList.concat(response.data.Result))
+                commentList.set(commentList.val.concat(response.data.Result))
+            }
         })
     }
 

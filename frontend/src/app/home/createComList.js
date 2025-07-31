@@ -6,9 +6,10 @@ import { newInfoMessage } from "../infoMessage"
 import { useHomeContext } from "./contextProvider"
 
 //component that creates the comments feed dynamically
-export function CreateComList({commentList}) {
+export function CreateComList() {
     const {
         curPost,
+        commentList,
     } = useHomeContext()
 
     return (
@@ -100,9 +101,11 @@ function likeCom(comFeed, fn) {
 }
 
 //Component called when user wants to create a new comment
-export function NewComInput({commentList, commentInput}) {
+export function NewComInput() {
     const {
         curPost,
+        commentList,
+        commentInput,
     } = useHomeContext()
 
     //called when the user chooses a file to update the preview

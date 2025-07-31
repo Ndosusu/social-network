@@ -24,57 +24,28 @@ export function Home() {
     const router = useRouter()
     CheckLogToken(router)
 
+    console.log("Rendering HomePage...")
+
     const {
         feedLoading,
         currentFeed,
         feedPosts,
         modal,
     } = useHomeContext()
-    
-    //reset post feed and refetch it
-    useEffect(() => {
-        feedPosts.set(null)
-        feedLoading.set(true)
-        //api call to get the correct post feed
-        fetch(DEFAULT_SERVER_PATH + "feed/" + currentFeed.val,{
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                session_uuid: localStorage.getItem("logToken"),
-                limit: 15,
-            })
-        })
-        .catch(error => {
-            setLoading(false)
-            throw new Error(error)
-        })
-
-        //make data readable as json object
-        .then(data => data.json())
-
-        //if posts returned, set post list
-        .then(response => {
-            if(response.data) {
-                feedLoading.set(false)    
-                feedPosts.set(response.data.Result)
-            } else {
-                setLoading(false)
-                throw new Error("No data.")
-            }
-        })
-    }, [currentFeed.val])
 
     //called when reaching the end of the post list to get the next ones
     const getNextPosts = () => {
+        const lastId = feedPosts.val[feedPosts.val.length - 1].Post.Id
+
+        console.log("Fetching posts after #" + lastId )
+
         //api call to get the post from the correct feed and give the id of the last post
         fetch(DEFAULT_SERVER_PATH + "feed/" + currentFeed.val, {
             method:"POST",
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 limit: 15,
-                last_id: feedPosts.val[feedPosts.val.length - 1].Post.Id,
+                last_id: lastId,
             }),
         })
         .catch(error => {
@@ -217,6 +188,8 @@ export async function likePost(postFeed, fn) {
     //make a clone so that the update state function works later
     const cloneFeed = structuredClone(postFeed)
 
+    console.log("Changing like state of post #" + postFeed.Post.Id + ", becoming " + (postFeed.Like ? "Unliked" : "Liked"))
+    
     //api call with a ternary to either delete the like or add it
     fetch(DEFAULT_SERVER_PATH + "likes",
         postFeed.Like 

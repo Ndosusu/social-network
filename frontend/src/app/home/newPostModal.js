@@ -12,7 +12,7 @@ export default function NewPostModal() {
         modal,
     } = useHomeContext()
 
-    //additional necessary state, DO NOT PUT IN CONTEXT, SEE detailPostModal.js FOR MORE DETAILS
+    //additional necessary state
     const [privacyState, setPrivacy] = useState(1)
 
     //called when new post form is submitted
