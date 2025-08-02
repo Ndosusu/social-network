@@ -30,8 +30,10 @@ export function NoComs() {
 
 //create a div for a comment with the appropriate data
 function CreateCom(data) {
+    //state needed to handle the liked state of the comment
     const [comFeed, setComFeed] = useState(data.comFeed)
     const com = comFeed.Comment
+    console.log(comFeed)
 
     return (
          <div className="w-full h-fit rounded-xl neon-sm bg-primaryT box-border">
@@ -42,6 +44,11 @@ function CreateCom(data) {
             <div className="w-full h-fit p-4">
                 <p className="break-all">{com.Message}</p>
             </div>
+            {
+                com.Image 
+                ? <img src={com.Image} />
+                : null
+            }
             <label className="p-3 flex gap-1 w-fit items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
                 <input type="button" className="hidden" onClick={() => {likeCom(comFeed, setComFeed)}} />
                 <img src={comFeed.Like ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>

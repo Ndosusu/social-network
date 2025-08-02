@@ -88,8 +88,6 @@ export default function DetailPostModal() {
 
     return (
         <div className="modal neon-xl bg-primaryT h-9/10 w-3/5 absolute z-12 inset-1/2 -translate-1/2 rounded-xl overflow-scroll" onScroll={(e) => {
-            console.log("scroll")
-            console.log(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop)
             //Check if user scrolled to the bottom, 1 is needed as a safety because scrollHeight and clientHeight are rounded numbers but not scrollTop
             if(e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop <= 1 && !commentInput.val) 
                 getNextComs()
