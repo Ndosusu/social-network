@@ -4,6 +4,7 @@ import { likePost } from "./page"
 import { CreateComList, NoComs, NewComInput } from "./createComList"
 import { DEFAULT_SERVER_PATH } from "../page"
 import { useHomeContext } from "./contextProvider"
+import { useState } from "react"
 
 export default function DetailPostModal() {
     const {
@@ -11,6 +12,8 @@ export default function DetailPostModal() {
         commentInput,
         commentList,
     } = useHomeContext()
+
+    const [comListRelative, setComList] = useState(commentList.val)
 
     const post = curPost.val.Post
 
@@ -41,8 +44,8 @@ export default function DetailPostModal() {
                 {
                     commentInput.val
                     ? <NewComInput />
-                    : (commentList.val && commentList.val.length > 0 
-                        ? <CreateComList />
+                    : (comListRelative && comListRelative.length > 0 
+                        ? <CreateComList comList={comListRelative} />
                         : <NoComs />)
                 }
             </div>
@@ -51,11 +54,11 @@ export default function DetailPostModal() {
 
     //function called when reaching the end of the comment list to get the next ones
     const getNextComs = () => {
-        if(!commentList.val) {
+        if(!comListRelative) {
             return
         }
 
-        const lastId = commentList.val[commentList.val.length - 1].Comment.Id
+        const lastId = comListRelative[comListRelative.length - 1].Comment.Id
         console.log("Fetching comments after #" + lastId + "...")
         
         //api call to get the next comments, it works by giving the id of the last comment you have, gives the next comments that are older than the given one
@@ -78,7 +81,7 @@ export default function DetailPostModal() {
         //update comment list with new comments
         .then(response => {
             if(response.data.Result) {
-                commentList.set(commentList.val.concat(response.data.Result))
+                setComList(comListRelative.concat(response.data.Result))
             }
         })
     }

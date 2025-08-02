@@ -6,16 +6,15 @@ import { newInfoMessage } from "../infoMessage"
 import { useHomeContext } from "./contextProvider"
 
 //component that creates the comments feed dynamically
-export function CreateComList() {
+export function CreateComList({comList}) {
     const {
         curPost,
-        commentList,
     } = useHomeContext()
 
     return (
         <div className="w-5/6 h-fit flex flex-col gap-7 p-2 pt-1">
             <p className="font-bold">{curPost.val.CommentCount} Comments :</p>
-            {commentList.val.map((obj, i) => <CreateCom comFeed={obj} key={i} />)}
+            {comList.map((obj, i) => <CreateCom comFeed={obj} key={i} />)}
         </div>
     )
 }
