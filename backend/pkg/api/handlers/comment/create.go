@@ -53,12 +53,6 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		comData["image"] = imageName
 	}
 
-	/* // Validate required fields
-	if errMsg := ValidateRequiredFields(postData, []string{"author_id", "message", "privacy_mode"}); errMsg != "" {
-		utils.JSONResponse(w, http.StatusBadRequest, errMsg, nil)
-		return
-	} */
-
 	cdb := comment.New(&db)
 	result, err = cdb.InsertComment(comData)
 	if err != nil {

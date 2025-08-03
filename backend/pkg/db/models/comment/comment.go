@@ -11,13 +11,13 @@ func (db *CommentDB) InsertComment(obj map[string]any) (*models.Response, error)
 		expected input (as json object) :
 		{
 			author_id : int,
-			comment_id : int,
+			post_id : int,
 			message : string,
 			image : string,
 		}
 	*/
-	stmt := "INSERT INTO comments (author_id, comment_id, message, image, date) VALUES (?, ?, ?, ?, ?);"
-	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["comment_id"], obj["message"], obj["image"], utils.GetCurrentTime())
+	stmt := "INSERT INTO comments (author_id, post_id, message, image, date) VALUES (?, ?, ?, ?, ?);"
+	result, err := db.Conn.Exec(stmt, obj["author_id"], obj["post_id"], obj["message"], obj["image"], utils.GetCurrentTime())
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
