@@ -33,7 +33,7 @@
 }
 
 .bitFont {
-  font-family: "Bitcount Prop Single", system-ui;
+  font-family: "Bitcount Prop Single", monospace;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;

@@ -33,7 +33,7 @@ function CreateCom(data) {
     //state needed to handle the liked state of the comment
     const [comFeed, setComFeed] = useState(data.comFeed)
     const com = comFeed.Comment
-    console.log(comFeed)
+    com.Image = "temp.png"
 
     return (
          <div className="w-full h-fit rounded-xl neon-sm bg-primaryT box-border">
@@ -46,7 +46,7 @@ function CreateCom(data) {
             </div>
             {
                 com.Image 
-                ? <img src={com.Image} />
+                ? <img src={DEFAULT_SERVER_PATH + "data/images/" + com.Image} className="center max-w-full"/>
                 : null
             }
             <label className="p-3 flex gap-1 w-fit items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
@@ -169,7 +169,8 @@ export function NewComInput() {
                 commentList.set([obj].concat(commentList.val))
             } else {
                 commentList.set([obj])
-            }           
+            }
+            newInfoMessage("Comment created successfuly")
             commentInput.set(false)
         })
     }

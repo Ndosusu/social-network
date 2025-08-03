@@ -29,6 +29,11 @@ export default function DetailPostModal() {
                     <div className="w-full h-fit p-4">
                         <p className="break-all">{post.Message || "Content not found"}</p>
                     </div>
+                    {
+                        post.Image 
+                        ? <img src={DEFAULT_SERVER_PATH + "data/images/" + post.Image} className="max-w-4/5 self-center" />
+                        : null
+                    }
                     <label className="w-fit flex items-center select-none p-3 gap-1 duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
                         <input type="button" className="hidden" onClick={() => {likePost(curPost.val, curPost.set)}} />
                         <img src={curPost.val.Like ? "/likeActive.svg" : "/like.svg"} className="h-8"></img>
