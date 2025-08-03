@@ -17,7 +17,7 @@ var (
 
 	// Handlers posts
 	CreatePostHandler = post.CreatePostHandler
-	//UpdatePostHandler = post.UpdatePostHandler
+	UpdatePostHandler = post.UpdatePostHandler
 	DeletePostHandler = post.DeletePostHandler
 	ServeImageHandler = post.ServeImageHandler
 	GlobalFeedHandler = post.GlobalFeedHandler
@@ -26,7 +26,7 @@ var (
 
 	// Handlers comments
 	CreateCommentHandler = comment.CreateCommentHandler
-	//UpdateCommentHandler = comment.UpdateCommentHandler
+	UpdateCommentHandler = comment.UpdateCommentHandler
 	DeleteCommentHandler = comment.DeleteCommentHandler
 	CommentsHandler      = comment.CommentsHandler
 

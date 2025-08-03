@@ -229,7 +229,7 @@ export function NewComInput() {
             <div className="col-span-2 grid align-center h-fit">
                 <label htmlFor="file" className="bg-primaryT h-fit neon-sm rounded-xl w-full p-2 flex flex-row justify-between" >
                     <div>
-                        <input name="File" type="file" id="file" className="hidden" onChange={changedFile} accept=".gif,.jpg,.jpeg,.png"/>
+                        <input name="image" type="file" id="file" className="hidden" onChange={changedFile} accept=".gif,.jpg,.jpeg,.png"/>
                         <p>File chosen (optional): </p><p id="fileNameCom" className="fileName">None</p>
                     </div>
                     <div className="w-25 h-25">

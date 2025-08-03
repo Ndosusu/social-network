@@ -29,7 +29,7 @@ func InitRouter() *http.ServeMux {
 
 	// Post routes
 	mux.HandleFunc("POST /posts", m.Cors(handlers.CreatePostHandler))
-	//mux.HandleFunc("PUT /posts", m.Cors(handlers.UpdatePostHandler))
+	mux.HandleFunc("PUT /posts", m.Cors(handlers.UpdatePostHandler))
 	mux.HandleFunc("DELETE /posts", m.Cors(handlers.DeletePostHandler))
 	mux.HandleFunc("GET /posts/image", m.Cors(handlers.ServeImageHandler))
 
@@ -37,17 +37,15 @@ func InitRouter() *http.ServeMux {
 	mux.HandleFunc("POST /feed/follow", m.Cors(handlers.FollowFeedHandler))
 	mux.HandleFunc("POST /feed/group", m.Cors(handlers.GroupFeedHandler))
 
-	//mux.HandleFunc("GET /posts", m.Cors(handlers.PostsHandler))
-
 	mux.HandleFunc("OPTIONS /posts", m.Cors(handlers.CreatePostHandler))
-	mux.HandleFunc("OPTIONS /posts/image", m.Cors(handlers.ServeImageHandler))
+	mux.HandleFunc("OPTIONS /posts/image", m.Cors(handlers.ServeImageHandler)) // Useful ?
 	mux.HandleFunc("OPTIONS /feed/global", m.Cors(handlers.GlobalFeedHandler))
 	mux.HandleFunc("OPTIONS /feed/follow", m.Cors(handlers.FollowFeedHandler))
 	mux.HandleFunc("OPTIONS /feed/group", m.Cors(handlers.GroupFeedHandler))
 
 	// Comment routes
 	mux.HandleFunc("POST /comments", m.Cors(handlers.CreateCommentHandler))
-	//mux.HandleFunc("PUT /comments", m.Cors(handlers.UpdateCommentHandler))
+	mux.HandleFunc("PUT /comments", m.Cors(handlers.UpdateCommentHandler))
 	mux.HandleFunc("DELETE /comments", m.Cors(handlers.DeleteCommentHandler))
 
 	mux.HandleFunc("POST /feed/detail", m.Cors(handlers.CommentsHandler))
@@ -68,6 +66,10 @@ func InitRouter() *http.ServeMux {
 
 	mux.HandleFunc("OPTIONS /groups", m.Cors(handlers.CreateGroupHandler))
 	mux.HandleFunc("OPTIONS /groups/list", m.Cors(handlers.ListGroupsHandler))
+
+	// Search routes
+	mux.HandleFunc("POST /search", m.Cors(handlers.SearchHandler))
+	mux.HandleFunc("OPTIONS /search", m.Cors(handlers.SearchHandler))
 	/*
 		// Chat routes - avec CORS ajouté
 		mux.HandleFunc("GET /chat", m.Cors(handlers.ChatHandler))

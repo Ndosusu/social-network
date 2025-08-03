@@ -1,9 +1,10 @@
 package handlers_post
 
-/* import (
-	"encoding/json"
+import (
 	"net/http"
 	"social-network/pkg/db/models"
+	post "social-network/pkg/db/models/post"
+	user "social-network/pkg/db/models/user"
 	"social-network/pkg/utils"
 )
 
@@ -12,40 +13,54 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	postID, err := parsePostID(r)
-	if err != nil || postID == 0 {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing post ID")
+	// Parse multipart form data to handle file uploads
+	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB max
+		utils.JSONResponse(w, http.StatusBadRequest, "Failed to parse form data", nil)
 		return
 	}
 
-	var updateData map[string]any
-	if err := json.NewDecoder(r.Body).Decode(&updateData); err != nil {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid JSON format")
-		return
+	updateData := map[string]any{
+		"post_id":      r.FormValue("post_id"),
+		"message":      r.FormValue("message"),
+		"privacy_mode": r.FormValue("privacy_mode"),
+		"group_id":     r.FormValue("group_id"),
 	}
 
-	db, err := getDBConnection()
+	// Process image upload
+	imageName, err := utils.ImageProcess(r, "image")
 	if err != nil {
-		utils.JSONResponse(w, http.StatusInternalServerError, "Database connection failed")
+		utils.JSONResponse(w, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	defer db.Close()
+	if imageName != "" {
+		updateData["image"] = imageName
+	}
 
-	dbInstance := &models.DB{Conn: db}
-
-	// Check if post exists
-	if existingPost := dbInstance.SelectPostById(map[string]any{"id": postID}); existingPost.Result == nil {
-		utils.JSONResponse(w, http.StatusNotFound, "Post not found")
+	// Logic to get Author ID
+	sessionUUID := r.FormValue("session_uuid")
+	if sessionUUID == "" {
+		utils.JSONResponse(w, http.StatusBadRequest, "Missing required field: session_uuid", nil)
 		return
 	}
 
-	updateData["id"] = postID
-	result := dbInstance.UpdatePost(updateData)
-	if result.Result == 0 {
+	var db models.DB
+	db.OpenConn()
+	defer db.CloseConn()
+
+	udb := user.New(&db)
+	result, err := udb.GetSessionByUuid(map[string]any{"session_uuid": sessionUUID})
+	if err != nil {
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid author UUID or user not found", nil)
+		return
+	}
+	updateData["author_id"] = result.Result.(models.Session).User.Id
+
+	pdb := post.New(&db)
+	result, err = pdb.UpdatePost(updateData)
+	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to update post", nil)
 		return
 	}
 
-	utils.JSONResponse(w, http.StatusOK, "Post updated successfully", result.Result)
+	utils.JSONResponse(w, http.StatusOK, "Post updated successfully", result)
 }
-*/

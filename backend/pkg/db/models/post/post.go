@@ -6,9 +6,11 @@
 package models_post
 
 import (
+	"errors"
 	"fmt"
 	"social-network/pkg/db/models"
 	"social-network/pkg/utils"
+	"strings"
 )
 
 func (db *PostDB) InsertPost(obj map[string]any) (*models.Response, error) {
@@ -140,19 +142,20 @@ func (db *PostDB) DeletePost(obj map[string]any) (*models.Response, error) {
 	return &models.Response{Result: "Ok"}, nil
 }
 
-/*func (db *PostDB) UpdatePost(obj map[string]any) (*models.Response, error) {
-
+func (db *PostDB) UpdatePost(obj map[string]any) (*models.Response, error) {
+	/*
 		expected input (as json object) :
 		{
-			id : int,
+			post_id : int,
+			author_id : int,
 			message : string (optional),
 			image : string (optional),
 			privacy_mode : int (optional),
 			group_id : int (optional),
 		}
+	*/
 
-
-	// Build dynamic update query
+	// Build dynamic SQL statement
 	setParts := []string{}
 	values := []any{}
 
@@ -190,15 +193,10 @@ func (db *PostDB) DeletePost(obj map[string]any) (*models.Response, error) {
 		return nil, err
 	}
 
-	// Add ID to the end of values for WHERE clause
 	values = append(values, obj["id"])
 
-	stmt := "UPDATE posts SET " + setParts[0]
-	for i := 1; i < len(setParts); i++ {
-		stmt += ", " + setParts[i]
-	}
-	stmt += " WHERE id = ?;"
-
+	// Join the set parts to form the final query
+	stmt := "UPDATE comments SET " + strings.Join(setParts, ", ") + " WHERE id = ?;"
 	_, err := db.Conn.Exec(stmt, values...)
 	if err != nil {
 		fmt.Println(err)
@@ -206,6 +204,8 @@ func (db *PostDB) DeletePost(obj map[string]any) (*models.Response, error) {
 	}
 
 	// Return the updated post
-	return db.SelectPostById(map[string]any{"id": obj["id"]})
+	return db.SelectPostById(map[string]any{
+		"post_id":   obj["post_id"],
+		"author_id": obj["author_id"],
+	})
 }
-*/
