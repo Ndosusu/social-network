@@ -60,12 +60,13 @@ function CreateCom(data) {
         .then(data => data.json())
 
         .then(response => {
-            console.log(response.data)
             comList.splice(comList.indexOf(comFeed), 1)
             setComList(comList)
+
             const copy = structuredClone(curPost.val)
             --copy.CommentCount
             curPost.set(copy)
+
             newInfoMessage("Comment deleted successfully")
         })
     }
@@ -218,6 +219,11 @@ export function NewComInput() {
             } else {
                 commentList.set([obj])
             }
+
+            const copy = structuredClone(curPost.val)
+            ++copy.CommentCount
+            curPost.set(copy)
+
             newInfoMessage("Comment created successfuly")
             commentInput.set(false)
         })

@@ -50,6 +50,16 @@ export default function DetailPostModal() {
         })
     }
 
+    const updatePostList = (post) => {
+        const index = feedPosts.val.indexOf(curPost.val)
+        const copyList = structuredClone(feedPosts.val)
+
+        copyList[index] = post
+        feedPosts.set(copyList)
+    }
+
+    console.log(curPost.val, curPost.val)
+
     //called after checking if the post exist to show it
     const DetailContent = () => {
         return (
@@ -68,7 +78,10 @@ export default function DetailPostModal() {
                         : null
                     }
                     <label className="w-fit flex items-center select-none p-3 gap-1 duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
-                        <input type="button" className="hidden" onClick={() => {likePost(curPost.val, curPost.set)}} />
+                        <input type="button" className="hidden" onClick={() => {likePost(curPost.val, (post) => {
+                            curPost.set(post)
+                            updatePostList(post)
+                        })}} />
                         <img src={curPost.val.Like ? "/likeActive.svg" : "/like.svg"} className="h-8"></img>
                         <p className={curPost.val.Like ? "text-secondary" : null}>{curPost.val.LikeCount || "0"}</p>
                     </label>

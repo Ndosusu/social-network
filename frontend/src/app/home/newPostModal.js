@@ -46,7 +46,7 @@ export default function NewPostModal() {
                 GroupTitle: "",
                 Post: response.data.Result,
             }
-            newInfoMessage("Post created successfuly #" + obj.Post.Id)
+            newInfoMessage("Post created successfuly")
             feedPosts.set(feedPosts.val ? [obj].concat(feedPosts.val) : [obj])
         })
     }
