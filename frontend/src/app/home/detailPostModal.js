@@ -90,7 +90,7 @@ export default function DetailPostModal() {
                     commentInput.val
                     ? <NewComInput />
                     : (comListRelative && comListRelative.length > 0 
-                        ? <CreateComList comList={comListRelative} />
+                        ? <CreateComList comList={comListRelative} setComList={setComList} />
                         : <NoComs />)
                 }
             </div>

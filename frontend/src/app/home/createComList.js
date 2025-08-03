@@ -6,7 +6,7 @@ import { newInfoMessage } from "../infoMessage"
 import { useHomeContext } from "./contextProvider"
 
 //component that creates the comments feed dynamically
-export function CreateComList({comList}) {
+export function CreateComList({comList, setComList}) {
     const {
         curPost,
     } = useHomeContext()
@@ -14,7 +14,7 @@ export function CreateComList({comList}) {
     return (
         <div className="w-5/6 h-fit flex flex-col gap-7 p-2 pt-1">
             <p className="font-bold">{curPost.val.CommentCount} Comments :</p>
-            {comList.map((obj, i) => <CreateCom comFeed={obj} key={i} />)}
+            {comList.map((obj, i) => <CreateCom comFeed={obj} comListState={{comList, setComList}} key={i} />)}
         </div>
     )
 }
@@ -33,7 +33,42 @@ function CreateCom(data) {
     //state needed to handle the liked state of the comment
     const [comFeed, setComFeed] = useState(data.comFeed)
     const com = comFeed.Comment
-    com.Image = "temp.png"
+    const {
+        comList,
+        setComList,
+    } = data.comListState
+    const {
+        curPost,
+    } = useHomeContext()
+
+    //function to call when user deletes a comment
+    const deleteCom = () => {
+        //api call to delete in db
+        fetch(DEFAULT_SERVER_PATH + "comments", {
+            method: "DELETE",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                comment_id: com.Id,
+            })
+        })
+        .catch(error => {
+            console.log(error)
+            throw new Error(error)
+        })
+
+        //make data readable as json object
+        .then(data => data.json())
+
+        .then(response => {
+            console.log(response.data)
+            comList.splice(comList.indexOf(comFeed), 1)
+            setComList(comList)
+            const copy = structuredClone(curPost.val)
+            --copy.CommentCount
+            curPost.set(copy)
+            newInfoMessage("Comment deleted successfully")
+        })
+    }
 
     return (
          <div className="w-full h-fit rounded-xl neon-sm bg-primaryT box-border">
@@ -55,10 +90,17 @@ function CreateCom(data) {
                     <img src={comFeed.Like ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
                     <p className={comFeed.Like ? "text-secondary" : null}>{comFeed.LikeCount || "0"}</p>
                 </label>
-                <label className="p-3 flex gap-1 w-fit items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
-                    <input type="button" className="hidden" onClick={() => console.log(comFeed)} />
-                    <img src="/bin.svg" className="h-8" />
-                </label>
+                {
+                    com.Author.IsClient
+
+                    ?
+                    <label className="bin p-3 flex gap-1 w-fit items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
+                        <input type="button" className="hidden" onClick={deleteCom} />
+                        <img src="/bin.svg" className="h-8" />
+                    </label>
+
+                    : null
+                }
             </div>
         </div>
     )
