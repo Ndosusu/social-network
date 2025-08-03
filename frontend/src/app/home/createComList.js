@@ -46,14 +46,20 @@ function CreateCom(data) {
             </div>
             {
                 com.Image 
-                ? <img src={DEFAULT_SERVER_PATH + "data/images/" + com.Image} className="center max-w-full"/>
+                ? <img src={DEFAULT_SERVER_PATH + "data/images/" + com.Image} className="center max-w-full rounded-xl"/>
                 : null
             }
-            <label className="p-3 flex gap-1 w-fit items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
-                <input type="button" className="hidden" onClick={() => {likeCom(comFeed, setComFeed)}} />
-                <img src={comFeed.Like ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
-                <p className={comFeed.Like ? "text-secondary" : null}>{comFeed.LikeCount || "0"}</p>
-            </label>
+            <div className="w-full flex flex-row justify-between">
+                <label className="p-3 flex gap-1 w-fit items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
+                    <input type="button" className="hidden" onClick={() => {likeCom(comFeed, setComFeed)}} />
+                    <img src={comFeed.Like ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
+                    <p className={comFeed.Like ? "text-secondary" : null}>{comFeed.LikeCount || "0"}</p>
+                </label>
+                <label className="p-3 flex gap-1 w-fit items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
+                    <input type="button" className="hidden" onClick={() => console.log(comFeed)} />
+                    <img src="/bin.svg" className="h-8" />
+                </label>
+            </div>
         </div>
     )
 }

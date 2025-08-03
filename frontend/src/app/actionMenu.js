@@ -17,6 +17,7 @@ export default function ActionMenu() {
     
     const logOut = async () => {
         localStorage.removeItem("logToken")
+        opened = false
         router.push("/")
     }
 

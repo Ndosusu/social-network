@@ -5,10 +5,13 @@ import { CreateComList, NoComs, NewComInput } from "./createComList"
 import { DEFAULT_SERVER_PATH } from "../page"
 import { useHomeContext } from "./contextProvider"
 import { useState } from "react"
+import { newInfoMessage } from "../infoMessage"
 
 export default function DetailPostModal() {
     const {
         curPost,
+        modal,
+        feedPosts,
         commentInput,
         commentList,
     } = useHomeContext()
@@ -16,6 +19,36 @@ export default function DetailPostModal() {
     const [comListRelative, setComList] = useState(commentList.val)
 
     const post = curPost.val.Post
+
+    //called when you try to delete a post
+    const deletePost = () => {
+        //api call to delete given post
+        fetch(DEFAULT_SERVER_PATH + "posts", {
+            method: "DELETE",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                post_id: curPost.val.Post.Id,
+            })
+        })
+        .catch(error => {
+            throw new Error(error)
+        })
+
+        //make data readable as json object
+        .then(data => data.json())
+
+        //api returns "Ok" as string if succesful, act accordingly
+        .then(response => {
+            if(response.data.Result != "Ok") {
+                throw new Error("Post deletion failed.")
+            } else {
+                feedPosts.val.splice(feedPosts.val.indexOf(curPost.val), 1)
+                feedPosts.set(feedPosts.val)
+                modal.set("")
+                newInfoMessage("Post deleted successfuly")
+            }
+        })
+    }
 
     //called after checking if the post exist to show it
     const DetailContent = () => {
@@ -31,7 +64,7 @@ export default function DetailPostModal() {
                     </div>
                     {
                         post.Image 
-                        ? <img src={DEFAULT_SERVER_PATH + "data/images/" + post.Image} className="max-w-4/5 self-center" />
+                        ? <img src={DEFAULT_SERVER_PATH + "data/images/" + post.Image} className="max-w-4/5 self-center rounded-xl" />
                         : null
                     }
                     <label className="w-fit flex items-center select-none p-3 gap-1 duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
@@ -42,9 +75,16 @@ export default function DetailPostModal() {
                 </div>
                 <div className="w-full flex flex-row justify-between">
                     <input type="button" value={commentInput.val? "See comments" : "New comment"} className="bg-secondary neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {commentInput.set(!commentInput.val)}} />
-                    <div className="flex flex-row justify-end w-full">
-                        <input type="button" value="Delete" className="bg-red-500 neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {deletePost()}} />
-                    </div>
+                    {
+                        post.Author.IsClient
+
+                        ? 
+                        <div className="flex flex-row justify-end w-full">
+                            <input type="button" value="Delete" className="bg-red-500 neon-sm p-3 rounded-xl duration-100 hover:scale-110" onClick={() => {deletePost()}} />
+                        </div>
+
+                        : null
+                    }
                 </div>
                 {
                     commentInput.val
@@ -100,41 +140,6 @@ export default function DetailPostModal() {
             {curPost.val ? <DetailContent /> : <PostNotFound /> }
         </div>
     )
-}
-
-//called when you try to delete a post
-function deletePost() {
-    const {
-        curPost,
-        modal,
-        feedPosts,
-    } = useHomeContext()
-
-    //api call to delete given post
-    fetch(DEFAULT_SERVER_PATH + "posts", {
-        method: "DELETE",
-        body: JSON.stringify({
-            session_uuid: localStorage.getItem("logToken"),
-            post_id: curPost.val.Post.Id,
-        })
-    })
-    .catch(error => {
-        throw new Error(error)
-    })
-
-    //make data readable as json object
-    .then(data => data.json())
-
-    //api returns "Ok" as string if succesful, act accordingly
-    .then(response => {
-        if(response.data.Result != "Ok") {
-            throw new Error("Post deletion failed.")
-        } else {
-            feedPosts.val.splice(feedPosts.val.indexOf(curPost.val), 1)
-            feedPosts.set(postsList)
-            modal.set("")
-        }
-    })
 }
 
 //called if the selected post is not found
