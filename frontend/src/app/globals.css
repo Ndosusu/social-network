@@ -15,11 +15,33 @@
   --color-primaryT: var(--primaryT);
   --color-secondary: var(--secondary);
   --color-secondaryT: var(--secondaryT);
+  --color-secondaryL: var(--secondaryL);
+  --color-secondaryLT: var(--secondaryLT);
   --color-hovered: var(--hovered);
 }
 
 *::-webkit-scrollbar {
   display:none;
+}
+
+
+.codeFont {
+  font-family: "Google Sans Code", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.bitFont {
+  font-family: "Bitcount Prop Single", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0,
+    "CRSV" 0.5,
+    "ELSH" 0,
+    "ELXP" 0;
 }
 
 .neon-xl {
@@ -43,7 +65,7 @@ input.neon-xl:hover, textarea.neon-xl:hover, label.neon-xl:hover, .neon-xl.hover
   border: 2px solid var(--secondaryLT);
 }
 
-input.neon-sm:hover, textarea.neon-sm:hover, label.neon-sm:hover, .neon-sm.hoverable:hover {
+input.neon-sm:hover, textarea.neon-sm:hover, label.neon-sm:hover, .neon-sm.hoverable:hover, .neon-sm.hoverable:hover > .postHeader {
   box-shadow: 0px 0px 10px 4px var(--secondaryLT), inset 0px 0px 8px 4px var(--secondaryLT);
   border: 1px solid var(--secondaryLT);
 }
@@ -85,4 +107,28 @@ label:has(input[type=radio]:checked:hover), label:has(input[type=checkbox]:check
 
 .fade {
   background-image: linear-gradient(var(--primary) 0%, rgba(0, 0, 0, 0) 5%, rgba(0, 0, 0, 0) 95%, var(--primary) 100%);
+}
+
+@keyframes informations {
+  0% {
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.infoMessage {
+  animation-name: informations;
+  animation-duration: 5s;
+  opacity:0;
 }

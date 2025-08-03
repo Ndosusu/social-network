@@ -82,7 +82,7 @@ export default function PrivateUserList() {
 function CreateUserCheckbox({user}) {
         return (
             <label id="userCheckBox" htmlFor={"checkbox"+user.id} className="w-full flex flex-row p-3 hover:bg-hovered text-xl items-center gap-3 select-none">
-                <input name="followers_id" form="newPostForm" value={user.id} id={"checkbox"+user.id} type="checkbox" className="hidden" onClick={async (event) => {
+                <input name="followers_id" form="newPostForm" value={user.id} id={"checkbox"+user.id} type="checkbox" className="hidden" onClick={(event) => {
                     const div = event.target
                     if(!div.checked) {
                         document.getElementById("userList").append(div.parentNode)

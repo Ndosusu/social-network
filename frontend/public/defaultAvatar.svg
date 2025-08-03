@@ -1,0 +1,5 @@
+<svg role="img" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+    <title>defaultAvatar</title>
+    <circle cx="25" cy="15" r="10" fill="white" />
+    <path d="M10 50 Q25 10,40 50 Z" fill="white" />
+</svg>

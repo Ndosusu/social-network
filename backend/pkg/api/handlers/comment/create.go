@@ -28,7 +28,7 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	// Logic to get Author ID
 	sessionUUID := r.FormValue("session_uuid")
 	if sessionUUID == "" {
-		utils.JSONResponse(w, http.StatusBadRequest, "Missing required field: author_uuid", nil)
+		utils.JSONResponse(w, http.StatusBadRequest, "Missing required field: session_uuid", nil)
 		return
 	}
 	var db models.DB
