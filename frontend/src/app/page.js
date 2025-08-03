@@ -105,8 +105,8 @@ export default function Home() {
         <section className="w-1/3 h-2/4">
           <form id="login" onSubmit={loginResolve} className="w-full h-full flex flex-col bg-primaryT p-10 justify-between items-center neon-xl rounded-3xl" method="post">
             <div className="flex flex-col h-fit gap-5 w-full justify-between">
-              <input name="Mail" type="text" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Mail" required/>
-              <input name="Password" type="password" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Password" required/>
+              <input name="mail" type="text" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Mail" required/>
+              <input name="password" type="password" className="bg-primaryT h-11 p-3 neon-sm rounded-xl" placeholder="Password" required/>
             </div>
             <div className="flex flex-col w-full items-center">
               <input type="submit" className="bg-secondary h-13 w-1/2 rounded-xl neon-xl hover:cursor-pointer text-xl duration-100 ease-in-out hover:scale-110" value="Log in"/>
@@ -133,27 +133,27 @@ export default function Home() {
             <div className="flex flex-col h-fit gap-5 justify-between">
               <div className="flex flex-row h-full gap-8">
                 <div className="grid grid-cols-2 gap-5 w-1/2 h-fit">
-                  <input name="FirstName" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="First Name" required/>
-                  <input name="LastName" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="Last Name" required/>
-                  <input name="Mail" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Mail" required/>
-                  <input name="Password" type="password" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Password" required/>
-                  <input name="RPassword" type="password" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Repeat Password" required/>
+                  <input name="firstName" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="First Name" required/>
+                  <input name="lastName" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl" placeholder="Last Name" required/>
+                  <input name="mail" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Mail" required/>
+                  <input name="password" type="password" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Password" required/>
+                  <input name="rpassword" type="password" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Repeat Password" required/>
                   <div className="col-span-2">
                   <p>Date of Birth:</p>
                     <div className="w-full flex flex-row gap-4">
-                      <input id="day" name="Day" type="number" min={1} maxLength={2} onInput={checkNumber} next="month" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Day" required/>
-                      <input id="month" name="Month" type="number" min={1} max={12} maxLength={2} onInput={checkNumber} next="year" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Month" required/>
-                      <input id="year" name="Year" type="number" min={curYear-150} max={curYear} maxLength={4} onInput={checkNumber} className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-max" placeholder="Year" required/>
+                      <input id="day" name="day" type="number" min={1} maxLength={2} onInput={checkNumber} next="month" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Day" required/>
+                      <input id="month" name="month" type="number" min={1} max={12} maxLength={2} onInput={checkNumber} next="year" className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-1/4" placeholder="Month" required/>
+                      <input id="year" name="year" type="number" min={curYear-150} max={curYear} maxLength={4} onInput={checkNumber} className="bg-primaryT h-10 p-3 neon-sm rounded-xl w-max" placeholder="Year" required/>
                     </div> 
                   </div>   
                 </div>
                 <div className="grid grid-cols-2 gap-5 w-1/2 auto-rows-max">
-                  <input name="Nickname" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Nickname (optional)"/>
-                  <textarea name="About" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2 h-40 resize-none" placeholder="About you (optional)" maxLength={512}></textarea>
+                  <input name="nickname" type="text" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2" placeholder="Nickname (optional)"/>
+                  <textarea name="about" className="bg-primaryT h-10 p-3 neon-sm rounded-xl col-span-2 h-40 resize-none" placeholder="About you (optional)" maxLength={512}></textarea>
                   <div className="col-span-2 grid align-center h-fit">
                     <label htmlFor="avatar" className="bg-primaryT h-fit neon-sm rounded-xl w-full p-2 flex flex-row justify-between" >
                       <div>
-                        <input name="Avatar" type="file" id="avatar" className="hidden" onChange={changedFile} accept=".gif,.jpg,.jpeg,.png"/>
+                        <input name="avatar" type="file" id="avatar" className="hidden" onChange={changedFile} accept=".gif,.jpg,.jpeg,.png"/>
                         <p>Avatar chosen (optional): </p><p id="fileName">None</p>
                       </div>
                       <div className="w-25 h-25">

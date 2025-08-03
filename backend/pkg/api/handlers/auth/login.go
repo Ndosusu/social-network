@@ -14,8 +14,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	loginData := utils.JSONDecode(w, r)
 
-	mail, mailOk := loginData["Mail"].(string)
-	password, passwordOk := loginData["Password"].(string)
+	mail, mailOk := loginData["mail"].(string)
+	password, passwordOk := loginData["password"].(string)
 
 	if !mailOk || !passwordOk || mail == "" || password == "" {
 		utils.JSONResponse(w, http.StatusBadRequest, "Missing email or password", nil)

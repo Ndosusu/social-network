@@ -4,12 +4,30 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"social-network/config"
 	"strings"
 	"time"
 )
+
+func ImageProcess(r *http.Request, fieldName string) (string, error) {
+	file, header, err := r.FormFile(fieldName)
+	if err == http.ErrMissingFile {
+		return "", nil // No image, no errors
+	}
+	if err != nil {
+		return "", fmt.Errorf("error processing image file")
+	}
+	defer file.Close()
+
+	if err := ValidateImageFile(file, header); err != nil {
+		return "", err
+	}
+
+	return SaveImageFile(file, header)
+}
 
 // validateImageFile checks if the uploaded file is a valid image
 func ValidateImageFile(file multipart.File, header *multipart.FileHeader) error {
@@ -38,7 +56,7 @@ func ValidateImageFile(file multipart.File, header *multipart.FileHeader) error 
 	return nil
 }
 
-// saveImageFile saves the uploaded image and returns the file path
+// SaveImageFile saves the uploaded image and returns the file name
 func SaveImageFile(file multipart.File, header *multipart.FileHeader) (string, error) {
 	// Create uploads directory if it doesn't exist
 	uploadDir := config.PicPath
@@ -66,7 +84,7 @@ func SaveImageFile(file multipart.File, header *multipart.FileHeader) (string, e
 	return fileName, nil
 }
 
-// getImageContentType returns the appropriate content type based on file extension
+// GetImageContentType returns the appropriate content type based on file extension
 func GetImageContentType(filePath string) string {
 	ext := strings.ToLower(filepath.Ext(filePath))
 	switch ext {

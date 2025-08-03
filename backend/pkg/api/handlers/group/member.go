@@ -20,4 +20,3 @@ func InviteToGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Logic to invite a user to a group
 }
-...

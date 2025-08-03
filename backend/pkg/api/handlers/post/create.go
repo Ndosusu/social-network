@@ -50,28 +50,14 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		postData["group_id"] = groupID
 	}
 
-	// Handle image upload if present
-	file, header, err := r.FormFile("image")
-	if err == nil {
-		defer file.Close()
-
-		// Validate image file
-		if err := utils.ValidateImageFile(file, header); err != nil {
-			utils.JSONResponse(w, http.StatusBadRequest, err.Error(), nil)
-			return
-		}
-
-		// Save the image
-		imageName, err := utils.SaveImageFile(file, header)
-		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, "Failed to save image: "+err.Error(), nil)
-			return
-		}
-
-		postData["image"] = imageName
-	} else if err != http.ErrMissingFile {
-		utils.JSONResponse(w, http.StatusBadRequest, "Error processing image file", nil)
+	// Process image upload
+	imageName, err := utils.ImageProcess(r, "image")
+	if err != nil {
+		utils.JSONResponse(w, http.StatusBadRequest, err.Error(), nil)
 		return
+	}
+	if imageName != "" {
+		postData["image"] = imageName
 	}
 
 	/* // Validate required fields

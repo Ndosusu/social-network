@@ -29,63 +29,48 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Extract form data
 	registrationData := map[string]any{
-		"FirstName": r.FormValue("FirstName"),
-		"LastName":  r.FormValue("LastName"),
-		"Mail":      r.FormValue("Mail"),
-		"Password":  r.FormValue("Password"),
-		"RPassword": r.FormValue("RPassword"),
-		"Day":       r.FormValue("Day"),
-		"Month":     r.FormValue("Month"),
-		"Year":      r.FormValue("Year"),
-		"Nickname":  r.FormValue("Nickname"),
-		"About":     r.FormValue("About"),
+		"firstName": r.FormValue("firstName"),
+		"lastName":  r.FormValue("lastName"),
+		"mail":      r.FormValue("mail"),
+		"password":  r.FormValue("password"),
+		"rpassword": r.FormValue("rpassword"),
+		"day":       r.FormValue("day"),
+		"month":     r.FormValue("month"),
+		"year":      r.FormValue("year"),
+		"nickname":  r.FormValue("nickname"),
+		"about":     r.FormValue("about"),
 	}
-
-	// Handle image upload if present
-	file, header, err := r.FormFile("Avatar")
-	if err == nil {
-		defer file.Close()
-
-		// Validate image file
-		if err := utils.ValidateImageFile(file, header); err != nil {
-			utils.JSONResponse(w, http.StatusBadRequest, err.Error(), nil)
-			return
-		}
-
-		// Save the image
-		imagePath, err := utils.SaveImageFile(file, header)
-		if err != nil {
-			utils.JSONResponse(w, http.StatusInternalServerError, "Failed to save image: "+err.Error(), nil)
-			return
-		}
-
-		registrationData["Avatar"] = imagePath
-	} else if err != http.ErrMissingFile {
-		utils.JSONResponse(w, http.StatusBadRequest, "Error processing image file", nil)
+	// Process avatar image
+	imageName, err := utils.ImageProcess(r, "avatar")
+	if err != nil {
+		utils.JSONResponse(w, http.StatusBadRequest, err.Error(), nil)
 		return
+	}
+	if imageName != "" {
+		registrationData["avatar"] = imageName
 	}
 
 	// Basic validation
-	if registrationData["FirstName"] == "" || registrationData["LastName"] == "" ||
-		registrationData["Mail"] == "" || registrationData["Password"] == "" {
+	if registrationData["firstName"] == "" || registrationData["lastName"] == "" ||
+		registrationData["mail"] == "" || registrationData["password"] == "" {
 		utils.JSONResponse(w, http.StatusBadRequest, "Missing required fields", nil)
 		return
 	}
 
-	if registrationData["Password"] != registrationData["RPassword"] {
+	if registrationData["password"] != registrationData["rpassword"] {
 		utils.JSONResponse(w, http.StatusBadRequest, "Passwords do not match", nil)
 		return
 	}
 
 	userData := map[string]any{
-		"email":      registrationData["Mail"],
-		"first_name": registrationData["FirstName"],
-		"last_name":  registrationData["LastName"],
-		"password":   registrationData["Password"],
-		"date_birth": FormatDate(registrationData["Day"].(string), registrationData["Month"].(string), registrationData["Year"].(string)),
-		"avatar":     registrationData["Avatar"],
-		"nickname":   registrationData["Nickname"],
-		"about":      registrationData["About"],
+		"email":      registrationData["mail"],
+		"first_name": registrationData["firstName"],
+		"last_name":  registrationData["lastName"],
+		"password":   registrationData["password"],
+		"date_birth": FormatDate(registrationData["day"].(string), registrationData["month"].(string), registrationData["year"].(string)),
+		"avatar":     registrationData["avatar"],
+		"nickname":   registrationData["nickname"],
+		"about":      registrationData["about"],
 	}
 
 	var db models.DB
