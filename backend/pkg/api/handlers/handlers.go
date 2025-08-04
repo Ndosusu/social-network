@@ -7,6 +7,7 @@ import (
 	like "social-network/pkg/api/handlers/like"
 	post "social-network/pkg/api/handlers/post"
 	search "social-network/pkg/api/handlers/search"
+	user "social-network/pkg/api/handlers/user"
 )
 
 var (
@@ -19,7 +20,7 @@ var (
 	CreatePostHandler = post.CreatePostHandler
 	UpdatePostHandler = post.UpdatePostHandler
 	DeletePostHandler = post.DeletePostHandler
-	ServeImageHandler = post.ServeImageHandler
+	ServeImageHandler = post.ServeImageHandler // Useful ?
 	GlobalFeedHandler = post.GlobalFeedHandler
 	FollowFeedHandler = post.FollowFeedHandler
 	GroupFeedHandler  = post.GroupFeedHandler
@@ -42,4 +43,10 @@ var (
 
 	// Handlers search
 	SearchHandler = search.SearchHandler
+
+	// Handlers profile
+	UserProfileHandler = user.UserProfileHandler
+	//UpdateProfileHandler = user.UpdateProfileHandler
+	FollowCreateHandler = user.FollowCreateHandler
+	FollowDeleteHandler = user.FollowDeleteHandler
 )

@@ -22,10 +22,12 @@ func InitRouter() *http.ServeMux {
 	mux.HandleFunc("OPTIONS /auth/logout", m.Cors(handlers.LogoutHandler))
 
 	// User routes
-	/* mux.HandleFunc("GET /user/profile", m.Cors(handlers.UserProfileHandler))
-	mux.HandleFunc("POST /user/follow", m.Cors(handlers.FollowUserHandler))
-	mux.HandleFunc("OPTIONS /user/profile", m.Cors(handlers.UserProfileHandler))
-	mux.HandleFunc("OPTIONS /user/follow", m.Cors(handlers.FollowUserHandler)) */
+	mux.HandleFunc("POST /profile", m.Cors(handlers.UserProfileHandler))
+	mux.HandleFunc("POST /follow", m.Cors(handlers.FollowCreateHandler))
+	mux.HandleFunc("DELETE /follow", m.Cors(handlers.FollowDeleteHandler))
+
+	mux.HandleFunc("OPTIONS /profile", m.Cors(handlers.UserProfileHandler))
+	mux.HandleFunc("OPTIONS /follow", m.Cors(handlers.FollowCreateHandler))
 
 	// Post routes
 	mux.HandleFunc("POST /posts", m.Cors(handlers.CreatePostHandler))
@@ -69,6 +71,7 @@ func InitRouter() *http.ServeMux {
 
 	// Search routes
 	mux.HandleFunc("POST /search", m.Cors(handlers.SearchHandler))
+
 	mux.HandleFunc("OPTIONS /search", m.Cors(handlers.SearchHandler))
 	/*
 		// Chat routes - avec CORS ajouté

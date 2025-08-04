@@ -6,6 +6,7 @@ import (
 	"social-network/pkg/utils"
 
 	"github.com/gofrs/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (db *UserDB) InsertSession(userId int) (*models.Response, error) {
@@ -58,4 +59,34 @@ func (db *UserDB) CloseSession(obj map[string]any) (*models.Response, error) {
 		return nil, err
 	}
 	return &models.Response{Result: result}, nil
+}
+
+func (db *UserDB) Authenticate(obj map[string]any) (*models.Response, error) {
+	/*
+		expected input (as json object) :
+		{
+			mail : string,
+			password : string,
+		}
+	*/
+	var id int
+	var password []byte
+	stmt := "SELECT id, password FROM users WHERE email = ?;"
+	result := db.Conn.QueryRow(stmt, obj["mail"])
+	err := result.Scan(&id, &password)
+	if err != nil {
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword(password, []byte(obj["password"].(string)))
+	if err != nil {
+		return nil, err
+	}
+	response, err := db.InsertSession(int(id))
+	if err != nil {
+		fmt.Println("Failed to create session for the user")
+		return nil, err
+	}
+
+	return response, nil
 }
