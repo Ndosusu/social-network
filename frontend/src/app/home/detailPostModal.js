@@ -58,8 +58,6 @@ export default function DetailPostModal() {
         feedPosts.set(copyList)
     }
 
-    console.log(curPost.val, curPost.val)
-
     //called after checking if the post exist to show it
     const DetailContent = () => {
         return (

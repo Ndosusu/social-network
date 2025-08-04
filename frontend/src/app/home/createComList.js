@@ -39,6 +39,7 @@ function CreateCom(data) {
     } = data.comListState
     const {
         curPost,
+        feedPosts,
     } = useHomeContext()
 
     //function to call when user deletes a comment
@@ -64,7 +65,13 @@ function CreateCom(data) {
             setComList(comList)
 
             const copy = structuredClone(curPost.val)
+            const listCopy = structuredClone(feedPosts.val)
+            const index = feedPosts.val.indexOf(curPost.val)
+
             --copy.CommentCount
+
+            listCopy[index] = copy
+            feedPosts.set(listCopy)
             curPost.set(copy)
 
             newInfoMessage("Comment deleted successfully")
@@ -159,6 +166,7 @@ function likeCom(comFeed, fn) {
 export function NewComInput() {
     const {
         curPost,
+        feedPosts,
         commentList,
         commentInput,
     } = useHomeContext()
@@ -221,7 +229,13 @@ export function NewComInput() {
             }
 
             const copy = structuredClone(curPost.val)
+            const listCopy = structuredClone(feedPosts.val)
+            const index = feedPosts.val.indexOf(curPost.val)
+
             ++copy.CommentCount
+
+            listCopy[index] = copy
+            feedPosts.set(listCopy)
             curPost.set(copy)
 
             newInfoMessage("Comment created successfuly")

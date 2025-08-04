@@ -1,7 +1,7 @@
 "use client"
 import { useRouter } from "next/navigation"
 import { CheckLogToken } from "../checkToken"
-import { useEffect, useState } from "react"
+import {  useState } from "react"
 import ActionMenu from "../actionMenu"
 import NewPostModal from "./newPostModal"
 import DetailPostModal from "./detailPostModal"
