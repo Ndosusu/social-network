@@ -4,6 +4,7 @@ import { useState } from "react"
 import { DEFAULT_SERVER_PATH } from "../page"
 import { newInfoMessage } from "../infoMessage"
 import { useHomeContext } from "./contextProvider"
+import { CheckApiResponse } from "../utils"
 
 //component that creates the comments feed dynamically
 export function CreateComList({comList, setComList}) {
@@ -61,20 +62,24 @@ function CreateCom(data) {
         .then(data => data.json())
 
         .then(response => {
-            comList.splice(comList.indexOf(comFeed), 1)
-            setComList(comList)
+            if(CheckApiResponse(response)){
+                comList.splice(comList.indexOf(comFeed), 1)
+                setComList(comList)
 
-            const copy = structuredClone(curPost.val)
-            const listCopy = structuredClone(feedPosts.val)
-            const index = feedPosts.val.indexOf(curPost.val)
+                const copy = structuredClone(curPost.val)
+                const listCopy = structuredClone(feedPosts.val)
+                const index = feedPosts.val.indexOf(curPost.val)
 
-            --copy.CommentCount
+                --copy.CommentCount
 
-            listCopy[index] = copy
-            feedPosts.set(listCopy)
-            curPost.set(copy)
+                listCopy[index] = copy
+                feedPosts.set(listCopy)
+                curPost.set(copy)
 
-            newInfoMessage("Comment deleted successfully")
+                newInfoMessage("Comment deleted successfully")
+            } else {
+                newInfoMessage("Failed to delete comment", "bg-red-500")
+            }
         })
     }
 
@@ -145,19 +150,23 @@ function likeCom(comFeed, fn) {
 
     //if action was delete, Result is "ok" as string, else Result is the new like as an object. act accordingly
     .then(response => {
-        switch(typeof response.data.Result) {
-            case "string": {
-                cloneFeed.Like = null
-                --cloneFeed.LikeCount
-                fn(cloneFeed)
-                break
+        if(CheckApiResponse(response)){
+            switch(typeof response.data.Result) {
+                case "string": {
+                    cloneFeed.Like = null
+                    --cloneFeed.LikeCount
+                    fn(cloneFeed)
+                    break
+                }
+                case "object": {
+                    cloneFeed.Like = response.data.Result
+                    ++cloneFeed.LikeCount
+                    fn(cloneFeed)
+                    break
+                }
             }
-            case "object": {
-                cloneFeed.Like = response.data.Result
-                ++cloneFeed.LikeCount
-                fn(cloneFeed)
-                break
-            }
+        } else {
+            newInfoMessage("Failed to like comment", "bg-red-500")
         }
     })
 }
@@ -216,30 +225,34 @@ export function NewComInput() {
 
         //if everything went well, Result is the new comment object. create an empty CommentFeed object and add it to the list
         .then(response => {
-            const obj = {
-                Like: null,
-                LikeCount: null,
-                Comment: response.data.Result,
-            }
-            // infosFn(newInfoMessage("Comment created successfully"))
-            if(commentList.val){
-                commentList.set([obj].concat(commentList.val))
+            if(CheckApiResponse(response)) {
+                const obj = {
+                    Like: null,
+                    LikeCount: null,
+                    Comment: response.data.Result,
+                }
+                // infosFn(newInfoMessage("Comment created successfully"))
+                if(commentList.val){
+                    commentList.set([obj].concat(commentList.val))
+                } else {
+                    commentList.set([obj])
+                }
+
+                const copy = structuredClone(curPost.val)
+                const listCopy = structuredClone(feedPosts.val)
+                const index = feedPosts.val.indexOf(curPost.val)
+
+                ++copy.CommentCount
+
+                listCopy[index] = copy
+                feedPosts.set(listCopy)
+                curPost.set(copy)
+
+                newInfoMessage("Comment created successfuly")
+                commentInput.set(false)
             } else {
-                commentList.set([obj])
+                newInfoMessage("Failed to create comment", "bg-red-500")
             }
-
-            const copy = structuredClone(curPost.val)
-            const listCopy = structuredClone(feedPosts.val)
-            const index = feedPosts.val.indexOf(curPost.val)
-
-            ++copy.CommentCount
-
-            listCopy[index] = copy
-            feedPosts.set(listCopy)
-            curPost.set(copy)
-
-            newInfoMessage("Comment created successfuly")
-            commentInput.set(false)
         })
     }
 

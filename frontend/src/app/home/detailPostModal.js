@@ -6,6 +6,7 @@ import { DEFAULT_SERVER_PATH } from "../page"
 import { useHomeContext } from "./contextProvider"
 import { useState } from "react"
 import { newInfoMessage } from "../infoMessage"
+import { CheckApiResponse } from "../utils"
 
 export default function DetailPostModal() {
     const {
@@ -39,13 +40,13 @@ export default function DetailPostModal() {
 
         //api returns "Ok" as string if succesful, act accordingly
         .then(response => {
-            if(response.data.Result != "Ok") {
-                throw new Error("Post deletion failed.")
-            } else {
+            if(CheckApiResponse(response)){
                 feedPosts.val.splice(feedPosts.val.indexOf(curPost.val), 1)
                 feedPosts.set(feedPosts.val)
                 modal.set("")
                 newInfoMessage("Post deleted successfuly")
+            } else {
+                newInfoMessage("Failed to delete post", "bg-red-500")
             }
         })
     }

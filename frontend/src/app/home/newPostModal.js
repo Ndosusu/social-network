@@ -5,6 +5,7 @@ import PrivateUserList from "./userList"
 import { DEFAULT_SERVER_PATH } from "../page"
 import { useHomeContext } from "./contextProvider"
 import { newInfoMessage } from "../infoMessage"
+import { CheckApiResponse } from "../utils"
 
 //component for the post creation modal
 export default function NewPostModal() {
@@ -39,15 +40,19 @@ export default function NewPostModal() {
 
         //create an empty PostFeed object and add it to the post list
         .then(response => {
-            modal.set("")
-            const obj = {
-                CommentCount: 0,
-                LikeCount: 0,
-                GroupTitle: "",
-                Post: response.data.Result,
+            if(CheckApiResponse(response)) {
+                modal.set("")
+                const obj = {
+                    CommentCount: 0,
+                    LikeCount: 0,
+                    GroupTitle: "",
+                    Post: response.data.Result,
+                }
+                newInfoMessage("Post created successfuly")
+                feedPosts.set(feedPosts.val ? [obj].concat(feedPosts.val) : [obj])
+            } else {
+                newInfoMessage("Failed to create post", "bg-red-500")
             }
-            newInfoMessage("Post created successfuly")
-            feedPosts.set(feedPosts.val ? [obj].concat(feedPosts.val) : [obj])
         })
     }
 

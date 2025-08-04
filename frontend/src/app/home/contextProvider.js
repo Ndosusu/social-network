@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { DEFAULT_SERVER_PATH } from "../page"
+import { CheckApiResponse } from "../utils"
 
 //create context hook
 const HomeContext = createContext()
@@ -67,10 +68,8 @@ export function HomeProvider({children}) {
         //if posts returned, set post list
         .then(response => {
             States.feedLoading.set(false)
-            if(response.data) {  
+            if(CheckApiResponse(response)) {
                 States.feedPosts.set(response.data.Result)
-            } else {
-                throw new Error("No data.")
             }
         })
     }, [States.currentFeed.val])
@@ -99,8 +98,11 @@ export function HomeProvider({children}) {
 
         //update comment list
         .then(response => {
-            // setComList(response.data.Result)
-            States.commentList.set(response.data.Result)
+            if(CheckApiResponse(response)) {
+                States.commentList.set(response.data.Result)
+            } else {
+                States.commentList.set(null)
+            }
         })
     }, [States.curPost.val])
 

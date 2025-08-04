@@ -10,3 +10,11 @@ export function CheckLogToken(router) {
         }
     })
 }
+
+export function CheckApiResponse(response) {
+    if(response && response.data && response.data.Result) {
+        return true
+    }
+    console.log("ERROR RESPONSE : ", response)
+    return false
+}

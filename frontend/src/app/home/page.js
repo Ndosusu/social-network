@@ -1,12 +1,12 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { CheckLogToken } from "../utils"
+import { CheckApiResponse, CheckLogToken } from "../utils"
 import {  useState } from "react"
 import ActionMenu from "../actionMenu"
 import NewPostModal from "./newPostModal"
 import DetailPostModal from "./detailPostModal"
 import { DEFAULT_SERVER_PATH } from "../page"
-import { CreateAllInfoMessages } from "../infoMessage"
+import { CreateAllInfoMessages, newInfoMessage } from "../infoMessage"
 import { HomeProvider, useHomeContext } from "./contextProvider"
 
 //needed to give the context to the whole Home page
@@ -218,19 +218,23 @@ export async function likePost(postFeed, fn) {
 
     //api returns "Ok" as a string if delete or the like as an object, act accordingly
     .then(response => {
-        switch(typeof response.data.Result) {
-            case "string": {
-                cloneFeed.Like = null
-                --cloneFeed.LikeCount
-                fn(cloneFeed)
-                break
+        if(CheckApiResponse(response)) {
+            switch(typeof response.data.Result) {
+                case "string": {
+                    cloneFeed.Like = null
+                    --cloneFeed.LikeCount
+                    fn(cloneFeed)
+                    break
+                }
+                case "object": {
+                    cloneFeed.Like = response.data.Result
+                    ++cloneFeed.LikeCount
+                    fn(cloneFeed)
+                    break
+                }
             }
-            case "object": {
-                cloneFeed.Like = response.data.Result
-                ++cloneFeed.LikeCount
-                fn(cloneFeed)
-                break
-            }
+        } else {
+            newInfoMessage("Failed to like Post", "bg-red-500")
         }
     })
 }
