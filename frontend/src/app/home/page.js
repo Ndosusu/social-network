@@ -99,7 +99,7 @@ export function Home() {
     }
 
     return (
-        <div className="text-white h-full w-full grid items-center text-xl">
+        <div className="text-white h-full w-full grid items-center">
             <div className="bg-primaryT h-6/4 w-2/3 center grid items-center relative">
                 <div className="w-full h-full neon-xl absolute z-6 pointer-events-none" />
                 <div className="w-full h-screen overflow-hidden flex flex-col">

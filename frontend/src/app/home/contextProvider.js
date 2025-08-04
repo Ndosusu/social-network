@@ -2,18 +2,10 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { DEFAULT_SERVER_PATH } from "../page"
-import { CheckApiResponse } from "../utils"
+import { CheckApiResponse, parseState } from "../utils"
 
 //create context hook
 const HomeContext = createContext()
-
-//small function to make state creation faster
-export const parseState = (tabState) => {
-    return {
-        val: tabState[0],
-        set: tabState[1]
-    }
-}
 
 //context provider component, gives access to the context to all child component as well as giving the context it's value
 export function HomeProvider({children}) {

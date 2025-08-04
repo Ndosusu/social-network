@@ -18,3 +18,11 @@ export function CheckApiResponse(response) {
     console.log("ERROR RESPONSE : ", response)
     return false
 }
+
+//small function to make state creation faster
+export const parseState = (tabState) => {
+    return {
+        val: tabState[0],
+        set: tabState[1]
+    }
+}

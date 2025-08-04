@@ -8,7 +8,7 @@ import (
 )
 
 func ListGroupsHandler(w http.ResponseWriter, r *http.Request) {
-	if !utils.ValidateMethod(w, r, http.MethodGet) {
+	if !utils.ValidateMethod(w, r, http.MethodPost) {
 		return
 	}
 

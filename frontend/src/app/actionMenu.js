@@ -66,6 +66,7 @@ export default function ActionMenu() {
                 <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="search" onClick={moveTo}>S</button>
                 <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="notifications" onClick={moveTo}>N</button>
                 <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="chats" onClick={moveTo}>C</button>
+                <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="groups" onClick={moveTo}>G</button>
                 <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" onClick={newChatModal}>CM</button>
                 <button className="neon-sm bg-red-500 w-12 h-12 rounded-xl" onClick={logOut}></button>
                 <div id="ActionOpen" className="bg-secondary neon-sm w-1/3 h-1/5 absolute -right-1/3 rounded-br-xl rounded-tr-xl p-1">
