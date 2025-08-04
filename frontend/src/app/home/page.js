@@ -146,10 +146,16 @@ export function Home() {
 export function CreatePost(data) {
     const {
         curPost,
+        feedPosts,
         modal,
     } = useHomeContext()
     const [postFeed, setPostFeed] = useState(data.postFeed)
     const post = postFeed.Post
+
+    const updatePostList = (post) => {
+        const index = feedPosts.val.indexOf(postFeed)
+        feedPosts.val[index] = post
+    }
     
     return (
         <div className="w-5/6 rounded-xl neon-sm duration-100 hoverable hover:scale-110" onClick={() => {
@@ -170,7 +176,11 @@ export function CreatePost(data) {
             </div>
             <div className="p-3 flex w-full gap-4">
                 <label className="min-w-1/10 flex items-center duration-100 hover:scale-110" onClick={(e) => {e.stopPropagation()}}>
-                    <input type="button" className="hidden" onClick={() => {likePost(postFeed, setPostFeed)}} />
+                    <input type="button" className="hidden" onClick={() => {likePost(postFeed, (post) => {
+                            updatePostList(post)
+                            setPostFeed(post)
+                        })
+                    }} />
                     <img src={postFeed.Like ? "/likeActive.svg" : "/like.svg"} className={"h-8 "}></img>
                     <p className={postFeed.Like ? "text-secondary" : null}>{postFeed.LikeCount || "0"}</p>
                 </label>
