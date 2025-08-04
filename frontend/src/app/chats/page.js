@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import ActionMenu from "../actionMenu"
-import { CheckLogToken } from "../checkToken"
+import { CheckLogToken } from "../utils"
 import { useRouter } from "next/navigation"
 
 export default function ChatPage() {

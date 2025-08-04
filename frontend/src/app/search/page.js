@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import ActionMenu from "../actionMenu"
-import { CheckLogToken } from "../checkToken"
+import { CheckLogToken } from "../utils"
 
 export default function SearchPage() {
     const router = useRouter()

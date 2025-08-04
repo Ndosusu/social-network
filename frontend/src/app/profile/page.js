@@ -4,7 +4,7 @@ import ActionMenu from "../actionMenu"
 import { CreatePost } from "../home/page"
 import DetailPostModal from "../home/detailPostModal"
 import { useRouter } from "next/navigation"
-import { CheckLogToken } from "../checkToken"
+import { CheckLogToken } from "../utils"
 
 export default function ProfilePage() {
     const router = useRouter()
