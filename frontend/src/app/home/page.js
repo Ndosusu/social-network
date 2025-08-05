@@ -143,7 +143,7 @@ export function Home() {
 }
 
 //component to create a single post with the correct data
-export function CreatePost(data) {
+function CreatePost(data) {
     const {
         curPost,
         feedPosts,

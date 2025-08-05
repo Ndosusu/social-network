@@ -6,21 +6,68 @@ import { parseState } from "../utils"
 const ProfileContext = createContext()
 
 export function ProfileProvider({children}) {
+    const tempUser = {
+        User: {
+            Id: 1,
+            FirstName: "Lotr",
+            LastName: "Taré",
+            Nickname: "Pepiño",
+            PrivateMode: 1,
+            BirthDate: "24/02/2004",
+            CreatedDate: "05/08/2025",
+            isClient: true,
+            About: "balabalabalabelebelebeleaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaa aaaaaaaaaa aaaaaaaaaaaaa aaaaaaaaaaaaaa aaaaaaaaaaaaaa aaaaaaaaaaaa aaaaaaaaaaaa aaaaaaaaaaaa",
+        },
+        IsFollower: false,
+        IsFollowed: false,
+    }
+
+    const tempPostList = [
+        {
+            Post: {
+                Author: {
+                    Avatar: "temp.png",
+                    Nickname: "OtrPepiño",
+                },
+                Message: "test post"
+            },
+            LikeCount: 0,
+            CommentCount: 0,            
+        }
+    ]
+
+    const tempUserList = [
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        }
+    ]
+
     const States = {
         //user to show the profile of
-        curUser: parseState(useState(null)),
+        curProfile: parseState(useState(tempUser)),
 
         //user's created posts list
-        postList: parseState(useState([])),
+        postList: parseState(useState(tempPostList)),
 
         //list of users following the current user
-        followedList: parseState(useState([])),
+        followedList: parseState(useState(tempUserList)),
 
         //list of users followed by the current user
-        followingList: parseState(useState([])),
+        followingList: parseState(useState(tempUserList)),
 
         //showed modal
         modal: parseState(useState("")),
+
+        //determines the content of the box under the main profile div
+        extraContent: parseState(useState("posts")),
+
+        //determines which feed to fetch
+        curFeed: parseState(useState("profile")),
+
+        //selected post
+        curPost: parseState(useState(null)),
     }
 
     return (
