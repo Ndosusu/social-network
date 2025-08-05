@@ -1,14 +1,49 @@
 "use client"
 
 import ActionMenu from "../actionMenu"
-import { CreatePost } from "../home/page"
-import DetailPostModal from "../home/detailPostModal"
-import { useRouter } from "next/navigation"
-import { CheckLogToken } from "../utils"
+import { useRouter, useSearchParams } from "next/navigation"
+import { CheckApiResponse, CheckLogToken } from "../utils"
+import { ProfileProvider } from "./contextProvider"
+import { useEffect } from "react"
+import { DEFAULT_SERVER_PATH } from "../page"
 
-export default function ProfilePage() {
+export default function ProfileContextWrapper() {
     const router = useRouter()
     CheckLogToken(router)
+    
+    const params = useSearchParams()
+    const id = params.get("id")
+
+    return (
+        <ProfileProvider>
+            <ProfilePage id={id}/>
+        </ProfileProvider>
+    )
+}
+
+export function ProfilePage({id}) {
+    useEffect(() => {
+        fetch(DEFAULT_SERVER_PATH + "profile", {
+            method: "POST",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                user_id: id,
+            })
+        })
+        .catch(error => {
+            console.log(error)
+            throw new Error(error)
+        })
+
+        .then(data => data.json())
+
+        .then(response => {
+            console.log(response)
+            if(CheckApiResponse(response)) {
+
+            }
+        })
+    }, [])
 
     const posts = [ // fetch user's posts
         {
@@ -26,13 +61,6 @@ export default function ProfilePage() {
             nbCom: 1,
         }
     ]
-
-    const hideModal = async () => {
-        document.getElementById("modalDiv").classList.add("hidden")
-        document.querySelectorAll(".modal").forEach(obj => {
-            obj.classList.add("hidden")
-        })
-    }
 
     return (
         <div className="center w-full h-full text-white overflow-scroll">
@@ -66,13 +94,9 @@ export default function ProfilePage() {
                 </div>
             </div>
             <div className="neon-xl w-8/10 min-h-5 h-fit mt-10 rounded-xl center py-5 flex flex-col items-center gap-8">
-                {posts.map((obj, i) => <CreatePost post={obj} key={i} />)}
+                
             </div>
             <ActionMenu />
-            <div id="modalDiv" className="w-screen h-screen absolute hidden top-0">
-                <div className="w-full h-full bg-black opacity-80 absolute z-5" onClick={hideModal}/>
-                <DetailPostModal />
-            </div>
         </div>
     )
 }
