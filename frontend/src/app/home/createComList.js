@@ -46,6 +46,9 @@ function CreateCom(data) {
         //api call to delete in db
         fetch(DEFAULT_SERVER_PATH + "comments", {
             method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 comment_id: com.Id,
@@ -115,6 +118,9 @@ function likeCom(comFeed, fn) {
     fetch(DEFAULT_SERVER_PATH + "likes", comFeed.Like 
         ? {
             method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 like_id: comFeed.Like.Id,
@@ -122,6 +128,9 @@ function likeCom(comFeed, fn) {
         }
         : {
             method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 comment_id: comFeed.Comment.Id,

@@ -17,13 +17,14 @@ var (
 	LogoutHandler   = auth.LogoutHandler
 
 	// Handlers posts
-	CreatePostHandler = post.CreatePostHandler
-	UpdatePostHandler = post.UpdatePostHandler
-	DeletePostHandler = post.DeletePostHandler
-	ServeImageHandler = post.ServeImageHandler // Useful ?
-	GlobalFeedHandler = post.GlobalFeedHandler
-	FollowFeedHandler = post.FollowFeedHandler
-	GroupFeedHandler  = post.GroupFeedHandler
+	CreatePostHandler  = post.CreatePostHandler
+	UpdatePostHandler  = post.UpdatePostHandler
+	DeletePostHandler  = post.DeletePostHandler
+	ServeImageHandler  = post.ServeImageHandler // Useful ?
+	GlobalFeedHandler  = post.GlobalFeedHandler
+	FollowFeedHandler  = post.FollowFeedHandler
+	GroupFeedHandler   = post.GroupFeedHandler
+	ProfileFeedHandler = post.ProfileFeedHandler
 
 	// Handlers comments
 	CreateCommentHandler = comment.CreateCommentHandler

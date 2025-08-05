@@ -42,6 +42,9 @@ export function Home() {
         //api call to get the post from the correct feed and give the id of the last post
         fetch(DEFAULT_SERVER_PATH + "feed/" + currentFeed.val, {
             method:"POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 limit: 15,
@@ -195,6 +198,9 @@ export async function likePost(postFeed, fn) {
         postFeed.Like 
         ? {
             method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 like_id: postFeed.Like.Id,
@@ -202,6 +208,9 @@ export async function likePost(postFeed, fn) {
         }
         : {
             method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 post_id: postFeed.Post.Id,

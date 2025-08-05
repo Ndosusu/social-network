@@ -13,12 +13,6 @@ func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse multipart form data to handle file uploads
-	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB max
-		utils.JSONResponse(w, http.StatusBadRequest, "Failed to parse form data", nil)
-		return
-	}
-
 	updateData := map[string]any{
 		"post_id":      r.FormValue("post_id"),
 		"message":      r.FormValue("message"),

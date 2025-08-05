@@ -31,7 +31,16 @@ func (db *UserDB) GetSessionByUuid(obj map[string]any) (*models.Response, error)
 			session_uuid : string,
 		}
 	*/
-	stmt := "SELECT id, uuid, user_id, date_creation, COALESCE(date_expiration, '') FROM sessions WHERE uuid = ? AND (date_expiration >= ? OR date_expiration IS NULL);"
+	stmt := `SELECT
+				id, 
+				uuid, 
+				user_id, 
+				date_creation, 
+				COALESCE(date_expiration, '') 
+			FROM sessions 
+			WHERE 
+				uuid = ? 
+				AND (date_expiration >= ? OR date_expiration IS NULL);`
 	result := db.Conn.QueryRow(stmt, obj["session_uuid"], utils.GetCurrentTime())
 
 	session := models.Session{

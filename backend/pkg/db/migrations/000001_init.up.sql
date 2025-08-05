@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS "users" (
     "first_name" VARCHAR(64) NOT NULL,
     "last_name" VARCHAR(64) NOT NULL,
     "date_birth" VARCHAR(10) NOT NULL,
-    "avatar" VARCHAR(128) NOT NULL,
-    "nick_name" VARCHAR(64) NOT NULL,
-    "about" VARCHAR(512) NOT NULL,
+    "avatar" VARCHAR(128),
+    "nick_name" VARCHAR(64),
+    "about" VARCHAR(512),
     "date_creation" VARCHAR(25) NOT NULL,
     "private_mode" BOOLEAN NOT NULL,
     PRIMARY KEY("id")
@@ -54,13 +54,10 @@ CREATE TABLE IF NOT EXISTS "comments" (
     "author_id" INTEGER NOT NULL,
     "message" VARCHAR(1024) NOT NULL,
     "image" VARCHAR(128),
-    "group_id" INTEGER,
     PRIMARY KEY("id"),
     FOREIGN KEY ("author_id") REFERENCES "users"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION,
     FOREIGN KEY ("post_id") REFERENCES "posts"("id")
-        ON UPDATE NO ACTION ON DELETE NO ACTION,
-    FOREIGN KEY ("group_id") REFERENCES "groups"("id")
         ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 

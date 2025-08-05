@@ -1,6 +1,7 @@
 package handlers_user
 
 import (
+	"fmt"
 	"net/http"
 	"social-network/pkg/utils"
 )
@@ -16,6 +17,7 @@ func UpdateProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updateData := map[string]any{}
+	fmt.Println(updateData)
 }
 
 // 3 form : avatar/infos/password

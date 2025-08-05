@@ -1,7 +1,6 @@
 package handlers_post
 
 import (
-	"fmt"
 	"net/http"
 	"social-network/pkg/db/models"
 	post "social-network/pkg/db/models/post"
@@ -13,13 +12,9 @@ func GlobalFeedHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := utils.JSONDecode(w, r)
-	fmt.Println(data)
 
-	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
-	if !sessionUUIDOk || sessionUUID == "" {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
-		return
-	}
+	sessionUUID := data["session_uuid"].(string)
+
 	lastID, lastIDOk := data["last_id"].(float64)
 	var lastIDInt int
 	if lastIDOk {

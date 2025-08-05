@@ -12,11 +12,8 @@ func DeleteGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := utils.JSONDecode(w, r)
-	sessionUUID, ok := data["session_uuid"].(string)
-	if !ok || sessionUUID == "" {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session UUID", nil)
-		return
-	}
+	sessionUUID := data["session_uuid"].(string)
+
 	groupID, ok := data["group_id"].(float64)
 	var groupIDInt int
 	if ok {

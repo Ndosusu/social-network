@@ -125,7 +125,6 @@ func (db *UserDB) SelectUserById(obj map[string]any) (*models.Response, error) {
 			FirstName:   firstName,
 			LastName:    lastName,
 			Nickname:    nickname,
-			Avatar:      &avatar,
 			PrivateMode: privateMode,
 			BirthDate:   dateBirth,
 			About:       about,
@@ -134,6 +133,10 @@ func (db *UserDB) SelectUserById(obj map[string]any) (*models.Response, error) {
 		},
 		IsFollower: isFollower,
 		IsFollowed: isFollowed,
+	}
+
+	if avatar != "" {
+		profile.User.Avatar = &avatar
 	}
 
 	return &models.Response{Result: profile}, nil

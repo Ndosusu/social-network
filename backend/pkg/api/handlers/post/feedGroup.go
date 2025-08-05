@@ -13,11 +13,8 @@ func GroupFeedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	data := utils.JSONDecode(w, r)
 
-	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
-	if !sessionUUIDOk || sessionUUID == "" {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
-		return
-	}
+	sessionUUID := data["session_uuid"].(string)
+
 	groupID, groupIDOk := data["group_id"].(float64)
 	var groupIDInt int
 	if groupIDOk {

@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"social-network/pkg/db/models"
 	rel "social-network/pkg/db/models/relation"
-	user "social-network/pkg/db/models/user"
 	"social-network/pkg/utils"
 )
 
@@ -14,23 +13,11 @@ func FollowDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := utils.JSONDecode(w, r)
-	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
-	if !sessionUUIDOk || sessionUUID == "" {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
-		return
-	}
+	clientID := int(data["client_id"].(float64))
 
 	var db models.DB
 	db.OpenConn()
 	defer db.CloseConn()
-	udb := user.New(&db)
-
-	result, err := udb.GetSessionByUuid(map[string]any{"session_uuid": sessionUUID})
-	if err != nil {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid session UUID or user not found", nil)
-		return
-	}
-	data["client_id"] = result.Result.(models.Session).User.Id
 
 	userID, userIDOk := data["user_id"].(float64)
 	var userIDInt int
@@ -47,8 +34,8 @@ func FollowDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rdb := rel.New(&db)
-	result, err = rdb.DeleteFollowRel(map[string]any{
-		"user_from": data["client_id"],
+	result, err := rdb.DeleteFollowRel(map[string]any{
+		"user_from": clientID,
 		"user_to":   userIDInt,
 	})
 	if err != nil {
