@@ -33,10 +33,114 @@ export function ProfileProvider({children}) {
             },
             LikeCount: 0,
             CommentCount: 0,            
+        },
+        {
+            Post: {
+                Author: {
+                    Avatar: "temp.png",
+                    Nickname: "OtrPepiño",
+                },
+                Message: "test post"
+            },
+            LikeCount: 0,
+            CommentCount: 0,            
+        },
+        {
+            Post: {
+                Author: {
+                    Avatar: "temp.png",
+                    Nickname: "OtrPepiño",
+                },
+                Message: "test post"
+            },
+            LikeCount: 0,
+            CommentCount: 0,            
+        },
+        {
+            Post: {
+                Author: {
+                    Avatar: "temp.png",
+                    Nickname: "OtrPepiño",
+                },
+                Message: "test post"
+            },
+            LikeCount: 0,
+            CommentCount: 0,            
+        },
+        {
+            Post: {
+                Author: {
+                    Avatar: "temp.png",
+                    Nickname: "OtrPepiño",
+                },
+                Message: "test post"
+            },
+            LikeCount: 0,
+            CommentCount: 0,            
         }
     ]
 
     const tempUserList = [
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 2,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 3,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 4,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
+        {
+            Id: 1,
+            Nickname: "EnkorPepiño",
+            Avatar: "temp.png"
+        },
         {
             Id: 1,
             Nickname: "EnkorPepiño",
