@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"social-network/pkg/db/models"
 	"social-network/pkg/utils"
+	"strings"
 )
 
 func (db *CommentDB) InsertComment(obj map[string]any) (*models.Response, error) {
@@ -112,4 +113,53 @@ func (db *CommentDB) DeleteComment(obj map[string]any) (*models.Response, error)
 	}
 
 	return &models.Response{Result: "Ok"}, nil
+}
+
+func (db *CommentDB) UpdateComment(obj map[string]any) (*models.Response, error) {
+	/*
+		expected input (as json object) :
+		{
+			comment_id : int,
+			author_id : int,
+			message : string,
+			image : string,
+		}
+	*/
+
+	// Build dynamic SQL statement
+	setParts := []string{}
+	values := []any{}
+
+	if obj["message"] != nil {
+		setParts = append(setParts, "message = ?")
+		values = append(values, obj["message"])
+	}
+
+	if obj["image"] != nil {
+		setParts = append(setParts, "image = ?")
+		if obj["image"] == "" {
+			values = append(values, nil)
+		} else {
+			values = append(values, obj["image"])
+		}
+	}
+
+	if len(setParts) == 0 {
+		return nil, fmt.Errorf("no fields to update")
+	}
+
+	values = append(values, obj["comment_id"])
+
+	// Join the set parts to form the final query
+	stmt := "UPDATE comments SET " + strings.Join(setParts, ", ") + " WHERE id = ?;"
+	_, err := db.Conn.Exec(stmt, values...)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return db.SelectCommentById(map[string]any{
+		"comment_id": obj["comment_id"],
+		"author_id":  obj["author_id"],
+	})
 }

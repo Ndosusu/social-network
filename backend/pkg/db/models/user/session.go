@@ -6,6 +6,7 @@ import (
 	"social-network/pkg/utils"
 
 	"github.com/gofrs/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (db *UserDB) InsertSession(userId int) (*models.Response, error) {
@@ -30,7 +31,16 @@ func (db *UserDB) GetSessionByUuid(obj map[string]any) (*models.Response, error)
 			session_uuid : string,
 		}
 	*/
-	stmt := "SELECT id, uuid, user_id, date_creation, COALESCE(date_expiration, '') FROM sessions WHERE uuid = ? AND (date_expiration >= ? OR date_expiration IS NULL);"
+	stmt := `SELECT
+				id, 
+				uuid, 
+				user_id, 
+				date_creation, 
+				COALESCE(date_expiration, '') 
+			FROM sessions 
+			WHERE 
+				uuid = ? 
+				AND (date_expiration >= ? OR date_expiration IS NULL);`
 	result := db.Conn.QueryRow(stmt, obj["session_uuid"], utils.GetCurrentTime())
 
 	session := models.Session{
@@ -58,4 +68,34 @@ func (db *UserDB) CloseSession(obj map[string]any) (*models.Response, error) {
 		return nil, err
 	}
 	return &models.Response{Result: result}, nil
+}
+
+func (db *UserDB) Authenticate(obj map[string]any) (*models.Response, error) {
+	/*
+		expected input (as json object) :
+		{
+			mail : string,
+			password : string,
+		}
+	*/
+	var id int
+	var password []byte
+	stmt := "SELECT id, password FROM users WHERE email = ?;"
+	result := db.Conn.QueryRow(stmt, obj["mail"])
+	err := result.Scan(&id, &password)
+	if err != nil {
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword(password, []byte(obj["password"].(string)))
+	if err != nil {
+		return nil, err
+	}
+	response, err := db.InsertSession(int(id))
+	if err != nil {
+		fmt.Println("Failed to create session for the user")
+		return nil, err
+	}
+
+	return response, nil
 }

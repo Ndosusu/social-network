@@ -19,7 +19,6 @@ func (db *UserDB) SearchUser(obj map[string]any) (*models.Response, error) {
 				COALESCE(u.avatar, ''),
 				u.private_mode,
 			FROM users u
-			LEFT JOIN sessions s ON s.user_id = u.id
 			WHERE
 				(
 					LOWER(u.nick_name) LIKE LOWER(?)

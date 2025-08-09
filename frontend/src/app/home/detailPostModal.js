@@ -26,6 +26,9 @@ export default function DetailPostModal() {
         //api call to delete given post
         fetch(DEFAULT_SERVER_PATH + "posts", {
             method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 post_id: curPost.val.Post.Id,
@@ -121,6 +124,9 @@ export default function DetailPostModal() {
         //api call to get the next comments, it works by giving the id of the last comment you have, gives the next comments that are older than the given one
         fetch(DEFAULT_SERVER_PATH + "feed/detail", {
             method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 post_id: post.Id,

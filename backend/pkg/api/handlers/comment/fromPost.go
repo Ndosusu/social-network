@@ -1,6 +1,7 @@
 package handlers_comment
 
 import (
+	"fmt"
 	"net/http"
 	"social-network/pkg/db/models"
 	comment "social-network/pkg/db/models/comment"
@@ -11,13 +12,10 @@ func CommentsHandler(w http.ResponseWriter, r *http.Request) {
 	if !utils.ValidateMethod(w, r, http.MethodPost) {
 		return
 	}
+	fmt.Println("Comments handler invoked")
 
 	data := utils.JSONDecode(w, r)
-	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
-	if !sessionUUIDOk || sessionUUID == "" {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
-		return
-	}
+	sessionUUID := data["session_uuid"].(string)
 
 	postID, postIDOk := data["post_id"].(float64)
 	var postIDInt int
