@@ -46,10 +46,12 @@ var (
 	SearchHandler = search.SearchHandler
 
 	// Handlers profile
-	UserProfileHandler = user.UserProfileHandler
-	//UpdateProfileHandler = user.UpdateProfileHandler
-	FollowCreateHandler = user.FollowCreateHandler
-	FollowDeleteHandler = user.FollowDeleteHandler
-	FollowToHandler     = user.FollowToHandler
-	FollowFromHandler   = user.FollowFromHandler
+	UserProfileHandler    = user.UserProfileHandler
+	UpdateAvatarHandler   = user.UpdateAvatarHandler
+	UpdateDataHandler     = user.UpdateDataHandler
+	UpdatePasswordHandler = user.UpdatePasswordHandler
+	FollowCreateHandler   = user.FollowCreateHandler
+	FollowDeleteHandler   = user.FollowDeleteHandler
+	FollowToHandler       = user.FollowToHandler
+	FollowFromHandler     = user.FollowFromHandler
 )

@@ -147,3 +147,81 @@ func (db *UserDB) SelectUserById(obj map[string]any) (*models.Response, error) {
 
 	return &models.Response{Result: profile}, nil
 }
+
+func (db *UserDB) UpdateData(obj map[string]any) (*models.Response, error) {
+	/*
+		expected input (as json object) :
+		{
+			user_id : int,
+			first_name : string,
+			last_name : string,
+			mail : string,
+			nickname : string,
+			about : string,
+		}
+	*/
+
+	stmt := `UPDATE users
+			SET first_name = ?, last_name = ?, email = ?, nick_name = ?, about = ?
+			WHERE id = ?;`
+	_, err := db.Conn.Exec(stmt, obj["first_name"], obj["last_name"], obj["mail"], obj["nickname"], obj["about"], obj["user_id"])
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return &models.Response{Result: "Ok"}, nil
+}
+
+func (db *UserDB) UpdatePassword(obj map[string]any) (*models.Response, error) {
+	/*
+		expected input (as json object) :
+		{
+			user_id : int,
+			old_password : string,
+			new_password : string,
+		}
+	*/
+	stmt := `SELECT password FROM users WHERE id = ?;`
+	var currentPassword string
+	err := db.Conn.QueryRow(stmt, obj["user_id"]).Scan(&currentPassword)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(currentPassword), []byte(obj["old_password"].(string))); err != nil {
+		return nil, fmt.Errorf("incorrect old password")
+	}
+	newPasswordHash, err := bcrypt.GenerateFromPassword([]byte(obj["new_password"].(string)), 12)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	stmt = `UPDATE users
+			SET password = ?
+			WHERE id = ?;`
+	_, err = db.Conn.Exec(stmt, newPasswordHash, obj["user_id"])
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return &models.Response{Result: "Ok"}, nil
+}
+
+func (db *UserDB) UpdateAvatar(obj map[string]any) (*models.Response, error) {
+	/*
+		expected input (as json object) :
+		{
+			user_id : int,
+			avatar : string,
+		}
+	*/
+	stmt := `UPDATE users
+			SET avatar = ?
+			WHERE id = ?;`
+	_, err := db.Conn.Exec(stmt, obj["avatar"], obj["user_id"])
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return &models.Response{Result: obj["avatar"]}, nil
+}

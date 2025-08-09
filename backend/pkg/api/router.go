@@ -27,11 +27,17 @@ func InitRouter() *http.ServeMux {
 	mux.HandleFunc("DELETE /follow", m.Cors(m.CheckSession(handlers.FollowDeleteHandler)))
 	mux.HandleFunc("POST /follow/by", m.Cors(m.CheckSession(handlers.FollowToHandler)))
 	mux.HandleFunc("POST /follow/from", m.Cors(m.CheckSession(handlers.FollowFromHandler)))
+	mux.HandleFunc("PUT /profile/avatar", m.Cors(m.CheckSession(handlers.UpdateAvatarHandler)))
+	mux.HandleFunc("PUT /profile/data", m.Cors(m.CheckSession(handlers.UpdateDataHandler)))
+	mux.HandleFunc("PUT /profile/password", m.Cors(m.CheckSession(handlers.UpdatePasswordHandler)))
 
 	mux.HandleFunc("OPTIONS /profile", m.Cors(handlers.UserProfileHandler))
 	mux.HandleFunc("OPTIONS /follow", m.Cors(handlers.FollowCreateHandler))
 	mux.HandleFunc("OPTIONS /follow/to", m.Cors(handlers.FollowToHandler))
 	mux.HandleFunc("OPTIONS /follow/from", m.Cors(handlers.FollowFromHandler))
+	mux.HandleFunc("OPTIONS /profile/avatar", m.Cors(handlers.UpdateAvatarHandler))
+	mux.HandleFunc("OPTIONS /profile/data", m.Cors(handlers.UpdateDataHandler))
+	mux.HandleFunc("OPTIONS /profile/password", m.Cors(handlers.UpdatePasswordHandler))
 
 	// Post routes
 	mux.HandleFunc("POST /posts", m.Cors(m.CheckSession(handlers.CreatePostHandler)))
