@@ -18,6 +18,10 @@ func UpdatePasswordHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !utils.IsValidPassword(r.FormValue("password")) {
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid password format", nil)
+		return
+	}
 	if r.FormValue("password") != r.FormValue("rpassword") {
 		utils.JSONResponse(w, http.StatusBadRequest, "Passwords do not match", nil)
 		return

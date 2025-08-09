@@ -9,7 +9,9 @@ const (
 	PRIVACY_MODE_GROUP     = 4
 
 	DEFAULT_ID    = math.MaxInt64
-	DEFAULT_LIMIT = 20
+	DEFAULT_LIMIT = 10
 
 	NOT_SCANNED = -1
+
+	LEN_MIN_PASSWORD = 8
 )

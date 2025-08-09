@@ -18,6 +18,17 @@ func UpdateDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.FormValue("firstName") == "" || r.FormValue("lastName") == "" ||
+		r.FormValue("mail") == "" || r.FormValue("nickname") == "" {
+		utils.JSONResponse(w, http.StatusBadRequest, "Missing required fields", nil)
+		return
+	}
+
+	if !utils.IsValidEmail(r.FormValue("mail")) {
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid email format", nil)
+		return
+	}
+
 	userID, err := strconv.Atoi(r.FormValue("user_id"))
 	if err != nil || userID <= 0 {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid user ID", nil)
