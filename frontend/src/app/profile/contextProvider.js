@@ -185,9 +185,16 @@ export function ProfileProvider({children}) {
     // useEffect(() => {
     //     //api call to get all post of curUser
     //     fetch(DEFAULT_SERVER_PATH + "feed/profile", {
-
+    //         method: "POST",
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: {
+    //             session_uuid: localStorage.getItem("logToken"),
+    //             user_id: States.curProfile.val.User.Id,
+    //         }
     //     })
-    // })
+    // }, [States.curProfile.val])
 
     return (
         <ProfileContext.Provider value={States}>

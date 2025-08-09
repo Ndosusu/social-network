@@ -9,6 +9,7 @@ import { DEFAULT_SERVER_PATH } from "../page"
 import { likePost } from "../home/page"
 import { CreateAllInfoMessages } from "../infoMessage"
 import DetailPostModal from "./detailPostModal"
+import { ImageModal } from "./imageModal"
 
 export default function ProfileContextWrapper() {
     const router = useRouter()
@@ -32,26 +33,26 @@ export function ProfilePage({id}) {
     } = useProfileContext()
 
     useEffect(() => {
-        // fetch(DEFAULT_SERVER_PATH + "profile", {
-        //     method: "POST",
-        //     body: JSON.stringify({
-        //         session_uuid: localStorage.getItem("logToken"),
-        //         user_id: id,
-        //     })
-        // })
-        // .catch(error => {
-        //     console.log(error)
-        //     throw new Error(error)
-        // })
+        fetch(DEFAULT_SERVER_PATH + "profile", {
+            method: "POST",
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                user_id: id,
+            })
+        })
+        .catch(error => {
+            console.log(error)
+            throw new Error(error)
+        })
 
-        // .then(data => data.json())
+        .then(data => data.json())
 
-        // .then(response => {
-        //     console.log(response)
-        //     if(CheckApiResponse(response)) {
-        //         curProfile.set(response.data.Result)
-        //     }
-        // })
+        .then(response => {
+            console.log(response)
+            if(CheckApiResponse(response)) {
+                curProfile.set(response.data.Result)
+            }
+        })
     }, [])
 
     return (
@@ -59,7 +60,7 @@ export function ProfilePage({id}) {
             <div className="neon-xl bg-primaryT w-full h-fit p-7 rounded-xl center flex flex-col gap-10">
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-row gap-6">
-                        <img src="discord.svg" className="w-50 h-50 rounded-xl bg-primary"></img>
+                        <img src={curProfile.val.User.Avatar ? DEFAULT_SERVER_PATH + "data/images/" + curProfile.val.User.Avatar : "defaultAvatar.svg"} className="w-50 h-50 rounded-xl bg-primary" onClick={() => {modal.set("imageModal")}} />
                         <div className="flex flex-col justify-between">
                             {curProfile.val.User.Nickname ? <p className="text-5xl h-fit">Pepiño</p> : null}
                             <p className={curProfile.val.User.Nickname ? "text-3xl h-fit text-gray-400" : "text-5xl h-fit"}>Lotr Taré</p>
@@ -130,6 +131,10 @@ function CheckModalState() {
     switch(modal.val) {
         case "detailModal":{
             return <DetailPostModal />
+        }
+
+        case "imageModal":{
+            return <ImageModal />
         }
     }
 }
