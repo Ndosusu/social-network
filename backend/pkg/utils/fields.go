@@ -1,6 +1,9 @@
 package utils
 
-import "regexp"
+import (
+	"regexp"
+	"unicode"
+)
 
 func IsValidPassword(password string) bool {
 	var hasUpper, hasLower, hasDigit, hasSpecial bool
@@ -10,13 +13,13 @@ func IsValidPassword(password string) bool {
 	}
 	for _, char := range password {
 		switch {
-		case char >= 'A' && char <= 'Z':
+		case unicode.IsUpper(char):
 			hasUpper = true
-		case char >= 'a' && char <= 'z':
+		case unicode.IsLower(char):
 			hasLower = true
-		case char >= '0' && char <= '9':
+		case unicode.IsDigit(char):
 			hasDigit = true
-		case (char >= '!' && char <= '/') || (char >= ':' && char <= '@') || (char >= '[' && char <= '`') || (char >= '{' && char <= '~'):
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
 			hasSpecial = true
 		default:
 			return false
