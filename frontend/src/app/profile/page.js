@@ -6,6 +6,9 @@ import { CheckApiResponse, CheckLogToken } from "../utils"
 import { ProfileProvider, useProfileContext } from "./contextProvider"
 import { useEffect, useState } from "react"
 import { DEFAULT_SERVER_PATH } from "../page"
+import { likePost } from "../home/page"
+import { CreateAllInfoMessages } from "../infoMessage"
+import DetailPostModal from "./detailPostModal"
 
 export default function ProfileContextWrapper() {
     const router = useRouter()
@@ -25,9 +28,9 @@ export function ProfilePage({id}) {
     const {
         curProfile,
         extraContent,
+        modal,
     } = useProfileContext()
 
-    console.log(id)
     useEffect(() => {
         // fetch(DEFAULT_SERVER_PATH + "profile", {
         //     method: "POST",
@@ -95,9 +98,40 @@ export function ProfilePage({id}) {
                 <div className="w-full h-full z-6 absolute neon-xl rounded-xl pointer-events-none" />
                 <CheckState />
             </div>
+            {
+                modal.val
+                ? <CreateModal />
+                : null
+            }
             <ActionMenu />
+            <CreateAllInfoMessages />
         </div>
     )
+}
+
+function CreateModal() {
+    const {
+        modal,
+    } = useProfileContext()
+
+    return (
+        <div id="modalDiv" className="w-screen h-screen absolute left-0 top-0 z-10">
+            <div className="w-full h-full bg-black opacity-80 absolute z-11" onClick={() => {modal.set("")}}/>
+            <CheckModalState />
+        </div>
+    )
+}
+
+function CheckModalState() {
+    const {
+        modal,
+    } = useProfileContext()
+
+    switch(modal.val) {
+        case "detailModal":{
+            return <DetailPostModal />
+        }
+    }
 }
 
 function CheckState() {

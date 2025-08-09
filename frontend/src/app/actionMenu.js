@@ -62,7 +62,7 @@ export default function ActionMenu() {
         <div>
             <div id="ActionMenu" opened="true" onMouseOut={hideMenu} onMouseOver={showMenu} className={"bg-primaryT h-fit w-fit absolute inset-y-1/2 -translate-y-1/2 left-0 flex flex-col p-4 gap-4 rounded-br-xl rounded-tr-xl duration-500 z-50 "+defaultState}>
                 <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl p-1" target="home" onClick={moveTo}><img src="home.svg" className="pointer-events-none"/></button>
-                <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="profile" onClick={moveTo}>P</button>
+                <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl p-1" target="profile" onClick={moveTo}><img src="defaultAvatar.svg" className="pointer-events-none" /></button>
                 <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="search" onClick={moveTo}>S</button>
                 <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="notifications" onClick={moveTo}>N</button>
                 <button className="neon-sm w-12 h-12 bg-primaryT rounded-xl" target="chats" onClick={moveTo}>C</button>

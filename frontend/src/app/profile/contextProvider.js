@@ -1,7 +1,8 @@
 "use client"
 
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import { parseState } from "../utils"
+import { DEFAULT_SERVER_PATH } from "../page"
 
 const ProfileContext = createContext()
 
@@ -172,7 +173,21 @@ export function ProfileProvider({children}) {
 
         //selected post
         curPost: parseState(useState(null)),
+
+        //list of comments for the selected post
+        commentList: parseState(useState([])),
+
+        //boolean to determine whether to show the new comment form
+        commentInput: parseState(useState(false)),
     }
+
+    //fill postList
+    // useEffect(() => {
+    //     //api call to get all post of curUser
+    //     fetch(DEFAULT_SERVER_PATH + "feed/profile", {
+
+    //     })
+    // })
 
     return (
         <ProfileContext.Provider value={States}>
