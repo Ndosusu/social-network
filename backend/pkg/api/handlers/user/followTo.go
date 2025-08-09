@@ -7,7 +7,7 @@ import (
 	"social-network/pkg/utils"
 )
 
-func FollowFromHandler(w http.ResponseWriter, r *http.Request) {
+func FollowToHandler(w http.ResponseWriter, r *http.Request) {
 	if !utils.ValidateMethod(w, r, http.MethodPost) {
 		return
 	}
@@ -45,16 +45,16 @@ func FollowFromHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.CloseConn()
 
 	udb := user.New(&db)
-	result, err := udb.GetFollowFrom(map[string]any{
+	result, err := udb.GetFollowTo(map[string]any{
 		"client_id": clientID,
 		"user_id":   userIDInt,
 		"last_id":   lastIDInt,
 		"limit":     limitInt,
 	})
 	if err != nil {
-		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve follow from", nil)
+		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to retrieve follow by", nil)
 		return
 	}
 
-	utils.JSONResponse(w, http.StatusOK, "Follow from retrieved successfully", result)
+	utils.JSONResponse(w, http.StatusOK, "Follow by retrieved successfully", result)
 }

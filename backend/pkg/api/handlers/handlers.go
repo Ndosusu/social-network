@@ -50,6 +50,6 @@ var (
 	//UpdateProfileHandler = user.UpdateProfileHandler
 	FollowCreateHandler = user.FollowCreateHandler
 	FollowDeleteHandler = user.FollowDeleteHandler
-	FollowByHandler     = user.FollowByHandler
+	FollowToHandler     = user.FollowToHandler
 	FollowFromHandler   = user.FollowFromHandler
 )

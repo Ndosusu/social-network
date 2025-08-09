@@ -72,7 +72,7 @@ func (db *UserDB) GetFollowFrom(obj map[string]any) (*models.Response, error) {
 	return &models.Response{Result: result}, nil
 }
 
-func (db *UserDB) GetFollowBy(obj map[string]any) (*models.Response, error) {
+func (db *UserDB) GetFollowTo(obj map[string]any) (*models.Response, error) {
 	/*
 		expected input (as json object) :
 		{
