@@ -48,7 +48,6 @@ export function ProfilePage({id}) {
         .then(data => data.json())
 
         .then(response => {
-            console.log(response)
             if(CheckApiResponse(response)) {
                 curProfile.set(response.data.Result)
             }
@@ -212,7 +211,7 @@ function CreatePostList({postList}) {
             <div className="w-full h-full overflow-hidden relative">
                 <div className="absolute top-0 left-0 w-full h-full fade pointer-events-none z-5" />
                 <div className="w-full h-full overflow-scroll flex flex-col gap-8 p-7 items-center">
-                    {postList.val.map((obj, i) => <CreatePost postFeed={obj} key={i} />)}
+                    {postList.val.length > 0 ? postList.val.map((obj, i) => <CreatePost postFeed={obj} key={i} />) : <p>No posts found.</p>}
                 </div>
             </div>
         </div>

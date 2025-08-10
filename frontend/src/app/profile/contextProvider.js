@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { parseState } from "../utils"
+import { CheckApiResponse, parseState } from "../utils"
 import { DEFAULT_SERVER_PATH } from "../page"
 
 const ProfileContext = createContext()
@@ -22,64 +22,6 @@ export function ProfileProvider({children}) {
         IsFollower: false,
         IsFollowed: false,
     }
-
-    const tempPostList = [
-        {
-            Post: {
-                Author: {
-                    Avatar: "temp.png",
-                    Nickname: "OtrPepiño",
-                },
-                Message: "test post"
-            },
-            LikeCount: 0,
-            CommentCount: 0,            
-        },
-        {
-            Post: {
-                Author: {
-                    Avatar: "temp.png",
-                    Nickname: "OtrPepiño",
-                },
-                Message: "test post"
-            },
-            LikeCount: 0,
-            CommentCount: 0,            
-        },
-        {
-            Post: {
-                Author: {
-                    Avatar: "temp.png",
-                    Nickname: "OtrPepiño",
-                },
-                Message: "test post"
-            },
-            LikeCount: 0,
-            CommentCount: 0,            
-        },
-        {
-            Post: {
-                Author: {
-                    Avatar: "temp.png",
-                    Nickname: "OtrPepiño",
-                },
-                Message: "test post"
-            },
-            LikeCount: 0,
-            CommentCount: 0,            
-        },
-        {
-            Post: {
-                Author: {
-                    Avatar: "temp.png",
-                    Nickname: "OtrPepiño",
-                },
-                Message: "test post"
-            },
-            LikeCount: 0,
-            CommentCount: 0,            
-        }
-    ]
 
     const tempUserList = [
         {
@@ -154,7 +96,7 @@ export function ProfileProvider({children}) {
         curProfile: parseState(useState(tempUser)),
 
         //user's created posts list
-        postList: parseState(useState(tempPostList)),
+        postList: parseState(useState([])),
 
         //list of users following the current user
         followedList: parseState(useState(tempUserList)),
@@ -182,19 +124,33 @@ export function ProfileProvider({children}) {
     }
 
     //fill postList
-    // useEffect(() => {
-    //     //api call to get all post of curUser
-    //     fetch(DEFAULT_SERVER_PATH + "feed/profile", {
-    //         method: "POST",
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: {
-    //             session_uuid: localStorage.getItem("logToken"),
-    //             user_id: States.curProfile.val.User.Id,
-    //         }
-    //     })
-    // }, [States.curProfile.val])
+    useEffect(() => {
+        //api call to get all post of curUser
+        fetch(DEFAULT_SERVER_PATH + "feed/" + States.curFeed.val, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: {
+                session_uuid: localStorage.getItem("logToken"),
+                user_id: States.curProfile.val.User.Id,
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            throw new Error(error)
+        })
+
+        .then(data => data.json())
+
+        .then(response => {
+            if(CheckApiResponse(response)) {
+                States.postList.set(response.data.Result)
+            }
+        })
+    }, [States.curProfile.val, States.curFeed.val])
+
+    
 
     return (
         <ProfileContext.Provider value={States}>
