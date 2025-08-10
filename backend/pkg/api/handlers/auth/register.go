@@ -57,6 +57,15 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !utils.IsValidEmail(registrationData["mail"].(string)) {
+		utils.JSONResponse(w, http.StatusBadRequest, "Invalid email format", nil)
+		return
+	}
+	if !utils.IsValidPassword(registrationData["password"].(string)) {
+		utils.JSONResponse(w, http.StatusBadRequest, "Password must be at least 8 characters long and contain uppercase, lowercase, digit, and special character", nil)
+		return
+	}
+
 	if registrationData["password"] != registrationData["rpassword"] {
 		utils.JSONResponse(w, http.StatusBadRequest, "Passwords do not match", nil)
 		return

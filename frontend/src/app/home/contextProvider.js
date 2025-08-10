@@ -75,6 +75,9 @@ export function HomeProvider({children}) {
 
         fetch(DEFAULT_SERVER_PATH + "feed/detail", {
             method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 post_id: States.curPost.val.Post.Id,

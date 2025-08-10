@@ -7,6 +7,7 @@ import (
 	like "social-network/pkg/api/handlers/like"
 	post "social-network/pkg/api/handlers/post"
 	search "social-network/pkg/api/handlers/search"
+	user "social-network/pkg/api/handlers/user"
 )
 
 var (
@@ -16,17 +17,18 @@ var (
 	LogoutHandler   = auth.LogoutHandler
 
 	// Handlers posts
-	CreatePostHandler = post.CreatePostHandler
-	//UpdatePostHandler = post.UpdatePostHandler
-	DeletePostHandler = post.DeletePostHandler
-	ServeImageHandler = post.ServeImageHandler
-	GlobalFeedHandler = post.GlobalFeedHandler
-	FollowFeedHandler = post.FollowFeedHandler
-	GroupFeedHandler  = post.GroupFeedHandler
+	CreatePostHandler  = post.CreatePostHandler
+	UpdatePostHandler  = post.UpdatePostHandler
+	DeletePostHandler  = post.DeletePostHandler
+	ServeImageHandler  = post.ServeImageHandler // Useful ?
+	GlobalFeedHandler  = post.GlobalFeedHandler
+	FollowFeedHandler  = post.FollowFeedHandler
+	GroupFeedHandler   = post.GroupFeedHandler
+	ProfileFeedHandler = post.ProfileFeedHandler
 
 	// Handlers comments
 	CreateCommentHandler = comment.CreateCommentHandler
-	//UpdateCommentHandler = comment.UpdateCommentHandler
+	UpdateCommentHandler = comment.UpdateCommentHandler
 	DeleteCommentHandler = comment.DeleteCommentHandler
 	CommentsHandler      = comment.CommentsHandler
 
@@ -42,4 +44,14 @@ var (
 
 	// Handlers search
 	SearchHandler = search.SearchHandler
+
+	// Handlers profile
+	UserProfileHandler    = user.UserProfileHandler
+	UpdateAvatarHandler   = user.UpdateAvatarHandler
+	UpdateDataHandler     = user.UpdateDataHandler
+	UpdatePasswordHandler = user.UpdatePasswordHandler
+	FollowCreateHandler   = user.FollowCreateHandler
+	FollowDeleteHandler   = user.FollowDeleteHandler
+	FollowToHandler       = user.FollowToHandler
+	FollowFromHandler     = user.FollowFromHandler
 )

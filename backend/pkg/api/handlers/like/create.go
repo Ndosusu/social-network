@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"social-network/pkg/db/models"
 	like "social-network/pkg/db/models/like"
-	user "social-network/pkg/db/models/user"
 	"social-network/pkg/utils"
 )
 
@@ -15,11 +14,8 @@ func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := utils.JSONDecode(w, r)
 
-	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
-	if !sessionUUIDOk || sessionUUID == "" {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
-		return
-	}
+	clientID := int(data["client_id"].(float64))
+
 	postID, postIDOk := data["post_id"].(float64)
 	var postIDInt int
 	if postIDOk {
@@ -45,21 +41,11 @@ func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 	db.OpenConn()
 	defer db.CloseConn()
 
-	udb := user.New(&db)
-	sessionResult, err := udb.GetSessionByUuid(map[string]any{
-		"session_uuid": sessionUUID,
-	})
-	if err != nil {
-		utils.JSONResponse(w, http.StatusUnauthorized, "Invalid session", nil)
-		return
-	}
-	userID := sessionResult.Result.(models.Session).User.Id
-
 	ldb := like.New(&db)
 	result, err := ldb.InsertLike(map[string]any{
 		"post_id":    postIDInt,
 		"comment_id": commentIDInt,
-		"user_id":    userID,
+		"user_id":    clientID,
 	})
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to insert like into database", nil)

@@ -14,11 +14,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := utils.JSONDecode(w, r)
-	sessionUUID, sessionUUIDOk := data["session_uuid"].(string)
-	if !sessionUUIDOk || sessionUUID == "" {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing session", nil)
-		return
-	}
+
 	query, queryOk := data["query"].(string)
 	if !queryOk || query == "" {
 		utils.JSONResponse(w, http.StatusBadRequest, "Invalid or missing parameters", nil)

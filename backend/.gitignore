@@ -7,6 +7,7 @@
 
 # Database files
 *.db
+data/images/
 
 # IDE files
 .vscode/
@@ -18,3 +19,5 @@
 
 # Documentation temporaire
 COMMENTS_IMPLEMENTATION.md
+
+

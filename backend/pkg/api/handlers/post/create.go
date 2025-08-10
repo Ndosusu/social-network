@@ -5,7 +5,6 @@ import (
 	"social-network/pkg/db/models"
 	post "social-network/pkg/db/models/post"
 	rel "social-network/pkg/db/models/relation"
-	user "social-network/pkg/db/models/user"
 	"social-network/pkg/utils"
 )
 
@@ -14,36 +13,16 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse multipart form data to handle file uploads
-	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB max
-		utils.JSONResponse(w, http.StatusBadRequest, "Failed to parse form data", nil)
-		return
-	}
-
 	// Extract form data
 	postData := map[string]any{
 		"message":      r.FormValue("message"),
 		"privacy_mode": r.FormValue("privacy_mode"),
-	}
-
-	// Logic to get Author ID
-	sessionUUID := r.FormValue("session_uuid")
-	if sessionUUID == "" {
-		utils.JSONResponse(w, http.StatusBadRequest, "Missing required field: session_uuid", nil)
-		return
+		"author_id":    r.FormValue("client_id"),
 	}
 
 	var db models.DB
 	db.OpenConn()
 	defer db.CloseConn()
-
-	udb := user.New(&db)
-	result, err := udb.GetSessionByUuid(map[string]any{"session_uuid": sessionUUID})
-	if err != nil {
-		utils.JSONResponse(w, http.StatusBadRequest, "Invalid session UUID or user not found", nil)
-		return
-	}
-	postData["author_id"] = result.Result.(models.Session).User.Id
 
 	// Group ID is optional
 	if groupID := r.FormValue("group_id"); groupID != "" {
@@ -65,9 +44,8 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		utils.JSONResponse(w, http.StatusBadRequest, errMsg, nil)
 		return
 	} */
-
 	pdb := post.New(&db)
-	result, err = pdb.InsertPost(postData)
+	result, err := pdb.InsertPost(postData)
 	if err != nil {
 		utils.JSONResponse(w, http.StatusInternalServerError, "Failed to create post", nil)
 		return
