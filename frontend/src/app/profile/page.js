@@ -2,7 +2,7 @@
 
 import ActionMenu from "../actionMenu"
 import { useRouter, useSearchParams } from "next/navigation"
-import { CheckApiResponse, CheckLogToken } from "../utils"
+import { CheckApiResponse, CheckLogToken, formatDate } from "../utils"
 import { ProfileProvider, useProfileContext } from "./contextProvider"
 import { useEffect, useState } from "react"
 import { DEFAULT_SERVER_PATH } from "../page"
@@ -19,40 +19,28 @@ export default function ProfileContextWrapper() {
     const id = params.get("id")
 
     return (
-        <ProfileProvider>
-            <ProfilePage id={id}/>
+        <ProfileProvider id={id}>
+            <ProfilePage />
         </ProfileProvider>
     )
 }
 
 export function ProfilePage({id}) {
+    console.log("Rendering profile page...")
+
     const {
         curProfile,
         extraContent,
         modal,
     } = useProfileContext()
 
-    useEffect(() => {
-        fetch(DEFAULT_SERVER_PATH + "profile", {
-            method: "POST",
-            body: JSON.stringify({
-                session_uuid: localStorage.getItem("logToken"),
-                user_id: id,
-            })
-        })
-        .catch(error => {
-            console.log(error)
-            throw new Error(error)
-        })
-
-        .then(data => data.json())
-
-        .then(response => {
-            if(CheckApiResponse(response)) {
-                curProfile.set(response.data.Result)
-            }
-        })
-    }, [])
+    if(!curProfile.val) {
+        return (
+            <div className="w-3/5 h-3/5 neon-xl inset-1/2 -translate-1/2 bg-primary text-white absolute text-3xl rounded-xl flex justify-center items-center">
+                <p>User not found</p>
+            </div>
+        )
+    }
 
     return (
         <div className="center w-full h-full text-white overflow-scroll p-10">
@@ -61,10 +49,10 @@ export function ProfilePage({id}) {
                     <div className="flex flex-row gap-6">
                         <img src={curProfile.val.User.Avatar ? DEFAULT_SERVER_PATH + "data/images/" + curProfile.val.User.Avatar : "defaultAvatar.svg"} className="w-50 h-50 rounded-xl bg-primary" onClick={() => {modal.set("imageModal")}} />
                         <div className="flex flex-col justify-between">
-                            {curProfile.val.User.Nickname ? <p className="text-5xl h-fit">Pepiño</p> : null}
-                            <p className={curProfile.val.User.Nickname ? "text-3xl h-fit text-gray-400" : "text-5xl h-fit"}>Lotr Taré</p>
-                            <p className="text-3xl h-fit">User since : {curProfile.val.User.CreatedDate}</p>
-                            <p className="text-3xl h-fit">Born on : {curProfile.val.User.BirthDate}</p>
+                            {curProfile.val.User.Nickname ? <p className="text-5xl h-fit">{curProfile.val.User.Nickname}</p> : null}
+                            <p className={curProfile.val.User.Nickname ? "text-3xl h-fit text-gray-400" : "text-5xl h-fit"}>{curProfile.val.User.FirstName + " " + curProfile.val.User.LastName}</p>
+                            <p className="text-3xl h-fit">User since : {formatDate(curProfile.val.User.CreatedDate)}</p>
+                            <p className="text-3xl h-fit">Born on : {formatDate(curProfile.val.User.BirthDate)}</p>
                         </div>
                     </div>
                     {

@@ -6,103 +6,19 @@ import { DEFAULT_SERVER_PATH } from "../page"
 
 const ProfileContext = createContext()
 
-export function ProfileProvider({children}) {
-    const tempUser = {
-        User: {
-            Id: 1,
-            FirstName: "Lotr",
-            LastName: "Taré",
-            Nickname: "Pepiño",
-            PrivateMode: 1,
-            BirthDate: "24/02/2004",
-            CreatedDate: "05/08/2025",
-            isClient: true,
-            About: "balabalabalabelebelebeleaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaa aaaaaaaaaa aaaaaaaaaaaaa aaaaaaaaaaaaaa aaaaaaaaaaaaaa aaaaaaaaaaaa aaaaaaaaaaaa aaaaaaaaaaaa",
-        },
-        IsFollower: false,
-        IsFollowed: false,
-    }
-
-    const tempUserList = [
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 2,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 3,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 4,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        },
-        {
-            Id: 1,
-            Nickname: "EnkorPepiño",
-            Avatar: "temp.png"
-        }
-    ]
-
+export function ProfileProvider({children, id}) {
     const States = {
         //user to show the profile of
-        curProfile: parseState(useState(tempUser)),
+        curProfile: parseState(useState(null)),
 
         //user's created posts list
         postList: parseState(useState([])),
 
         //list of users following the current user
-        followedList: parseState(useState(tempUserList)),
+        followedList: parseState(useState([])),
 
         //list of users followed by the current user
-        followingList: parseState(useState(tempUserList)),
+        followingList: parseState(useState([])),
 
         //showed modal
         modal: parseState(useState("")),
@@ -123,21 +39,53 @@ export function ProfileProvider({children}) {
         commentInput: parseState(useState(false)),
     }
 
+    //fetch given profile
+    useEffect(() => {
+        fetch(DEFAULT_SERVER_PATH + "profile", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                session_uuid: localStorage.getItem("logToken"),
+                user_id: id,
+            })
+        })
+        .catch(error => {
+            console.log(error)
+            throw new Error(error)
+        })
+
+        .then(data => data.json())
+
+        .then(response => {
+            if(CheckApiResponse(response)) {
+                States.curProfile.set(response.data.Result)
+            }
+        })
+    }, [])
+
     //fill postList
     useEffect(() => {
+        if(!States.curProfile.val) {
+            return
+        }
+
         //api call to get all post of curUser
         fetch(DEFAULT_SERVER_PATH + "feed/" + States.curFeed.val, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: {
+            body: JSON.stringify({
                 session_uuid: localStorage.getItem("logToken"),
                 user_id: States.curProfile.val.User.Id,
-            }
+                limit: 15,
+            })
         })
         .catch(error => {
             console.log(error)
+            States.postList.set([])
             throw new Error(error)
         })
 
@@ -150,7 +98,15 @@ export function ProfileProvider({children}) {
         })
     }, [States.curProfile.val, States.curFeed.val])
 
-    
+    //get list of people that follow you
+    useEffect(() => {
+        
+    }, [States.curProfile.val])
+
+    //get list of poeple the user follow
+    useEffect(() => {
+
+    }, [States.curProfile.val])
 
     return (
         <ProfileContext.Provider value={States}>

@@ -20,9 +20,13 @@ export function CheckApiResponse(response) {
 }
 
 //small function to make state creation faster
-export const parseState = (tabState) => {
+export function parseState(tabState) {
     return {
         val: tabState[0],
         set: tabState[1]
     }
+}
+
+export function formatDate(date) {
+    return date.split(" ")[0].split("-").reverse().join("/")
 }
