@@ -25,7 +25,7 @@ func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 	if userIDOk {
 		userIDInt = int(userID)
 	} else {
-		userIDInt = data["client_id"].(int)
+		userIDInt = clientID
 	}
 
 	result, err := udb.SelectUserById(map[string]any{
