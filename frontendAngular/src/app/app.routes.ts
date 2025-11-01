@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { NotFound } from './pages/not-found/not-found';
+import { Authentification } from './pages/authentification/authentification';
 
 /*
 to create a route, you need to add in Routes the following json object :
@@ -13,6 +14,10 @@ you also need to import the required component
 */
 
 export const routes: Routes = [
+    {
+        path: "/authentication",
+        component: Authentification,
+    },
     {
         path: '**', // all other paths
         component: NotFound,
