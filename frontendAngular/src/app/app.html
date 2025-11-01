@@ -1,4 +1,10 @@
 <!--MAIN PAGE TEMPLATE ALL PAGES WILL BE CONTAINED IN THIS HTML-->
-<div class="background full">
-    <router-outlet />
+<div [ngClass]="{
+    'background w-full h-full': true,
+    'light-theme' : !darkMode,
+    'dark-theme' : darkMode,
+}">
+    <div class="w-full h-full">
+        <router-outlet />
+    </div>
 </div>

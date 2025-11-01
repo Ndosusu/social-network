@@ -1,14 +1,9 @@
-<div [ngClass]="{
-    'full': true,
-    'light-theme' : !darkMode,
-    'dark-theme' : darkMode
-}">
-    <div class="absolute-center center-text">
-        <h1 class="error-text">404 ERROR</h1>
-        <a href="/home" class="important fit">
-            <button class="btn-default bg-primary code-font">
-                Return to home page
-            </button>
-        </a>
-    </div>
+<div class="absolute-center center-text">
+    <p class="text-5xl font-bold mb-5">404 ERROR</p>
+    <a routerLink="/home" class="important fit">
+        <button class="btn-default bg-primary code-font">
+            Return to home page
+        </button>
+    </a>
 </div>
+

@@ -15,7 +15,7 @@ you also need to import the required component
 
 export const routes: Routes = [
     {
-        path: "/authentication",
+        path: "authentication",
         component: Authentification,
     },
     {
