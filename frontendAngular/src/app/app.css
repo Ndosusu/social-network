@@ -1,0 +1,12 @@
+:host {
+    --primary-color: rgb(100, 0, 200);
+    --primary-color-light: color-mix(in oklab, var(--primary-color) 100%, white 80%);
+    --primary-color-dark: color-mix(in oklab, var(--primary-color), black 80%);
+
+    --light-theme: rgb(225, 225, 225);
+    --light-theme-text: black;
+
+    --dark-theme: rgb(25, 25, 25);
+    --dark-theme-text: white,
+
+}
